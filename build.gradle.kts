@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    implementation("org.springframework.boot:spring-boot-configuration-processor:2.6.14")
+    implementation("org.springframework.boot:spring-boot-configuration-processor:2.6.15")
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.11")
@@ -32,7 +32,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.14.2")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:2.6.14")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:2.6.15")
 
     runtimeOnly("com.h2database:h2:1.4.200")
     implementation("io.r2dbc:r2dbc-h2:0.8.5.RELEASE")
