@@ -4,8 +4,8 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     id("org.springframework.boot") version "2.6.15"
-    kotlin("jvm") version "1.8.20"
-    kotlin("plugin.spring") version "1.8.20"
+    kotlin("jvm") version "1.8.22"
+    kotlin("plugin.spring") version "1.8.22"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -40,8 +40,8 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.6")
 
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
