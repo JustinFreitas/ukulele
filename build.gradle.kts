@@ -29,6 +29,12 @@ dependencies {
     implementation("com.github.walkyst:lavaplayer-fork:1.4.2")
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation("commons-io:commons-io:2.13.0")
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation("org.json:json:20230618")
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation("org.jsoup:jsoup:1.16.1")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
