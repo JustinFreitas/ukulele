@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.domain.Persistable
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Service
@@ -45,6 +46,7 @@ class GuildPropertiesService(private val repo: GuildPropertiesRepository) {
 
 @Table("guild_properties")
 data class GuildProperties(
+        @Column("guild_id")
         @Id val guildId: Long,
         var volume: Int = 100,
         var prefix: String? = null
