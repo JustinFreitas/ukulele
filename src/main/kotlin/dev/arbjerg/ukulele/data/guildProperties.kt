@@ -48,7 +48,9 @@ class GuildPropertiesService(private val repo: GuildPropertiesRepository) {
 data class GuildProperties(
         @Column("guild_id")
         @Id val guildId: Long,
+        @Column("volume")
         var volume: Int = 100,
+        @Column("prefix")
         var prefix: String? = null
 ) : Persistable<Long> {
     @Transient var new: Boolean = false
