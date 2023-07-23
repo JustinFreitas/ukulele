@@ -1,13 +1,12 @@
 package dev.arbjerg.ukulele.command
 
-import dev.arbjerg.ukulele.audio.PlayerRegistry
 import dev.arbjerg.ukulele.features.HelpContext
 import dev.arbjerg.ukulele.jda.Command
 import dev.arbjerg.ukulele.jda.CommandContext
 import org.springframework.stereotype.Component
 
 @Component
-class VolumeCommand(val players: PlayerRegistry) : Command("volume", "v") {
+class VolumeCommand : Command("volume", "v") {
     override suspend fun CommandContext.invoke() {
         if (argumentText.isBlank()) return reply("The volume is set to ${player.volume}%.")
 

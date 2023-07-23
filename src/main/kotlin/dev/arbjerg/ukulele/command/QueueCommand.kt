@@ -2,7 +2,6 @@ package dev.arbjerg.ukulele.command
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.audio.Player
-import dev.arbjerg.ukulele.audio.PlayerRegistry
 import dev.arbjerg.ukulele.features.HelpContext
 import dev.arbjerg.ukulele.jda.Command
 import dev.arbjerg.ukulele.jda.CommandContext
@@ -10,9 +9,7 @@ import dev.arbjerg.ukulele.utils.TextUtils
 import org.springframework.stereotype.Component
 
 @Component
-class QueueCommand(
-        private val players: PlayerRegistry
-) : Command("queue", "q", "list") {
+class QueueCommand : Command("queue", "q", "list") {
 
     private val pageSize = 10
 

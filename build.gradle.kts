@@ -47,7 +47,9 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
 
     runtimeOnly("com.h2database:h2:2.2.220")
-    implementation("io.r2dbc:r2dbc-h2:1.0.0.RELEASE")
+    implementation("io.r2dbc:r2dbc-h2:1.0.0.RELEASE") {
+        exclude(group = "com.h2database", module = "h2")
+    }
     implementation("org.flywaydb:flyway-core:9.21.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.6")
 

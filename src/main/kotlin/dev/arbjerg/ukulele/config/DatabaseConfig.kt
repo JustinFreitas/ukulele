@@ -6,10 +6,9 @@ import io.r2dbc.spi.ConnectionFactory
 import org.flywaydb.core.Flyway
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
 
 @Configuration
-class DatabaseConfig(private val botProps: BotProps, private val env: Environment) {
+class DatabaseConfig(private val botProps: BotProps) {
 
     @Bean
     fun connectionFactory(): ConnectionFactory = H2ConnectionFactory(H2ConnectionConfiguration.builder()

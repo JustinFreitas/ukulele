@@ -11,7 +11,6 @@ class TrackQueue {
     fun add(vararg tracks: AudioTrack) { queue.addAll(tracks) }
     fun addFirst(track: AudioTrack) { queue.add(0, track) }
     fun take() = queue.removeFirstOrNull()
-    fun peek() = queue.firstOrNull()
     fun clear() = queue.clear()
 
     fun removeRange(range: IntRange): List<AudioTrack> {

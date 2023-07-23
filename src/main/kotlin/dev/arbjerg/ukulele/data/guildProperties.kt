@@ -30,9 +30,9 @@ class GuildPropertiesService(private val repo: GuildPropertiesRepository) {
     fun get(guildId: Long) = cache[guildId].toMono()
     suspend fun getAwait(guildId: Long): GuildProperties = get(guildId).awaitSingle()
 
-    fun transform(guildId: Long, func: (GuildProperties) -> Unit): Mono<GuildProperties> = cache[guildId]
+    fun transform(guildId: Long, ignoredFunc: (GuildProperties) -> Unit): Mono<GuildProperties> = cache[guildId]
             .toMono()
-            .map { func(it); it }
+            .map { ignoredFunc(it); it }
             .flatMap { repo.save(it) }
             .map {
                 it.apply { new = false }

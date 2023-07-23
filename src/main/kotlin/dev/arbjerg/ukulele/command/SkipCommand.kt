@@ -6,6 +6,7 @@ import dev.arbjerg.ukulele.jda.Command
 import dev.arbjerg.ukulele.jda.CommandContext
 import org.springframework.stereotype.Component
 
+@Suppress("SameParameterValue")
 @Component
 class SkipCommand : Command("skip", "s") {
     override suspend fun CommandContext.invoke() {
