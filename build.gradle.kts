@@ -21,7 +21,9 @@ repositories {
 
 dependencies {
     // Required for BotProps
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:3.1.2")
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:3.1.2")
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.0")
@@ -29,7 +31,8 @@ dependencies {
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.12")
 
-    implementation("com.github.walkyst:lavaplayer-fork:1.4.2")
+    // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
+    implementation("com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.2")
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
     // https://mvnrepository.com/artifact/commons-io/commons-io
@@ -46,18 +49,27 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
 
+    // https://mvnrepository.com/artifact/com.h2database/h2
     runtimeOnly("com.h2database:h2:2.2.220")
+    // https://mvnrepository.com/artifact/io.r2dbc/r2dbc-h2
     implementation("io.r2dbc:r2dbc-h2:1.0.0.RELEASE") {
         exclude(group = "com.h2database", module = "h2")
     }
+    // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
     implementation("org.flywaydb:flyway-core:9.21.0")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.6")
+    // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.7")
 
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.2")
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
+    // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.2") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 }
