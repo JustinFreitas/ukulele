@@ -2,10 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
+    val kotlinVersion = "1.9.0"
     java
+    // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.1.2"
-    kotlin("jvm") version "1.9.0"
-    kotlin("plugin.spring") version "1.9.0"
+    // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
+    kotlin("jvm") version kotlinVersion
+    // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
+    kotlin("plugin.spring") version kotlinVersion
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -21,10 +25,11 @@ repositories {
 
 dependencies {
     // Required for BotProps
+    val springVersion = "3.1.2"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-    implementation("org.springframework.boot:spring-boot-configuration-processor:3.1.2")
+    implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:3.1.2")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springVersion")
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.0")
 
@@ -34,7 +39,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
     implementation("com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.2")
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Stay on 4.x for now, replaces vuln from lava.
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.13.0")
     // https://mvnrepository.com/artifact/org.json/json
@@ -42,12 +47,13 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.16.1")
 
+    val jacksonVersion = "2.15.2"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
 
     // https://mvnrepository.com/artifact/com.h2database/h2
     runtimeOnly("com.h2database:h2:2.2.220")
@@ -60,16 +66,17 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.7")
 
+    val kotlinVersion = "1.9.0"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
     // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.2") {
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 }
