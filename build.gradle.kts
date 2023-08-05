@@ -31,7 +31,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springVersion")
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml:2.1")
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.12")
@@ -62,7 +62,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:9.21.0")
+    implementation("org.flywaydb:flyway-core:9.21.1")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.7")
 
