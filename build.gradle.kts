@@ -34,7 +34,7 @@ dependencies {
     implementation("org.yaml:snakeyaml:2.1")
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.12")
+    implementation("net.dv8tion:JDA:5.0.0-beta.13")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
     implementation("com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.2")
