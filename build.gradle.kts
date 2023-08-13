@@ -64,7 +64,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
     implementation("org.flywaydb:flyway-core:9.21.1")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.7")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     val kotlinVersion = "1.9.0"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
