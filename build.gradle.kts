@@ -36,8 +36,8 @@ dependencies {
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.13")
 
-    // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
-    implementation("com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.2")
+    // https://github.com/lavalink-devs/lavaplayer
+    implementation("dev.arbjerg:lavaplayer:2.0.1")
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Stay on 4.x for now, replaces vuln from lava.
     // https://mvnrepository.com/artifact/commons-io/commons-io
