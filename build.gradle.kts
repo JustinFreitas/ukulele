@@ -38,8 +38,6 @@ dependencies {
 
     // https://github.com/lavalink-devs/lavaplayer
     implementation("dev.arbjerg:lavaplayer:2.0.1")
-    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-    implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Stay on 4.x for now, replaces vuln from lava.
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.13.0")
     // https://mvnrepository.com/artifact/org.json/json
