@@ -31,7 +31,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springVersion")
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:2.1")
+    implementation("org.yaml:snakeyaml:2.2")
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.13")
@@ -54,13 +54,13 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
 
     // https://mvnrepository.com/artifact/com.h2database/h2
-    runtimeOnly("com.h2database:h2:2.2.220")
+    runtimeOnly("com.h2database:h2:2.2.222")
     // https://mvnrepository.com/artifact/io.r2dbc/r2dbc-h2
     implementation("io.r2dbc:r2dbc-h2:1.0.0.RELEASE") {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:9.21.2")
+    implementation("org.flywaydb:flyway-core:9.22.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
