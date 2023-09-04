@@ -53,7 +53,7 @@ class SkipCommand : Command("skip", "s") {
     private fun CommandContext.printSkipped(skipped: List<AudioTrack>) {
         val playing = when (player.tracks.isEmpty()) {
             true -> "The queue is empty and the player is stopped."
-            false -> "Playing `${player.tracks.first().info.title}`"
+            false -> "Playing " + player.tracks.first().info.title
         }
 
         val skippedMessage = when (skipped.size) {
