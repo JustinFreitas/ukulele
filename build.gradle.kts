@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "1.9.10"
+    val kotlinVersion = "1.9.20-Beta"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.1.3"
@@ -37,9 +37,10 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-beta.13")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
+    // https://github.com/Walkyst/lavaplayer-fork
     implementation("com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.3")
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-    implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Stay on 4.x for now, replaces vuln from lava.
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Lavaplayer uses 4.5.10, which has vuln.
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.13.0")
     // https://mvnrepository.com/artifact/org.json/json
@@ -66,7 +67,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    val kotlinVersion = "1.9.10"
+    val kotlinVersion = "1.9.20-Beta"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
