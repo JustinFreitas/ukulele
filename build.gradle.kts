@@ -34,6 +34,7 @@ dependencies {
     implementation("org.yaml:snakeyaml:2.2")
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
+    // https://github.com/discord-jda/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.13")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
@@ -63,7 +64,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:9.22.0")
+    implementation("org.flywaydb:flyway-core:9.22.1")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
