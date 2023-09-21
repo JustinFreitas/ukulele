@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "1.9.20-Beta"
+    val kotlinVersion = "1.9.20-Beta2"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.1.3"
+    id("org.springframework.boot") version "3.1.4"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.1.3"
+    val springVersion = "3.1.4"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -58,7 +58,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
 
     // https://mvnrepository.com/artifact/com.h2database/h2
-    runtimeOnly("com.h2database:h2:2.2.222")
+    runtimeOnly("com.h2database:h2:2.2.224")
     // https://mvnrepository.com/artifact/io.r2dbc/r2dbc-h2
     implementation("io.r2dbc:r2dbc-h2:1.0.0.RELEASE") {
         exclude(group = "com.h2database", module = "h2")
@@ -68,7 +68,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    val kotlinVersion = "1.9.20-Beta"
+    val kotlinVersion = "1.9.20-Beta2"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
