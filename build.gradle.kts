@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "1.9.20-Beta2"
+    val kotlinVersion = "1.9.20-RC"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.1.4"
