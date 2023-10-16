@@ -45,7 +45,7 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.14.0")
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20230618")
+    implementation("org.json:json:20231013")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.16.1")
 
