@@ -5,7 +5,7 @@ plugins {
     val kotlinVersion = "1.9.20-RC"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.1.4"
+    id("org.springframework.boot") version "3.1.5"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.1.4"
+    val springVersion = "3.1.5"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
