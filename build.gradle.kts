@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "1.9.20-RC"
+    val kotlinVersion = "1.9.20"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.1.5"
@@ -35,7 +35,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.16")
+    implementation("net.dv8tion:JDA:5.0.0-beta.17")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
     // https://github.com/Walkyst/lavaplayer-fork
@@ -64,11 +64,11 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:9.22.3")
+    implementation("org.flywaydb:flyway-core:10.0.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    val kotlinVersion = "1.9.20-Beta2"
+    val kotlinVersion = "1.9.20"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
