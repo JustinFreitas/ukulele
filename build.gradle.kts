@@ -35,7 +35,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.17")
+    implementation("net.dv8tion:JDA:5.0.0-beta.18")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
     // https://github.com/Walkyst/lavaplayer-fork
