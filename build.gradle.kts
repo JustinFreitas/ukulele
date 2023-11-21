@@ -10,6 +10,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
+	id("org.flywaydb.flyway") version "10.0.1"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -64,7 +65,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:10.0.0")
+    implementation("org.flywaydb:flyway-core:10.0.1")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
