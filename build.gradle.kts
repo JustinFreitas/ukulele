@@ -2,15 +2,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "1.9.20"
+    val kotlinVersion = "2.0.0-Beta1"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.1.5"
+    id("org.springframework.boot") version "3.2.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
-	id("org.flywaydb.flyway") version "10.0.1"
+    // https://plugins.gradle.org/plugin/org.flywaydb.flyway
+	id("org.flywaydb.flyway") version "10.1.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -26,7 +27,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.1.5"
+    val springVersion = "3.2.0"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -50,7 +51,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.16.2")
 
-    val jacksonVersion = "2.16.0-rc1"
+    val jacksonVersion = "2.16.0"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
