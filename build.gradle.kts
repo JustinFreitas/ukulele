@@ -45,7 +45,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Lavaplayer uses 4.5.10, which has vuln.
     // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation("commons-io:commons-io:2.15.0")
+    implementation("commons-io:commons-io:2.15.1")
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20231013")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
