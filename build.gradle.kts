@@ -76,7 +76,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0-RC")
     // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
