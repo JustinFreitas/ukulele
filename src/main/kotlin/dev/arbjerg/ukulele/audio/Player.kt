@@ -64,6 +64,7 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
 
     var repeatTrack: Boolean = beans.botProps.repeatTrack
     var queueLooping: Boolean = beans.botProps.queueLooping
+    var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
     var lastChannel: TextChannel? = null
 

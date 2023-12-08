@@ -13,5 +13,6 @@ class BotProps(
         var announceTracks: Boolean = false,
         var queueLooping: Boolean = false,
         var repeatTrack: Boolean = false,
-        var playlist: String = ""
+        var playlist: String = "",
+        var showQueueOnSkip: Boolean = true
 )

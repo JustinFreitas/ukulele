@@ -5,6 +5,7 @@ config:
   database: "./database" # Database filename
   game: ""               # Status message shown when your bot is online
   trackDurationLimit: 0  # Maximum limit of track duration in minutes. Set to 0 for unlimited
-  announceTracks: false  # Announce the start of a track
-  queueLooping: false    # Queue looping true/false, default is false.
-  repeatTrack: false      # Repeat track true/false, default is false.
+  announceTracks: true  # Announce the start of a track, default is false.
+  queueLooping: true    # Queue looping true/false, default is false.
+  repeatTrack: true     # Repeat track true/false, default is false.
+  showQueueOnSkip: false # Prints the queue when tracks are skipped, default is true.

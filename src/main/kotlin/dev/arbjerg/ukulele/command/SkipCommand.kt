@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.features.HelpContext
 import dev.arbjerg.ukulele.jda.Command
 import dev.arbjerg.ukulele.jda.CommandContext
+import dev.arbjerg.ukulele.utils.TextUtils
 import org.springframework.stereotype.Component
 
 @Suppress("SameParameterValue")
@@ -13,6 +14,7 @@ class SkipCommand : Command("skip", "s") {
         val args = argumentText.split("\\s+".toRegex())
         when {
             args.isEmpty() || args[0].isEmpty() -> skipNext()
+            args[0].equals("toggleshowqueue") -> toggleShowQueueOnSkip()
             args.size == 1 -> skipIndex(args[0].toInt())
             else -> skipRange()
         }
@@ -20,6 +22,16 @@ class SkipCommand : Command("skip", "s") {
 
     private fun CommandContext.skipNext() {
         printSkipped(player.skip(0..0))
+    }
+
+    private fun CommandContext.toggleShowQueueOnSkip() {
+        player.showQueueOnSkip = !player.showQueueOnSkip
+        val showQueueOnSkipMessage = when(player.showQueueOnSkip) {
+            true -> "Show Queue On Skip is on.\r"
+            false -> "Show Queue On Skip is off.\r"
+        }
+
+        reply(showQueueOnSkipMessage)
     }
 
     private fun CommandContext.skipIndex(i: Int) {
@@ -50,14 +62,40 @@ class SkipCommand : Command("skip", "s") {
         }
     }
 
+    private fun listTracksInQueue(tracks: List<AudioTrack>) = buildString {
+        tracks.forEachIndexed { i, t ->
+            appendLine("`[${i + 1}]` **${t.info.title}** `[${if (t.info.isStream) "Live" else TextUtils.humanReadableTime(t.duration)}]`")
+        }
+    }
+
+    private fun CommandContext.listQueueIfLoopingEnabled(): String {
+        val totalDuration = player.remainingDuration
+        val tracks = player.tracks
+        return when(player.tracks.isNotEmpty() && player.queueLooping) {
+            true -> buildString {
+                append("Queue:\n")
+                append(listTracksInQueue(tracks))
+                append("\nThere are **${tracks.size}** tracks with a remaining length of ")
+
+                if (tracks.any{ it.info.isStream }) {
+                    append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue excluding streams.")
+                } else {
+                    append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue.")
+                }
+            }
+            false -> ""
+        }
+    }
+
     private fun CommandContext.printSkipped(skipped: List<AudioTrack>) {
         val playing = when (player.tracks.isEmpty()) {
             true -> "The queue is empty and the player is stopped."
             false -> "Playing " + player.tracks.first().info.title
         }
 
-        val skippedMessage = when (skipped.size) {
-            0 -> getHelp(this.command).toString()
+        val queue = listQueueIfLoopingEnabled()
+        var skippedMessage = when (skipped.size) {
+            0 -> playing
             1 -> """
             Skipped `${skipped.first().info.title}`
             
@@ -66,8 +104,12 @@ class SkipCommand : Command("skip", "s") {
             else -> """
                 Skipped `${skipped.size} tracks`
                 
-                `${playing}`
+            `${playing}`
             """.trimIndent()
+        }
+
+        if (player.showQueueOnSkip) {
+            skippedMessage = skippedMessage + "\n\n" + queue
         }
 
         reply(skippedMessage)
