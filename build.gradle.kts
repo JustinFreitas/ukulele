@@ -5,13 +5,13 @@ plugins {
     val kotlinVersion = "2.0.0-Beta2"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.2.0"
+    id("org.springframework.boot") version "3.2.1"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-	id("org.flywaydb.flyway") version "10.2.0"
+	id("org.flywaydb.flyway") version "10.4.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -27,7 +27,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.2.0"
+    val springVersion = "3.2.1"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -66,7 +66,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:10.2.0")
+    implementation("org.flywaydb:flyway-core:10.3.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
