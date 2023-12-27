@@ -51,7 +51,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.1")
 
-    val jacksonVersion = "2.16.0"
+    val jacksonVersion = "2.16.1"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
@@ -66,7 +66,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:10.4.0")
+    implementation("org.flywaydb:flyway-core:10.4.1")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
