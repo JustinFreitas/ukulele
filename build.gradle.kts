@@ -37,7 +37,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.18")
+    implementation("net.dv8tion:JDA:5.0.0-beta.19")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
     // https://github.com/Walkyst/lavaplayer-fork
@@ -49,7 +49,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20231013")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
-    implementation("org.jsoup:jsoup:1.17.1")
+    implementation("org.jsoup:jsoup:1.17.2")
 
     val jacksonVersion = "2.16.1"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
