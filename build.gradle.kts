@@ -5,7 +5,7 @@ plugins {
     val kotlinVersion = "2.0.0-Beta3"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.2"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
@@ -27,7 +27,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.2.1"
+    val springVersion = "3.2.2"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -37,7 +37,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.19")
+    implementation("net.dv8tion:JDA:5.0.0-beta.20")
 
     // https://mvnrepository.com/artifact/com.github.walkyst.lavaplayer-fork/lavaplayer
     // https://github.com/Walkyst/lavaplayer-fork
