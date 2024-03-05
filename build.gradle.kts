@@ -47,11 +47,11 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.15.1")
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20240205")
+    implementation("org.json:json:20240303")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
 
-    val jacksonVersion = "2.16.1"
+    val jacksonVersion = "2.17.0-rc1"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
