@@ -37,11 +37,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.20")
+    implementation("net.dv8tion:JDA:5.0.0-beta.21")
 
-    // Use a commit version right after 2.1.0
-    // See https://github.com/lavalink-devs/lavaplayer/pull/70
-    implementation("com.github.lavalink-devs.lavaplayer:lavaplayer:727959e9f6")
+    // https://mvnrepository.com/artifact/dev.arbjerg/lavaplayer
+    // https://github.com/lavalink-devs/lavaplayer
+    implementation("dev.arbjerg:lavaplayer:2.1.1")
 
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Lavaplayer uses 4.5.10, which has vuln.
