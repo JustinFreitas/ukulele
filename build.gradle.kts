@@ -43,8 +43,6 @@ dependencies {
     // https://github.com/lavalink-devs/lavaplayer
     implementation("dev.arbjerg:lavaplayer:2.1.1")
 
-    // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.15.1")
     // https://mvnrepository.com/artifact/org.json/json
