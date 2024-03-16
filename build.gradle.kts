@@ -11,7 +11,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-	id("org.flywaydb.flyway") version "10.9.1"
+	id("org.flywaydb.flyway") version "10.10.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -43,8 +43,8 @@ dependencies {
     // https://github.com/lavalink-devs/lavaplayer
     implementation("dev.arbjerg:lavaplayer:2.1.1")
 
-    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-    implementation("org.apache.httpcomponents:httpclient:4.5.14")  // Lavaplayer uses 4.5.10, which has vuln.
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.15.1")
     // https://mvnrepository.com/artifact/org.json/json
@@ -52,7 +52,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
 
-    val jacksonVersion = "2.17.0-rc1"
+    val jacksonVersion = "2.17.0"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
@@ -67,7 +67,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:10.9.1")
+    implementation("org.flywaydb:flyway-core:10.10.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
