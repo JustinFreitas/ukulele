@@ -11,7 +11,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-	id("org.flywaydb.flyway") version "10.10.0"
+	id("org.flywaydb.flyway") version "10.11.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -37,14 +37,14 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.21")
+    implementation("net.dv8tion:JDA:5.0.0-beta.22")
 
     // https://mvnrepository.com/artifact/dev.arbjerg/lavaplayer
     // https://github.com/lavalink-devs/lavaplayer
     implementation("dev.arbjerg:lavaplayer:2.1.1")
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation("commons-io:commons-io:2.15.1")
+    implementation("commons-io:commons-io:2.16.0")
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20240303")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
@@ -65,7 +65,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:10.10.0")
+    implementation("org.flywaydb:flyway-core:10.11.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
