@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "2.0.0-Beta5"
+    val kotlinVersion = "2.0.0-RC1"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.2.4"
@@ -44,7 +44,7 @@ dependencies {
     implementation("dev.arbjerg:lavaplayer:2.1.1")
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation("commons-io:commons-io:2.16.0")
+    implementation("commons-io:commons-io:2.16.1")
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20240303")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
@@ -69,7 +69,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    val kotlinVersion = "2.0.0-Beta5"
+    val kotlinVersion = "2.0.0-RC1"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
