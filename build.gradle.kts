@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
@@ -98,9 +99,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.named("compileKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask::class.java) {
-    compilerOptions {
-        freeCompilerArgs.add("-Xjsr305=strict")
-        freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict",
+                                  "-opt-in=kotlin.RequiresOptIn")
+        jvmTarget = "17"
     }
 }

@@ -14,7 +14,7 @@ class SkipCommand : Command("skip", "s") {
         val args = argumentText.split("\\s+".toRegex())
         when {
             args.isEmpty() || args[0].isEmpty() -> skipNext()
-            args[0] == "toggleshowqueue" -> toggleShowQueueOnSkip()
+            args[0].equals("toggleshowqueue") -> toggleShowQueueOnSkip()
             args.size == 1 -> skipIndex(args[0].toInt())
             else -> skipRange()
         }
