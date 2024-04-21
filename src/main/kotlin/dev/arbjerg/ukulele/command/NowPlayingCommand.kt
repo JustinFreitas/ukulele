@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import org.springframework.stereotype.Component
 import java.awt.Color
+import java.net.URLEncoder
 
 @Component
 class NowPlayingCommand : Command ("nowplaying", "np") {
@@ -36,7 +37,7 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
 
     private class GetEmbed(val track: AudioTrack) {
         val timeField = if (track.info.isStream) "[Live]" else "[${TextUtils.humanReadableTime(track.position)} / ${TextUtils.humanReadableTime(track.info.length)}]"
-        val titleFixLocalUri = if (track is LocalAudioTrack) "https://" + track.info.uri else track.info.uri
+        val titleFixLocalUri = if (track is LocalAudioTrack) "https://" + URLEncoder.encode(track.info.uri, "UTF-8") else track.info.uri
 
         //Set up common parts of the embed
         val message = EmbedBuilder()
