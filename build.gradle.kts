@@ -1,11 +1,10 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     val kotlinVersion = "2.0.0-RC1"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.2.4"
+    id("org.springframework.boot") version "3.2.5"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
@@ -14,10 +13,9 @@ plugins {
 	id("org.flywaydb.flyway") version "10.11.0"
 }
 
-apply(plugin = "io.spring.dependency-management")
-group = "dev.arbjerg"
-version = "0.1"
-java.sourceCompatibility = JavaVersion.VERSION_17
+kotlin {
+    jvmToolchain(17)
+}
 
 repositories {
     //mavenLocal()
@@ -27,7 +25,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.2.4"
+    val springVersion = "3.2.5"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -42,7 +40,11 @@ dependencies {
     // https://mvnrepository.com/artifact/dev.arbjerg/lavaplayer
     // https://github.com/lavalink-devs/lavaplayer
     implementation("dev.arbjerg:lavaplayer:2.1.1")
-
+    constraints {
+        implementation("commons-codec:commons-codec:1.13") {
+            because("Apache commons-codec before 1.13 is vulnerable to information exposure.")
+        }
+    }
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.16.1")
     // https://mvnrepository.com/artifact/org.json/json
@@ -92,17 +94,5 @@ tasks.withType<BootJar> {
             from("build/libs/ukulele.jar")
             into(".")
         }
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict",
-                                  "-opt-in=kotlin.RequiresOptIn")
-        jvmTarget = "17"
     }
 }

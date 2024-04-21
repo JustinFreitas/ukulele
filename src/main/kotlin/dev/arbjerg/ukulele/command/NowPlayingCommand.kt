@@ -1,5 +1,6 @@
 package dev.arbjerg.ukulele.command
 
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack
@@ -28,6 +29,7 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
             is YoutubeAudioTrack -> GetEmbed(track).youtube()
             is SoundCloudAudioTrack -> GetEmbed(track).soundcloud()
             is TwitchStreamAudioTrack -> GetEmbed(track).twitch()
+            is LocalAudioTrack -> GetEmbed(track).local()
             else -> GetEmbed(track).default()
         }
     }
@@ -58,6 +60,11 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
             return message.build()
         }
 
+        fun local() :MessageEmbed {
+            message.setColor(LOCAL_BLUE)
+            return message.build()
+        }
+
         fun default(): MessageEmbed {
             message.setTitle(track.info.title)  // Show just the title of the radio station. Weird uri jank.
             message.setColor(DEFAULT_GREY)
@@ -75,6 +82,7 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
         val YOUTUBE_RED = Color(205, 32, 31).rgb
         val SOUNDCLOUD_ORANGE = Color(255, 85, 0).rgb
         val TWITCH_PURPLE = Color(100, 65, 164).rgb
+        val LOCAL_BLUE = Color(66, 135, 245).rgb
         val DEFAULT_GREY = Color(100, 100, 100).rgb
     }
 }
