@@ -37,13 +37,7 @@ class QueueCommand : Command("queue", "q", "list") {
             append(repeatTrackMessage)
             append(queueLoopingMessage)
             append(paginateQueue(tracks, pageIndex))
-            append("\nThere are **${tracks.size}** tracks with a remaining length of ")
-
-            if (tracks.any{ it.info.isStream }) {
-                append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue excluding streams.")
-            } else {
-                append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue.")
-            }
+            listQueueDurationAndLength(tracks, totalDuration)
         }
     }
 

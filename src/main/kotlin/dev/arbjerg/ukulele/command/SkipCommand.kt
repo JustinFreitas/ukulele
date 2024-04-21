@@ -14,7 +14,7 @@ class SkipCommand : Command("skip", "s") {
         val args = argumentText.split("\\s+".toRegex())
         when {
             args.isEmpty() || args[0].isEmpty() -> skipNext()
-            args[0].equals("toggleshowqueue") -> toggleShowQueueOnSkip()
+            args[0] == "toggleshowqueue" -> toggleShowQueueOnSkip()
             args.size == 1 -> skipIndex(args[0].toInt())
             else -> skipRange()
         }
@@ -75,13 +75,7 @@ class SkipCommand : Command("skip", "s") {
             true -> buildString {
                 append("Queue:\n")
                 append(listTracksInQueue(tracks))
-                append("\nThere are **${tracks.size}** tracks with a remaining length of ")
-
-                if (tracks.any{ it.info.isStream }) {
-                    append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue excluding streams.")
-                } else {
-                    append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue.")
-                }
+                listQueueDurationAndLength(tracks, totalDuration)
             }
             false -> ""
         }
