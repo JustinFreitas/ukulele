@@ -63,6 +63,7 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
 
         fun local() :MessageEmbed {
             message.setColor(LOCAL_BLUE)
+            message.addField("Time", timeField, true)
             return message.build()
         }
 
