@@ -36,7 +36,7 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
 
     private class GetEmbed(val track: AudioTrack) {
         val timeField = if (track.info.isStream) "[Live]" else "[${TextUtils.humanReadableTime(track.position)} / ${TextUtils.humanReadableTime(track.info.length)}]"
-        val titleFixLocalUri = if (track is LocalAudioTrack) "attachment://" + track.info.uri else track.info.uri
+        val titleFixLocalUri = if (track is LocalAudioTrack) "https://" + track.info.uri else track.info.uri
 
         //Set up common parts of the embed
         val message = EmbedBuilder()
