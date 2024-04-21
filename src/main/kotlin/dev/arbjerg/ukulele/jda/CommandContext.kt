@@ -55,7 +55,7 @@ class CommandContext(
         channel.sendMessage(getHelp(forCommand)).queue()
     }
 
-    fun getHelp(forCommand: Command): MessageCreateData {
+    private fun getHelp(forCommand: Command): MessageCreateData {
         val help = HelpContext(this, forCommand)
         forCommand.provideHelp0(help)
         return help.buildMessage()
