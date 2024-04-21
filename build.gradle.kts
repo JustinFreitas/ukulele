@@ -39,12 +39,16 @@ dependencies {
 
     // https://mvnrepository.com/artifact/dev.arbjerg/lavaplayer
     // https://github.com/lavalink-devs/lavaplayer
-    implementation("dev.arbjerg:lavaplayer:2.1.1")
+    // implementation("dev.arbjerg:lavaplayer:2.1.1")
+    // Above broken for YouTube links.  Use Justin's fork.
+    // https://github.com/JustinFreitas/lavaplayer
+    implementation("com.github.justinfreitas:lavaplayer:2.1.1.1")
     constraints {
         implementation("commons-codec:commons-codec:1.16.1") {
             because("Apache commons-codec before 1.13 is vulnerable to information exposure.")
         }
     }
+
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.16.1")
     // https://mvnrepository.com/artifact/org.json/json
