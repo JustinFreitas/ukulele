@@ -1,11 +1,13 @@
 config:
-  token: ""              # Your discord bot token
-  shards: 1              # Number of shards to create. 1 works for most bots
-  prefix: "::"           # Prefix to invoke commands with
-  database: "./database" # Database filename
-  game: ""               # Status message shown when your bot is online
-  trackDurationLimit: 0  # Maximum limit of track duration in minutes. Set to 0 for unlimited
-  announceTracks: true  # Announce the start of a track, default is false.
-  queueLooping: true    # Queue looping true/false, default is false.
-  repeatTrack: true     # Repeat track true/false, default is false.
-  showQueueOnSkip: false # Prints the queue when tracks are skipped, default is true.
+  token: ""                       # Your discord bot token
+  shards: 1                       # Number of shards to create. 1 works for most bots
+  prefix: "::"                    # Prefix to invoke commands with
+  database: "./database"          # Database filename
+  game: ""                        # Status message shown when your bot is online
+  trackDurationLimit: 0           # Maximum limit of track duration in minutes. Set to 0 for unlimited
+  announceTracks: true            # Announce the start of a track, default is false.
+  queueLooping: true              # Queue looping true/false, default is false.
+  repeatTrack: true               # Repeat track true/false, default is false.
+  showQueueOnSkip: false          # Prints the queue when tracks are skipped, default is true.
+  prependQueueLabelToTitle: false # When a queue label is defined when playing tracks (i.e. [Label] URL),
+                                  # use that value in front of the title when listing queue.

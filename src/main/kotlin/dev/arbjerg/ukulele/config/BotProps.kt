@@ -14,5 +14,6 @@ class BotProps(
         var queueLooping: Boolean = false,
         var repeatTrack: Boolean = false,
         var playlist: String = "",
-        var showQueueOnSkip: Boolean = true
+        var showQueueOnSkip: Boolean = true,
+        var prependQueueLabelToTitle: Boolean = false
 )

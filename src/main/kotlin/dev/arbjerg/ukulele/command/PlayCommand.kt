@@ -13,13 +13,16 @@ import dev.arbjerg.ukulele.jda.Command
 import dev.arbjerg.ukulele.jda.CommandContext
 import net.dv8tion.jda.api.Permission
 import org.springframework.stereotype.Component
+import java.util.regex.Pattern
 
 @Component
 class PlayCommand(
-        val players: PlayerRegistry,
-        val apm: AudioPlayerManager,
-        val botProps: BotProps
+    val players: PlayerRegistry,
+    val apm: AudioPlayerManager,
+    val botProps: BotProps
 ) : Command("play", "p") {
+    val pattern: Pattern = Pattern.compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
+
     override suspend fun CommandContext.invoke() {
         if (!ensureVoiceChannel()) return
 
@@ -31,9 +34,13 @@ class PlayCommand(
 
         identifiers.forEach { identifier ->
             // identifier format is:  [Some Label] Source URL or local drive file path
-            val source = identifier.trim().replace("^\\s*\\[.*]\\s*".toRegex(), "")
-            if (source.isNotEmpty()) {
-                apm.loadItemOrdered(this, source, Loader(this, player, identifier))
+            val matcher = pattern.matcher(identifier)
+            if (matcher.find() && matcher.groupCount() == 2) {
+                val queueLabel = if (matcher.group(1) != null) matcher.group(1) else ""
+                val source = if (matcher.group(2) != null) matcher.group(2) else ""
+                if (source.isNotEmpty()) {
+                    apm.loadItemOrdered(this, source, Loader(this, player, identifier, queueLabel))
+                }
             }
         }
     }
@@ -65,13 +72,16 @@ class PlayCommand(
     inner class Loader(
             private val ctx: CommandContext,
             private val player: Player,
-            private val identifier: String
+            private val identifier: String,
+            private val queueLabel: String
     ) : AudioLoadResultHandler {
         override fun trackLoaded(track: AudioTrack) {
             if (track.isOverDurationLimit) {
                 ctx.reply("Refusing to play `${track.info.title}` because it is over ${botProps.trackDurationLimit} minutes long")
                 return
             }
+            track.info.title = if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty())
+                                    "`${queueLabel} - `${track.info.title}" else track.info.title
             val started = player.add(track)
             if (started) {
                 ctx.reply("Started playing `${track.info.title}`")
