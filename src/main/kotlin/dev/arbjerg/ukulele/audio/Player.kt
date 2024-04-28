@@ -70,7 +70,7 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
 
     var lastChannel: TextChannel? = null
 
-    private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*[vV]:(\\d{1,2}).*]?.*$")
+    private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*[vV]:(\\d{1,3}).*]?.*$")
 
     /**
      * @return true if playing started, false if not.
@@ -153,7 +153,8 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
     private fun adjustVolumeFromQueueLabelVolumeMatcher(player: AudioPlayer, track: AudioTrack) {
         val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
         if (matcher.find() && matcher.group(1) != null) {
-            player.volume = matcher.group(1).toInt().coerceAtLeast(1)
+            val volume = matcher.group(1).toInt().coerceAtLeast(1).coerceAtMost(150)
+            player.volume = volume
         }
     }
 
