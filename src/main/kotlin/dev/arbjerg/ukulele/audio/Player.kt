@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.nio.Buffer
 import java.nio.ByteBuffer
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class Player(private val beans: Beans, guildProperties: GuildProperties) : AudioEventAdapter(), AudioSendHandler {
     @Component
@@ -67,6 +69,8 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
     var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
     var lastChannel: TextChannel? = null
+
+    var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*v:(\\d{1,3})]?.*\$")
 
     /**
      * @return true if playing started, false if not.
@@ -136,6 +140,20 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
     override fun onTrackStart(player: AudioPlayer, track: AudioTrack) {
         if (beans.botProps.announceTracks) {
             lastChannel?.sendMessageEmbeds(beans.nowPlayingCommand.buildEmbed(track))?.queue()
+        }
+
+        adjustVolumeFromQueueLabelVolumeMatcher(player, track)
+    }
+
+    /**
+     * With the option to specify a queue label on track add, there is also the capability to specify a volume for
+     * the track.  It will be in the form "[Some Queue Label, v:42] TrackIdentifierUrlOrPath".  If found, the volume
+     * will be set to that when the track starts.
+     */
+    private fun adjustVolumeFromQueueLabelVolumeMatcher(player: AudioPlayer, track: AudioTrack) {
+        val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
+        if (matcher.find() && matcher.group(1) != null) {
+            player.volume = matcher.group(1).toInt().coerceAtLeast(1)
         }
     }
 
