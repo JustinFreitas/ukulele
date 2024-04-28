@@ -70,7 +70,7 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
 
     var lastChannel: TextChannel? = null
 
-    var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*v:(\\d{1,3})]?.*\$")
+    var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*[vV]:(\\d{1,2}).*]?.*$")
 
     /**
      * @return true if playing started, false if not.
