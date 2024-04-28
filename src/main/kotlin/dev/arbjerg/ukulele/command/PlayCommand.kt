@@ -81,7 +81,7 @@ class PlayCommand(
                 return
             }
             track.info.title = if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty())
-                                    "`${queueLabel} - `${track.info.title}" else track.info.title
+                                    "${queueLabel} - ${track.info.title}" else track.info.title
             val started = player.add(track)
             if (started) {
                 ctx.reply("Started playing `${track.info.title}`")
