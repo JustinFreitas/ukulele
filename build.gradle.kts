@@ -46,7 +46,7 @@ dependencies {
 
     constraints {
         // https://mvnrepository.com/artifact/commons-codec/commons-codec
-        implementation("commons-codec:commons-codec:1.16.1") {
+        implementation("commons-codec:commons-codec:1.17.0") {
             because("Apache commons-codec before 1.13 is vulnerable to information exposure.")
         }
     }
