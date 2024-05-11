@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "2.0.0-RC2"
+    val kotlinVersion = "2.0.0-RC3"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.2.5"
@@ -58,7 +58,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
 
-    val jacksonVersion = "2.17.0"
+    val jacksonVersion = "2.17.1"
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
@@ -77,7 +77,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    val kotlinVersion = "2.0.0-RC2"
+    val kotlinVersion = "2.0.0-RC3"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
