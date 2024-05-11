@@ -21,6 +21,8 @@ repositories {
     //mavenLocal()
     mavenCentral()
     maven { url = uri("https://jitpack.io") }
+    // snapshots are available under '/snapshots'
+    maven { url = uri("https://maven.lavalink.dev/releases") }
 }
 
 dependencies {
@@ -42,7 +44,9 @@ dependencies {
     // implementation("dev.arbjerg:lavaplayer:2.1.1")
     // Above broken for YouTube links.  Use Justin's fork.
     // https://github.com/JustinFreitas/lavaplayer
-    implementation("com.github.justinfreitas:lavaplayer:2.1.1.2")
+    implementation("com.github.justinfreitas:lavaplayer:v2.1.2_1")
+    // https://github.com/lavalink-devs/youtube-source
+    implementation("dev.lavalink.youtube:v2:1.2.0")
 
     constraints {
         // https://mvnrepository.com/artifact/commons-codec/commons-codec
