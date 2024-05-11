@@ -39,7 +39,8 @@ dependencies {
     // https://github.com/discord-jda/JDA
     implementation("net.dv8tion:JDA:5.0.0-beta.23")
 
-    // https://mvnrepository.com/artifact/dev.arbjerg/lavaplayer
+    // Jocull has latest Ukulele we should pattern after in JDA-5 branch.
+    // https://github.com/jocull/ukulele/tree/jda-5
     // https://github.com/lavalink-devs/lavaplayer
     // implementation("dev.arbjerg:lavaplayer:2.1.1")
     // Above broken for YouTube links.  Use Justin's fork.
