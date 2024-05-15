@@ -10,7 +10,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-	id("org.flywaydb.flyway") version "10.12.0"
+	id("org.flywaydb.flyway") version "10.13.0"
 }
 
 kotlin {
@@ -37,7 +37,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.dv8tion/JDA
     // https://github.com/discord-jda/JDA
-    implementation("net.dv8tion:JDA:5.0.0-beta.23")
+    implementation("net.dv8tion:JDA:5.0.0-beta.24")
 
     // Jocull has latest Ukulele we should pattern after in JDA-5 branch.
     // https://github.com/jocull/ukulele/tree/jda-5
@@ -88,7 +88,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1")
     // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
