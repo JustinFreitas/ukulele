@@ -50,8 +50,8 @@ dependencies {
     // https://github.com/JustinFreitas/lavaplayer
     implementation("com.github.justinfreitas:lavaplayer:v2.1.2_1")
     // https://github.com/lavalink-devs/youtube-source
-    // implementation("dev.lavalink.youtube:v2:1.3.0")
-    // implementation("dev.lavalink.youtube:common:1.3.0")
+    implementation("dev.lavalink.youtube:v2:1.3.0")
+    implementation("dev.lavalink.youtube:common:1.3.0")
     implementation("dev.lavalink.youtube:youtube-plugin:1.3.0")
     constraints {
         // https://mvnrepository.com/artifact/commons-codec/commons-codec
