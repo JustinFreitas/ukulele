@@ -103,7 +103,7 @@ dependencies {
 
 tasks.withType<BootJar> {
     archiveFileName.set("ukulele.jar")
-    duplicatesStrategy = DuplicatesStrategy.WARN
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     doLast {
         //copies the jar into a place where the Dockerfile can find it easily (and users maybe too)
         copy {
