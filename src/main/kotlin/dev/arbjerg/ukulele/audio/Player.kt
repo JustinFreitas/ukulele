@@ -158,10 +158,24 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
         }
     }
 
+    /**
+     * The queue label volume feature was changing the volume when the track was repeated,
+     * so this is a way to set the label volume to the current volume, if present, to
+     * keep the volume the same in the repeat track scenario.
+     */
+    private fun adjustQueueLabelVolumeToCurrentPlayerVolume(player: AudioPlayer, track: AudioTrack) {
+        val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
+        if (matcher.find() && matcher.group(1) != null) {
+            track.info.title = matcher.replaceAll { player.volume.toString() }
+        }
+    }
+
     override fun onTrackEnd(player: AudioPlayer, track: AudioTrack, endReason: AudioTrackEndReason) {
         if (endReason.mayStartNext) {
             if (repeatTrack) {
-                queue.addFirst(track.makeClone())
+                val clonedTrack: AudioTrack = track.makeClone()
+                adjustQueueLabelVolumeToCurrentPlayerVolume(player, clonedTrack)
+                queue.addFirst(clonedTrack)
             } else if (queueLooping) {
                 queue.add(track.makeClone())
             }
