@@ -10,7 +10,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-	id("org.flywaydb.flyway") version "10.13.0"
+	id("org.flywaydb.flyway") version "10.14.0"
 }
 
 kotlin {
@@ -82,7 +82,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:10.13.0")
+    implementation("org.flywaydb:flyway-core:10.14.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
@@ -92,7 +92,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0-RC")
     // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
