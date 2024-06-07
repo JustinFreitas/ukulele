@@ -48,7 +48,7 @@ dependencies {
     // implementation("dev.arbjerg:lavaplayer:2.1.1")
     // Above broken for YouTube links.  Use Justin's fork.
     // https://github.com/JustinFreitas/lavaplayer
-    implementation("com.github.justinfreitas:lavaplayer:v2.1.2_1")
+    implementation("com.github.justinfreitas:lavaplayer:v2.2.0_1")
     // https://github.com/lavalink-devs/youtube-source
     implementation("dev.lavalink.youtube:v2:1.3.0")
     implementation("dev.lavalink.youtube:common:1.3.0")
