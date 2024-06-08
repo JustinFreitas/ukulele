@@ -101,6 +101,33 @@ dependencies {
     }
 }
 
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("org.jetbrains:annotations:13.0")).using(module("org.jetbrains:annotations:23.0.0"))
+        substitute(module("net.bytebuddy:byte-buddy:1.14.11")).using(module("net.bytebuddy:byte-buddy:1.14.12"))
+        substitute(module("commons-codec:commons-codec:1.11")).using(module("commons-codec:commons-codec:1.17.0"))
+        substitute(module("commons-io:commons-io:2.13.0")).using(module("commons-io:commons-io:2.16.1"))
+        substitute(module("org.hamcrest:hamcrest:2.1")).using(module("org.hamcrest:hamcrest:2.2"))
+        substitute(module("com.fasterxml.jackson.core:jackson-core:2.15.2")).using(module("com.fasterxml.jackson.core:jackson-core:2.17.1"))
+        substitute(module("com.fasterxml.jackson.core:jackson-core:2.17.0")).using(module("com.fasterxml.jackson.core:jackson-core:2.17.1"))
+        substitute(module("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2")).using(module("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1"))
+        substitute(module("com.fasterxml.jackson.core:jackson-databind:2.15.2")).using(module("com.fasterxml.jackson.core:jackson-databind:2.17.1"))
+        substitute(module("com.fasterxml.jackson.core:jackson-databind:2.17.0")).using(module("com.fasterxml.jackson.core:jackson-databind:2.17.1"))
+        substitute(module("net.minidev:json-smart:2.5.0")).using(module("net.minidev:json-smart:2.5.1"))
+        substitute(module("org.jsoup:jsoup:1.16.1")).using(module("org.jsoup:jsoup:1.17.2"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:1.9.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib:2.0.0"))
+        substitute(module("org.reactivestreams:reactive-streams:1.0.3")).using(module("org.reactivestreams:reactive-streams:1.0.4"))
+        substitute(module("org.mozilla:rhino-engine:1.7.14")).using(module("org.mozilla:rhino-engine:1.7.15"))
+        substitute(module("org.springframework:spring-beans:6.1.7")).using(module("org.springframework:spring-beans:6.1.8"))
+        substitute(module("org.springframework:spring-context:6.1.7")).using(module("org.springframework:spring-context:6.1.8"))
+        substitute(module("org.springframework:spring-core:6.1.7")).using(module("org.springframework:spring-core:6.1.8"))
+    }
+}
+
 tasks.withType<BootJar> {
     archiveFileName.set("ukulele.jar")
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
