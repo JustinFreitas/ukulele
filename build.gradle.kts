@@ -1,10 +1,10 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "2.0.0"
+    val kotlinVersion = "2.0.20-Beta1"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.3.0"
+    id("org.springframework.boot") version "3.3.1"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
     // Required for BotProps
-    val springVersion = "3.3.0"
+    val springVersion = "3.3.1"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -86,7 +86,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    val kotlinVersion = "2.0.0"
+    val kotlinVersion = "2.0.20-Beta1"
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
@@ -115,16 +115,23 @@ configurations.all {
         substitute(module("com.fasterxml.jackson.core:jackson-databind:2.17.0")).using(module("com.fasterxml.jackson.core:jackson-databind:2.17.1"))
         substitute(module("net.minidev:json-smart:2.5.0")).using(module("net.minidev:json-smart:2.5.1"))
         substitute(module("org.jsoup:jsoup:1.16.1")).using(module("org.jsoup:jsoup:1.17.2"))
-        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0"))
-        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:1.9.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0"))
-        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0"))
-        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0"))
-        substitute(module("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib:2.0.0"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:1.9.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")).using(module("org.jetbrains.kotlin:kotlin-stdlib:2.0.20-Beta1"))
+        substitute(module("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")).using(module("org.jetbrains.kotlin:kotlin-stdlib:2.0.20-Beta1"))
         substitute(module("org.reactivestreams:reactive-streams:1.0.3")).using(module("org.reactivestreams:reactive-streams:1.0.4"))
         substitute(module("org.mozilla:rhino-engine:1.7.14")).using(module("org.mozilla:rhino-engine:1.7.15"))
         substitute(module("org.springframework:spring-beans:6.1.7")).using(module("org.springframework:spring-beans:6.1.8"))
+        substitute(module("org.springframework:spring-beans:6.1.9")).using(module("org.springframework:spring-beans:6.1.10"))
         substitute(module("org.springframework:spring-context:6.1.7")).using(module("org.springframework:spring-context:6.1.8"))
+        substitute(module("org.springframework:spring-context:6.1.9")).using(module("org.springframework:spring-context:6.1.10"))
         substitute(module("org.springframework:spring-core:6.1.7")).using(module("org.springframework:spring-core:6.1.8"))
+        substitute(module("org.springframework:spring-core:6.1.9")).using(module("org.springframework:spring-core:6.1.10"))
     }
 }
 
