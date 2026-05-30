@@ -145,6 +145,14 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.3")
 }
 
+val mockitoAgent: Configuration by configurations.creating
+
+dependencies {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.8") {
+        isTransitive = false
+    }
+}
+
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         // logback issue requiring both substitutions: https://github.com/qos-ch/logback/issues/890
@@ -277,6 +285,7 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs("-javaagent:${mockitoAgent.asPath}", "-XX:+EnableDynamicAgentLoading", "-Xshare:off")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
