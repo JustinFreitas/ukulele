@@ -1,71 +1,92 @@
 # Ukulele
 ...and his music was electric.
 
-Ukulele is a bot made by the creator and collaborators of FredBoat. The concept is to replicate FredBoat while keeping it simple. The original stack is engineered for serving millions of servers and is thus too complex to selfhost.
+Ukulele is a lightweight, simple-to-host Discord music bot inspired by FredBoat. While FredBoat is engineered for millions of servers, Ukulele is designed for personal use and small communities, keeping the stack focused and efficient.
 
-The bot is self-contained and only requires Java 25 to run.
+The bot is self-contained and requires **Java 25** to run.
 
 > [!IMPORTANT]
-> This project utilizes a **custom Lavaplayer fork** to support **ReplayGain (Volume Normalization)**. Standard Lavaplayer distributions do not support this feature, and it is required for the `normalization` setting in `ukulele.yml` to function correctly.
+> This project utilizes a **custom Lavaplayer fork** which enables advanced features like **ReplayGain (Volume Normalization)**. This allows the bot to maintain consistent volume levels across different tracks automatically.
 
+---
 
-This is currently a work-in-progress.
+## 🚀 Key Features
 
-## Features
-- Basic player commands (::play, ::list, ::skip, ::shuffle)
-- Volume command
-- Zero-maintenance embedded database
+### 🎵 Core Music Playback
+* **Multi-Source Support:** Play music from YouTube, SoundCloud, Bandcamp, Vimeo, Twitch, and more.
+* **Local Files:** Support for playing local audio files directly from the host system.
+* **Dynamic Queue:** Manage your playback queue with ease.
+* **Shuffle & Loop:** Randomize your queue or loop individual tracks and the entire queue.
+* **Precise Seeking:** Jump to any part of a track with the `seek` command.
 
-## Host it yourself
+### 🔊 Advanced Audio Control
+* **Volume Normalization (ReplayGain):** Automatically balances audio levels so you don't have to constantly adjust your volume.
+* **Virtual Volume Scaling:** High-fidelity volume control mapped to the player's internal engine.
+* **Per-Track Volume:** Support for specifying volume levels within a track's queue label (e.g., `[Label, v:42] URL`).
 
-### Manual
-- Install Java 25. Adoptium has JDK and JRE downloads available.  Also, there is Zulu.
-- Make a copy of `ukulele.example.yml` and rename it to `ukulele.yml`
-- Input the bot token [(guide)](https://discordjs.guide/preparations/setting-up-a-bot-application.html)
-- Run `./ukulele` to build and run the application (Windows users use the .bat files via commandline)
+### 📱 Remote Control & Integration
+* **REST API:** Fully featured API to control the player, manage the queue, and update configuration programmatically.
+* **WebSockets (STOMP):** Real-time player status updates and event streaming for building modern dashboards or mobile app integrations.
+* **Secure Access:** Built-in security with API token authentication.
+
+### 🛠️ Robust Infrastructure
+* **Java 25 & Spring Boot 4:** Built on the latest, high-performance Java ecosystem.
+* **Zero-Maintenance Database:** Uses an embedded H2 database with R2DBC for efficient, reactive data handling.
+* **Flyway Migrations:** Automated database schema management.
+* **Docker Ready:** Includes a `Dockerfile` and `docker-compose.yml` for instant deployment.
+
+---
+
+## ⌨️ Commands
+
+| Command | Description |
+| :--- | :--- |
+| `::play <query/url>` | Play a track or add it to the queue. |
+| `::skip [range]` | Skip the current track or a range of tracks. |
+| `::nowplaying` | Show detailed information about the current track. |
+| `::queue` | Display the current playback queue. |
+| `::volume <0-150>` | Adjust the player volume. |
+| `::seek <time>` | Seek to a specific timestamp in the track. |
+| `::pause` / `::resume` | Pause or resume playback. |
+| `::shuffle` | Randomize the current queue. |
+| `::repeat` | Toggle looping for the current track. |
+| `::loop` | Toggle looping for the entire queue. |
+| `::prefix <new_prefix>` | Change the bot's command prefix for the guild. |
+| `::say <message>` | Make the bot speak in the voice channel. |
+| `::help` | List all available commands. |
+
+---
+
+## 🏠 Host it yourself
+
+### Manual Installation
+1. **Install Java 25:** Downloads available from [Adoptium (Temurin)](https://adoptium.net/) or [Azul (Zulu)](https://www.azul.com/downloads/).
+2. **Configure:** Copy `ukulele.example.yml` to `ukulele.yml` and add your **Discord Bot Token**.
+3. **Run:** Execute `./ukulele` (Linux/macOS) or `ukulele.bat` (Windows) to build and start the bot.
 
 ### Using Docker
-#### Requirements
-- Docker (Engine: 18.06.0+)
-- Docker-Compose
-
-#### Running
 ```shell script
-# Create DB directory and own it to 999
+# 1. Prepare environment
 mkdir db && chown -R 999 db/
-
-# Copy ukulele config file
 cp ukulele.example.yml ukulele.yml
-# Open ukulele.yml and make config changes
 
-# Now simply run run docker-compose 
+# 2. Start the bot
 docker-compose up -d
 ```
 
-To run the container in detached mode simply add `-d` to the arguments of the run command.
+---
 
-### AUR Package ![AUR version](https://img.shields.io/aur/version/ukulele-git)
-https://aur.archlinux.org/packages/ukulele-git/
+## 📡 Remote API
+Ukulele includes a powerful REST and WebSocket API. See **[API.md](API.md)** for full documentation on endpoints and integration.
 
-This Arch package provides a systemd service for ukulele and places the files for ukulele in the correct places, according to the [Arch Package Guidelines](https://wiki.archlinux.org/title/Arch_package_guidelines#Directories). This installation method is only relevant if you have an arch-based system.
+---
 
-- Install the package either using an AUR helper (paru, yay, etc.) or following the [guide](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages) on the Arch Wiki.
-- Edit the config file (`/etc/ukulele/ukulele.yml`) as required.
-    - As noted when installing the package, the discord bot token must be set in the config file ([guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html))
-- Start/enable the `ukulele.service` as required ([wiki](https://wiki.archlinux.org/title/Systemd#Using_units))
+## 🤝 Contributing
+Pull requests are welcome! Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** before submitting.
 
+---
 
-## Remote API
-Ukulele includes a built-in REST API and WebSocket interface for remote control. This allows you to build custom dashboards or mobile apps to control your bot.
-
-For full details on endpoints and authentication, see [API.md](API.md).
-
-## Contributing
-Pull requests are welcome! Look through the issues and/or create one if you have an idea.
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## Make your own changes (More info soon)
-- Change code
-- `./gradlew clean build`
-
+## 🛠️ Development
+* **Build:** `./gradlew clean build`
+* **Test:** `./gradlew test`
+* **Linter:** `./gradlew ktlintCheck` (Enforces high-quality, idiomatic Kotlin code)
