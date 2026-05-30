@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Suppress Flyway warning about H2 version being newer than verified -->
+    <logger name="org.flywaydb.core.internal.database.base.Database" level="ERROR"/>
+
+    <!-- Optional: Suppress JDA cache warnings if any remain -->
+    <logger name="net.dv8tion.jda.api.JDA" level="INFO"/>
+</configuration>
