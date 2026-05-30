@@ -2,9 +2,9 @@
 Contributions are welcome! Below are some technical details on how to work on the project.
 
 ## Setting up your workspace
-To get started you only need JDK 11 or up. Gradle will automatically install itself.
+To get started, you only need JDK 25 or up. Gradle will automatically install itself.
 
-Clone this git repository. You can then import this Gradle project into your favourite IDE. Intellij IDEA is recommended.
+Clone this git repository. You can then import this Gradle project into your favourite IDE. IntelliJ IDEA is recommended.
 
 You can build the project with `./gradlew clean build`. If you're a Windows user, you can use `gradlew.bat` instead.
 A self-contained .jar file will be built in `build/libs/ukulele.jar`.
@@ -23,7 +23,7 @@ If you're new to Kotlin, I recommend the following reading:
 * [Kotlin Koans](https://kotlinlang.org/docs/tutorials/koans.html) (Interactive)
 
 ## Working with Spring Boot
-Ukulele uses Spring Boot as a framework. The basic concept is that we can declare components (beans, services, etc) to
+Ukulele uses Spring Boot as a framework. The basic concept is that we can declare components (beans, services, etc.) to
 be depended on by other beans. This is called inversion of control. It allows us to reduce coupling between components.
 
 All `Command`s are beans. Another bean is the `CommandManager`, which depends on all Command beans. Beans are automatically
@@ -69,3 +69,4 @@ class PlayCommand(
     // ...
 }
 ```
+
