@@ -6,16 +6,18 @@ import dev.arbjerg.ukulele.jda.CommandContext
 import org.springframework.stereotype.Component
 
 @Component
-class ResumeCommand : Command("resume") {
+class LoopCommand : Command("loop", "l") {
     override suspend fun CommandContext.invoke() {
-        if (!player.isPaused) return reply("Player is already playing.")
-
-        player.resume()
-        reply("Playback has been resumed.")
+        player.queueLooping = !player.queueLooping
+        if (player.queueLooping) {
+            reply("Queue looping is now enabled.")
+        } else {
+            reply("Queue looping is now disabled.")
+        }
     }
 
     override fun HelpContext.provideHelp() {
         addUsage("")
-        addDescription("Resumes the playback.")
+        addDescription("Toggles the looping of the queue.")
     }
 }

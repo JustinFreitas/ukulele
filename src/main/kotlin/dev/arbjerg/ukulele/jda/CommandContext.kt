@@ -2,32 +2,31 @@ package dev.arbjerg.ukulele.jda
 
 import dev.arbjerg.ukulele.audio.Player
 import dev.arbjerg.ukulele.audio.PlayerRegistry
-import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildProperties
 import dev.arbjerg.ukulele.features.HelpContext
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.TextChannel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import org.springframework.stereotype.Component
 
 class CommandContext(
-        val beans: Beans,
-        val guildProperties: GuildProperties,
-        val guild: Guild,
-        val channel: TextChannel,
-        val invoker: Member,
-        val message: Message,
-        val command: Command,
-        val prefix: String,
-        /** Prefix + command name */
-        val trigger: String
+    val beans: Beans,
+    val guildProperties: GuildProperties,
+    val guild: Guild,
+    val channel: TextChannel,
+    val invoker: Member,
+    val message: Message,
+    val command: Command,
+    val prefix: String,
+    /** Prefix + command name */
+    val trigger: String,
 ) {
     @Component
     class Beans(
-            val players: PlayerRegistry,
-            val botProps: BotProps
+        val players: PlayerRegistry,
     ) {
         lateinit var commandManager: CommandManager
     }
@@ -44,18 +43,22 @@ class CommandContext(
         channel.sendMessage(msg).queue()
     }
 
-    fun replyMsg(msg: Message) {
+    fun replyMsg(msg: MessageCreateData) {
         channel.sendMessage(msg).queue()
     }
 
     fun replyEmbed(embed: MessageEmbed) {
-        channel.sendMessage(embed).queue()
+        channel.sendMessage(MessageCreateData.fromEmbeds(embed)).queue()
     }
 
     fun replyHelp(forCommand: Command = command) {
+        channel.sendMessage(getHelp(forCommand)).queue()
+    }
+
+    private fun getHelp(forCommand: Command): MessageCreateData {
         val help = HelpContext(this, forCommand)
         forCommand.provideHelp0(help)
-        channel.sendMessage(help.buildMessage()).queue()
+        return help.buildMessage()
     }
 
     fun handleException(t: Throwable) {

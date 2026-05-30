@@ -6,7 +6,7 @@ import dev.arbjerg.ukulele.jda.CommandContext
 import org.springframework.stereotype.Component
 
 @Component
-class PauseCommand : Command ("pause") {
+class PauseCommand : Command("pause") {
     override suspend fun CommandContext.invoke() {
         if (player.isPaused) return reply("Player already paused. Use `resume` to continue playback.")
 
