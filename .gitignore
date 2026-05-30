@@ -1,14 +1,8 @@
-*.mv.db
-*.trace.db
-HELP.md
-.gradle
+# Build systems
+.gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-ukulele.yml
-
-### STS ###
+bin/
+out/
 .apt_generated
 .classpath
 .factorypath
@@ -16,25 +10,51 @@ ukulele.yml
 .settings
 .springBeans
 .sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
+# Databases and related files
+*.mv.db
+*.trace.db
+*.mv.db.backup
+/database-backup.sql
+/export.sql
+db/
+new-databases/
+old-databases/
+tmp/
+
+# Configuration and secrets
+/ukulele.yml
+/ukulele.yml.bak
+/gradle.properties
+
+# IDE specific files
+.idea/
+.vscode/
+.kotlin/
+.run/
 *.iws
 *.iml
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# Operating System files
+hs_err_pid*
+replay_pid*
+*.log
 
-### VS Code ###
-.vscode/
+# Project specific artifacts
+/ukulele.jar
+/CONTRIBUTING.md
+/HELP.md
+
+# Scripts and binaries
+/gradlew
+/gradlew.bat
+/gradle/wrapper/gradle-wrapper.jar
+/ukulele
+/ukulele.bat
+/Ukulele Discord Bot.bat
+/h2-*.jar
+/upgrade-h2-database.bat
+/upgradeH2.sh
+
+/docker-compose.override.yml
