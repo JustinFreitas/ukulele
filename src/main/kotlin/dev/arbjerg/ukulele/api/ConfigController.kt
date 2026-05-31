@@ -15,11 +15,12 @@ data class ConfigDto(
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = ["*"])
-class ConfigController(val botProps: BotProps) {
+class ConfigController(
+    val botProps: BotProps,
+) {
     @GetMapping("/config")
-    fun getConfig(): ConfigDto {
-        return ConfigDto(
+    fun getConfig(): ConfigDto =
+        ConfigDto(
             useWebsockets = botProps.useWebsockets,
         )
-    }
 }

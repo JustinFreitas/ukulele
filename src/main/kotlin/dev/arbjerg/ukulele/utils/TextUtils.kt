@@ -3,8 +3,8 @@ package dev.arbjerg.ukulele.utils
 import java.util.concurrent.TimeUnit
 
 object TextUtils {
-    fun humanReadableTime(length: Long): String {
-        return if (length < 3600000) {
+    fun humanReadableTime(length: Long): String =
+        if (length < 3600000) {
             String.format(
                 "%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(length),
@@ -18,5 +18,4 @@ object TextUtils {
                 TimeUnit.MILLISECONDS.toSeconds(length) % TimeUnit.MINUTES.toSeconds(1),
             )
         }
-    }
 }

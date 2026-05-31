@@ -34,13 +34,12 @@ class PlayerController(
     private val log = org.slf4j.LoggerFactory.getLogger(PlayerController::class.java)
 
     @GetMapping("/guilds")
-    fun getGuilds(): List<GuildDto> {
-        return shardManager.guilds.map { guild ->
+    fun getGuilds(): List<GuildDto> =
+        shardManager.guilds.map { guild ->
             val player = playerRegistry.getExisting(guild.idLong)
             val isPlaying = player?.currentTrack != null && !player.isPaused
             GuildDto(guild.id, guild.name, isPlaying)
         }
-    }
 
     @GetMapping("/player/{guildId}")
     suspend fun getPlayer(
@@ -133,7 +132,9 @@ class PlayerController(
             identifiers = botProps.playlist.split("|")
         }
 
-        val pattern = java.util.regex.Pattern.compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
+        val pattern =
+            java.util.regex.Pattern
+                .compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
         val errors = mutableListOf<String>()
 
         identifiers.forEach { identifier ->

@@ -8,23 +8,25 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class DatabaseConfig(private val botProps: BotProps) {
+class DatabaseConfig(
+    private val botProps: BotProps,
+) {
     @Bean
     fun connectionFactory(): ConnectionFactory =
         H2ConnectionFactory(
-            H2ConnectionConfiguration.builder()
+            H2ConnectionConfiguration
+                .builder()
                 .file(botProps.database + ";DATABASE_TO_UPPER=false")
                 .build(),
         )
 
     @Bean(initMethod = "migrate")
-    fun flyway(): Flyway {
-        return Flyway(
+    fun flyway(): Flyway =
+        Flyway(
             Flyway.configure().dataSource(
                 "jdbc:h2:" + botProps.database + ";DATABASE_TO_UPPER=false",
                 "",
                 "",
             ),
         )
-    }
 }

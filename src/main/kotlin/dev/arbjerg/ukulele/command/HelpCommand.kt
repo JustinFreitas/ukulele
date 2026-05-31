@@ -24,8 +24,7 @@ class HelpCommand : Command("help", "h", "?") {
                                 }
                             },
                         ),
-                    )
-                    .addContent("\nUse '$trigger <command>' to see more details.")
+                    ).addContent("\nUse '$trigger <command>' to see more details.")
             replyMsg(msg.build())
         }
     }

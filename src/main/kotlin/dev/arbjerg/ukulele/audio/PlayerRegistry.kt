@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
-class PlayerRegistry(val playerBeans: Player.Beans) {
+class PlayerRegistry(
+    val playerBeans: Player.Beans,
+) {
     private val players = ConcurrentHashMap<Long, Player>()
 
     fun get(

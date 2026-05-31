@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component
 import kotlin.system.exitProcess
 
 @Component
-class ExitCommand(val botProps: BotProps) : Command("exit") {
+class ExitCommand(
+    val botProps: BotProps,
+) : Command("exit") {
     override suspend fun CommandContext.invoke() {
         if (message.author.id != botProps.ownerId) {
             reply("You do not have permission to run this command.")

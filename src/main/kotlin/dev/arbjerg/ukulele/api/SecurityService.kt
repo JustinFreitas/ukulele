@@ -38,9 +38,7 @@ class SecurityService {
         return true
     }
 
-    fun getUnauthorizedCount(): Long {
-        return unauthorizedAttempts.get()
-    }
+    fun getUnauthorizedCount(): Long = unauthorizedAttempts.get()
 
     fun resetUnauthorized() {
         unauthorizedAttempts.set(0)

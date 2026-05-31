@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/security")
 @CrossOrigin(origins = ["*"])
-class SecurityController(val securityService: SecurityService) {
+class SecurityController(
+    val securityService: SecurityService,
+) {
     @GetMapping("/stats")
-    fun getStats(): Map<String, Long> {
-        return mapOf("unauthorizedAttempts" to securityService.getUnauthorizedCount())
-    }
+    fun getStats(): Map<String, Long> = mapOf("unauthorizedAttempts" to securityService.getUnauthorizedCount())
 
     @org.springframework.web.bind.annotation.PostMapping("/reset")
     fun resetStats() {

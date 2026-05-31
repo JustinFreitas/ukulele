@@ -26,7 +26,11 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
-class Player(private val beans: Beans, guildProperties: GuildProperties) : AudioEventAdapter(), AudioSendHandler {
+class Player(
+    private val beans: Beans,
+    guildProperties: GuildProperties,
+) : AudioEventAdapter(),
+    AudioSendHandler {
     @Component
     class Beans(
         val apm: AudioPlayerManager,
@@ -54,9 +58,10 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
         set(value) {
             field = value
             player.volume = scaleVolume(value)
-            beans.guildProperties.transform(guildId) {
-                it.volume = value
-            }.subscribe()
+            beans.guildProperties
+                .transform(guildId) {
+                    it.volume = value
+                }.subscribe()
             publishState()
         }
 
@@ -74,7 +79,12 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
                 maxVolume = beans.botProps.maxVolume,
                 isReplayGainEnabled = beans.botProps.normalization,
                 queueSize = queue.tracks.size,
-                channelId = beans.shardManager.getGuildById(guildId)?.audioManager?.connectedChannel?.id,
+                channelId =
+                    beans.shardManager
+                        .getGuildById(guildId)
+                        ?.audioManager
+                        ?.connectedChannel
+                        ?.id,
             )
         beans.publisher.publishUpdate(guildId.toString(), dto)
     }
@@ -240,7 +250,12 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
     ) {
         val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
         if (matcher.find() && matcher.group(1) != null) {
-            val volume = matcher.group(1).toInt().coerceAtLeast(1).coerceAtMost(150)
+            val volume =
+                matcher
+                    .group(1)
+                    .toInt()
+                    .coerceAtLeast(1)
+                    .coerceAtMost(150)
             player.volume = volume
         }
     }
@@ -299,9 +314,7 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
         log.error("Track $track got stuck!")
     }
 
-    override fun canProvide(): Boolean {
-        return player.provide(frame)
-    }
+    override fun canProvide(): Boolean = player.provide(frame)
 
     override fun provide20MsAudio(): ByteBuffer {
         // flip to make it a read buffer
@@ -309,7 +322,5 @@ class Player(private val beans: Beans, guildProperties: GuildProperties) : Audio
         return buffer
     }
 
-    override fun isOpus(): Boolean {
-        return frame.format is OpusAudioDataFormat
-    }
+    override fun isOpus(): Boolean = frame.format is OpusAudioDataFormat
 }

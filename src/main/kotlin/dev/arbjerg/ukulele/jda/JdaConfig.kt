@@ -47,7 +47,8 @@ class JdaConfig {
         val daveSessionFactory = JDaveSessionFactory()
 
         val builder =
-            DefaultShardManagerBuilder.create(botProps.token, intents)
+            DefaultShardManagerBuilder
+                .create(botProps.token, intents)
                 .setAudioModuleConfig(AudioModuleConfig().withDaveSessionFactory(daveSessionFactory))
                 .disableCache(
                     CacheFlag.ACTIVITY,
@@ -56,8 +57,7 @@ class JdaConfig {
                     CacheFlag.STICKER,
                     CacheFlag.SCHEDULED_EVENTS,
                     CacheFlag.SOUNDBOARD_SOUNDS,
-                )
-                .setBulkDeleteSplittingEnabled(false)
+                ).setBulkDeleteSplittingEnabled(false)
                 .setEnableShutdownHook(true)
                 .addEventListeners(eventHandler)
                 .setActivity(activity)
@@ -67,7 +67,9 @@ class JdaConfig {
     }
 
     @Component
-    class JdaShutdownHook(val shardManager: ShardManager) : DisposableBean {
+    class JdaShutdownHook(
+        val shardManager: ShardManager,
+    ) : DisposableBean {
         override fun destroy() {
             shardManager.shutdown()
         }

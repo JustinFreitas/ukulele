@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 
 @Component
-class AuthFilter(val botProps: BotProps, val securityService: SecurityService) : Filter {
+class AuthFilter(
+    val botProps: BotProps,
+    val securityService: SecurityService,
+) : Filter {
     override fun doFilter(
         request: ServletRequest,
         response: ServletResponse,

@@ -10,10 +10,10 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-    id("org.flywaydb.flyway") version "12.5.0"
+    id("org.flywaydb.flyway") version "12.7.0"
     // https://plugins.gradle.org/plugin/com.github.ben-manes.versions
     id("com.github.ben-manes.versions") version "0.54.0"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
+    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
 tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {

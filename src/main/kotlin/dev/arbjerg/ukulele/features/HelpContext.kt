@@ -5,7 +5,10 @@ import dev.arbjerg.ukulele.jda.CommandContext
 import net.dv8tion.jda.api.utils.MarkdownUtil
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 
-class HelpContext(private val commandContext: CommandContext, private val command: Command) {
+class HelpContext(
+    private val commandContext: CommandContext,
+    private val command: Command,
+) {
     private val lines = mutableListOf<String>()
 
     fun addUsage(usage: String) = addUsages(usage)

@@ -79,9 +79,7 @@ class SeekCommand : Command("seek") {
         return timestamp
     }
 
-    private fun forceTwoDigits(i: Int): String {
-        return if (i < 10) "0$i" else i.toString()
-    }
+    private fun forceTwoDigits(i: Int): String = if (i < 10) "0$i" else i.toString()
 
     override fun HelpContext.provideHelp() {
         addUsage("[[hh:]mm:]ss")

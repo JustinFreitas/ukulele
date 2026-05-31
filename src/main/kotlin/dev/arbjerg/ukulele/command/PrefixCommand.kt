@@ -8,7 +8,10 @@ import dev.arbjerg.ukulele.jda.CommandContext
 import org.springframework.stereotype.Component
 
 @Component
-class PrefixCommand(val guildPropertiesService: GuildPropertiesService, val botProps: BotProps) : Command("prefix") {
+class PrefixCommand(
+    val guildPropertiesService: GuildPropertiesService,
+    val botProps: BotProps,
+) : Command("prefix") {
     override suspend fun CommandContext.invoke() =
         when {
             argumentText == "reset" -> {

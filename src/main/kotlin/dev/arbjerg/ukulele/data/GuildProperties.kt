@@ -17,14 +17,18 @@ import reactor.kotlin.core.publisher.toMono
 import java.time.Duration
 
 @Service
-class GuildPropertiesService(private val repo: GuildPropertiesRepository) {
+class GuildPropertiesService(
+    private val repo: GuildPropertiesRepository,
+) {
     private val log: Logger = LoggerFactory.getLogger(GuildPropertiesService::class.java)
 
     private val cache: AsyncLoadingCache<Long, GuildProperties> =
-        Caffeine.newBuilder()
+        Caffeine
+            .newBuilder()
             .expireAfterAccess(Duration.ofMinutes(10))
             .buildAsync { id, _ ->
-                repo.findById(id)
+                repo
+                    .findById(id)
                     .defaultIfEmpty(GuildProperties(id).apply { new = true })
                     .toFuture()
                     .thenApply { it!! }
@@ -43,14 +47,12 @@ class GuildPropertiesService(private val repo: GuildPropertiesRepository) {
             .map {
                 func(it)
                 it
-            }
-            .flatMap { repo.save(it) }
+            }.flatMap { repo.save(it) }
             .map {
                 it.apply { new = false }
                 log.info("Updated guild properties: {}", it)
                 it
-            }
-            .doOnSuccess {
+            }.doOnSuccess {
                 it!!
                 cache.synchronous().put(it.guildId, it)
             }

@@ -24,17 +24,18 @@ class NowPlayingCommand : Command("nowplaying", "np") {
         replyEmbed(buildEmbed(player.tracks[0]))
     }
 
-    fun buildEmbed(track: AudioTrack): MessageEmbed {
-        return when (track) {
+    fun buildEmbed(track: AudioTrack): MessageEmbed =
+        when (track) {
             is YoutubeAudioTrack -> GetEmbed(track).youtube()
             is SoundCloudAudioTrack -> GetEmbed(track).soundcloud()
             is TwitchStreamAudioTrack -> GetEmbed(track).twitch()
             is LocalAudioTrack -> GetEmbed(track).local()
             else -> GetEmbed(track).default()
         }
-    }
 
-    private class GetEmbed(val track: AudioTrack) {
+    private class GetEmbed(
+        val track: AudioTrack,
+    ) {
         val timeField =
             if (track.info.isStream) {
                 "[Live]"

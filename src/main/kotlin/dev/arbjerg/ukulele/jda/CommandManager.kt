@@ -66,7 +66,8 @@ class CommandManager(
                 trigger = mention + name
             } else if (message.contentRaw.startsWith(prefix)) {
                 name =
-                    message.contentRaw.drop(prefix.length)
+                    message.contentRaw
+                        .drop(prefix.length)
                         .takeWhile { !it.isWhitespace() }
                 trigger = prefix + name
             } else {

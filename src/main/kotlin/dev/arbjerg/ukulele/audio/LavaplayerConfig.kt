@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class LavaplayerConfig(val botProps: dev.arbjerg.ukulele.config.BotProps) {
+class LavaplayerConfig(
+    val botProps: dev.arbjerg.ukulele.config.BotProps,
+) {
     @Bean
     fun playerManager(): AudioPlayerManager {
         val apm = DefaultAudioPlayerManager()

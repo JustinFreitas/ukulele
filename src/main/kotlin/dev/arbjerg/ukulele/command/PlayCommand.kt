@@ -38,7 +38,16 @@ class PlayCommand(
             val matcher = pattern.matcher(identifier)
             if (matcher.find() && matcher.groupCount() == 2) {
                 val queueLabel = if (matcher.group(1) != null) matcher.group(1).trim() else ""
-                val source = if (matcher.group(2) != null) matcher.group(2).trim().removePrefix("<").removeSuffix(">") else ""
+                val source =
+                    if (matcher.group(2) != null) {
+                        matcher
+                            .group(2)
+                            .trim()
+                            .removePrefix("<")
+                            .removeSuffix(">")
+                    } else {
+                        ""
+                    }
                 if (source.isNotEmpty()) {
                     apm.loadItemOrdered(this, source, Loader(this, player, identifier, queueLabel))
                 }
