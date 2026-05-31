@@ -81,7 +81,7 @@ dependencies {
     // implementation("dev.arbjerg:lavaplayer:2.2.6")
     // Above broken for YouTube links.  Use Justin's fork.
     // https://github.com/JustinFreitas/lavaplayer
-    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_11")
+    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_12")
     // https://mvnrepository.com/artifact/club.minnced/jdave-api
     implementation("club.minnced:jdave-api:$jdaveVersion")
     implementation("club.minnced:jdave-native-win-x86-64:$jdaveVersion")
