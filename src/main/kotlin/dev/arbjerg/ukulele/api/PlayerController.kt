@@ -106,14 +106,14 @@ class PlayerController(
     @PostMapping("/player/{guildId}/play")
     suspend fun play(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, String>,
+        @RequestBody body: PlayRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: throw RuntimeException("Guild not found")
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)
 
         // Ensure connected to voice
-        val channelId = body["channelId"]
+        val channelId = body.channelId
         if (!guild.audioManager.isConnected) {
             val channel = getChannel(guild, channelId)
             if (channel != null) {
@@ -122,12 +122,11 @@ class PlayerController(
             }
         }
 
-        if (body["fadeIn"] == "true") {
+        if (body.fadeIn == true) {
             player.isFadeInArmed = true
         }
 
-        var identifiers = (body["url"] ?: "").split("|")
-        // ... (rest of play method logic)
+        var identifiers = (body.url ?: "").split("|")
         if (identifiers.isNotEmpty() && identifiers.first().isEmpty()) {
             identifiers = botProps.playlist.split("|")
         }
@@ -220,11 +219,11 @@ class PlayerController(
     @PostMapping("/player/{guildId}/skip")
     suspend fun skip(
         @PathVariable guildId: Long,
-        @RequestBody(required = false) body: Map<String, Int>?,
+        @RequestBody(required = false) body: SkipRequest?,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val index = body?.get("index")
+        val index = body?.index
         val range = if (index != null && index >= 0) 0..index else 0..0
         playerRegistry.get(guild, properties).skip(range)
     }
@@ -232,11 +231,11 @@ class PlayerController(
     @PostMapping("/player/{guildId}/volume")
     suspend fun setVolume(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, Int>,
+        @RequestBody body: VolumeRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val volume = body["volume"] ?: return
+        val volume = body.volume
         playerRegistry.get(guild, properties).volume = volume
     }
 
@@ -262,44 +261,49 @@ class PlayerController(
     @PostMapping("/player/{guildId}/repeat")
     suspend fun repeat(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, Boolean>,
+        @RequestBody body: RepeatRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val isRepeat = body["repeat"] ?: false
+        val isRepeat = body.repeat
         playerRegistry.get(guild, properties).repeatTrack = isRepeat
     }
 
     @PostMapping("/player/{guildId}/loop")
     suspend fun loop(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, Boolean>,
+        @RequestBody body: LoopRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val isLoop = body["loop"] ?: false
+        val isLoop = body.loop
         playerRegistry.get(guild, properties).queueLooping = isLoop
     }
 
     @PostMapping("/player/{guildId}/seek")
     suspend fun seek(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, Long>,
+        @RequestBody body: SeekRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val position = body["position"] ?: return
+        val position = body.position
         playerRegistry.get(guild, properties).seek(position)
     }
 
     @PostMapping("/player/{guildId}/say")
     suspend fun say(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, String>,
+        @RequestBody body: SayRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val text = body["text"] ?: return
+        val text =
+            org.jsoup.Jsoup.clean(
+                body.text,
+                org.jsoup.safety.Safelist
+                    .none(),
+            )
         val player = playerRegistry.get(guild, properties)
         // Only say if there is a text channel the bot last spoke in
         player.lastChannel?.sendMessage(text)?.queue()
@@ -308,10 +312,10 @@ class PlayerController(
     @PostMapping("/player/{guildId}/move")
     suspend fun move(
         @PathVariable guildId: Long,
-        @RequestBody body: Map<String, String>,
+        @RequestBody body: MoveRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
-        val channelId = body["channelId"] ?: return
+        val channelId = body.channelId
         val channel = getChannel(guild, channelId)
         if (channel != null) {
             guild.audioManager.openAudioConnection(channel)

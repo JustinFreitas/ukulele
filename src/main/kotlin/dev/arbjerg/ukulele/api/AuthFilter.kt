@@ -36,7 +36,15 @@ class AuthFilter(
         }
 
         val ip = req.remoteAddr ?: "unknown"
+        val isWrite = req.method != "GET" && req.method != "OPTIONS"
         val isResetEndpoint = path == "/api/security/reset" && req.method == "POST"
+
+        // Rate limiting check
+        if (securityService.isRateLimited(ip, isWrite)) {
+            res.status = HttpStatus.TOO_MANY_REQUESTS.value()
+            res.writer.write("Rate limit exceeded. Please try again later.")
+            return
+        }
 
         // If banned, block everything EXCEPT the reset endpoint (which allows self-recovery if you have the token)
         if (!isResetEndpoint && securityService.isBanned(ip)) {

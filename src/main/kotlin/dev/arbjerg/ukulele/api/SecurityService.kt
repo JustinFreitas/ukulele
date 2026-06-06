@@ -1,7 +1,10 @@
 package dev.arbjerg.ukulele.api
 
+import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 @Service
@@ -10,9 +13,35 @@ class SecurityService {
     private val failedAttempts = ConcurrentHashMap<String, Int>()
     private val bannedIps = ConcurrentHashMap<String, Long>()
 
+    // Rate limiting buckets
+    private val readRateLimitCache =
+        Caffeine
+            .newBuilder()
+            .expireAfterWrite(15, TimeUnit.MINUTES)
+            .build<String, AtomicInteger>()
+
+    private val writeRateLimitCache =
+        Caffeine
+            .newBuilder()
+            .expireAfterWrite(15, TimeUnit.MINUTES)
+            .build<String, AtomicInteger>()
+
     companion object {
         const val MAX_FAILURES = 10
         const val BAN_DURATION_MS = 10 * 60 * 1000L // 10 minutes
+        const val MAX_READ_REQUESTS_15M = 5000
+        const val MAX_WRITE_REQUESTS_15M = 50
+    }
+
+    fun isRateLimited(
+        ip: String,
+        isWrite: Boolean,
+    ): Boolean {
+        val cache = if (isWrite) writeRateLimitCache else readRateLimitCache
+        val limit = if (isWrite) MAX_WRITE_REQUESTS_15M else MAX_READ_REQUESTS_15M
+
+        val count = cache.get(ip) { AtomicInteger(0) }.incrementAndGet()
+        return count > limit
     }
 
     fun incrementUnauthorized() {

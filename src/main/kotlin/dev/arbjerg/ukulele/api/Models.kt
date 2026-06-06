@@ -48,3 +48,37 @@ data class VoiceChannelDto(
     val id: String,
     val name: String,
 )
+
+data class PlayRequest(
+    val url: String? = null,
+    val channelId: String? = null,
+    val fadeIn: Boolean? = null,
+)
+
+data class SkipRequest(
+    val index: Int? = null,
+)
+
+data class VolumeRequest(
+    val volume: Int,
+)
+
+data class RepeatRequest(
+    val repeat: Boolean,
+)
+
+data class LoopRequest(
+    val loop: Boolean,
+)
+
+data class SeekRequest(
+    val position: Long,
+)
+
+data class SayRequest(
+    val text: String,
+)
+
+data class MoveRequest(
+    val channelId: String,
+)
