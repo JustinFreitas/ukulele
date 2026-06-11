@@ -131,6 +131,9 @@ docker-compose up -d
 ## 📡 Remote API
 Ukulele includes a powerful REST and WebSocket API. See **[API.md](API.md)** for full documentation on endpoints and integration.
 
+### 📱 Ukulele Remote
+**[Ukulele Remote](https://github.com/JustinFreitas/ukulele-remote)** is a companion mobile app that drives this API — a sleek, real-time controller for managing playback, the queue, and voice channel switching from your phone. Built with React Native and Expo, it stays in sync over the WebSocket interface (set `useWebsockets: true` in your config to enable live updates).
+
 ---
 
 ## 🛠️ Development
