@@ -5,8 +5,11 @@ Ukulele is a lightweight, simple-to-host Discord music bot inspired by FredBoat.
 
 The bot is self-contained and requires **Java 25** to run.
 
+> [!NOTE]
+> The modernized stack (Java 25, Spring Boot 4, Kotlin 2.3, REST/WebSocket API) lives on the **[`modernize-java25`](../../tree/modernize-java25)** branch. This is a personal fork, so that branch is the active line of development rather than `master`.
+
 > [!IMPORTANT]
-> This project utilizes a **custom Lavaplayer fork** which enables advanced features like **ReplayGain (Volume Normalization)**. This allows the bot to maintain consistent volume levels across different tracks automatically.
+> This project utilizes a **custom Lavaplayer fork** ([`JustinFreitas/lavaplayer`](https://github.com/JustinFreitas/lavaplayer), `v2.2.6_13`) which enables advanced features like **ReplayGain (Volume Normalization)**. This allows the bot to maintain consistent volume levels across different tracks automatically.
 
 ---
 
@@ -15,6 +18,7 @@ The bot is self-contained and requires **Java 25** to run.
 ### 🎵 Core Music Playback
 * **Multi-Source Support:** Play music from YouTube, SoundCloud, Bandcamp, Vimeo, Twitch, and more.
 * **Local Files:** Support for playing local audio files directly from the host system.
+* **Batch Queueing:** Add multiple tracks in one command by separating URLs with a pipe (`url1 | url2 | url3`).
 * **Dynamic Queue:** Manage your playback queue with ease.
 * **Shuffle & Loop:** Randomize your queue or loop individual tracks and the entire queue.
 * **Precise Seeking:** Jump to any part of a track with the `seek` command.
@@ -30,7 +34,7 @@ The bot is self-contained and requires **Java 25** to run.
 * **Secure Access:** Built-in security with API token authentication.
 
 ### 🛠️ Robust Infrastructure
-* **Java 25 & Spring Boot 4:** Built on the latest, high-performance Java ecosystem.
+* **Java 25, Spring Boot 4 & Kotlin 2.3:** Built on the latest, high-performance Java ecosystem, with JDA 6 for Discord.
 * **Zero-Maintenance Database:** Uses an embedded H2 database with R2DBC for efficient, reactive data handling.
 * **Flyway Migrations:** Automated database schema management.
 * **Docker Ready:** Includes a `Dockerfile` and `docker-compose.yml` for instant deployment.
@@ -39,21 +43,25 @@ The bot is self-contained and requires **Java 25** to run.
 
 ## ⌨️ Commands
 
+The default prefix is `::`. Each command's aliases are shown in parentheses.
+
 | Command | Description |
 | :--- | :--- |
-| `::play <query/url>` | Play a track or add it to the queue. |
-| `::skip [range]` | Skip the current track or a range of tracks. |
-| `::nowplaying` | Show detailed information about the current track. |
-| `::queue` | Display the current playback queue. |
-| `::volume <0-150>` | Adjust the player volume. |
+| `::play` (`p`) `<url>[\|<url>...]` | Add one or more tracks to the queue. |
+| `::skip` (`s`) `[range]` | Skip the current track or a range of tracks. |
+| `::nowplaying` (`np`) | Show detailed information about the current track. |
+| `::queue` (`q`, `list`) | Display the current playback queue. |
+| `::volume` (`v`) `<0-150>%` | Set the volume, or use `+` / `-` to step by the optimal amount. |
 | `::seek <time>` | Seek to a specific timestamp in the track. |
 | `::pause` / `::resume` | Pause or resume playback. |
 | `::shuffle` | Randomize the current queue. |
-| `::repeat` | Toggle looping for the current track. |
-| `::loop` | Toggle looping for the entire queue. |
+| `::repeat` (`r`) | Toggle looping for the current track. |
+| `::loop` (`l`) | Toggle looping for the entire queue. |
+| `::stop` | Clear the queue and disconnect the player. |
 | `::prefix <new_prefix>` | Change the bot's command prefix for the guild. |
-| `::say <message>` | Make the bot speak in the voice channel. |
-| `::help` | List all available commands. |
+| `::say <text>` | Repeat the given text back as a message. |
+| `::exit` | Shut down the bot gracefully (owner only). |
+| `::help` (`h`, `?`) `[command]` | List all commands, or show help for a specific one. |
 
 ---
 
@@ -78,11 +86,6 @@ docker-compose up -d
 
 ## 📡 Remote API
 Ukulele includes a powerful REST and WebSocket API. See **[API.md](API.md)** for full documentation on endpoints and integration.
-
----
-
-## 🤝 Contributing
-Pull requests are welcome! Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** before submitting.
 
 ---
 
