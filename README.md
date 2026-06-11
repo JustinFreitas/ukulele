@@ -9,7 +9,7 @@ The bot is self-contained and requires **Java 25** to run.
 > The modernized stack (Java 25, Spring Boot 4, Kotlin 2.3, REST/WebSocket API) lives on the **[`modernize-java25`](../../tree/modernize-java25)** branch. This is a personal fork, so that branch is the active line of development rather than `master`.
 
 > [!IMPORTANT]
-> This project utilizes a **custom Lavaplayer fork** ([`JustinFreitas/lavaplayer`](https://github.com/JustinFreitas/lavaplayer), `v2.2.6_13`) which enables advanced features like **ReplayGain (Volume Normalization)**. This allows the bot to maintain consistent volume levels across different tracks automatically.
+> This project utilizes a **custom Lavaplayer fork** ([`JustinFreitas/lavaplayer`](https://github.com/JustinFreitas/lavaplayer), `v2.2.6_13`) which unlocks advanced features like **ReplayGain (Volume Normalization)**. This is **opt-in** — see [Volume Normalization](#-volume-normalization-replaygain) to enable it.
 
 ---
 
@@ -24,9 +24,9 @@ The bot is self-contained and requires **Java 25** to run.
 * **Precise Seeking:** Jump to any part of a track with the `seek` command.
 
 ### 🔊 Advanced Audio Control
-* **Volume Normalization (ReplayGain):** Automatically balances audio levels so you don't have to constantly adjust your volume.
+* **Volume Normalization (ReplayGain):** Optionally balances audio levels across tracks so you don't have to constantly adjust your volume. Disabled by default — see [Volume Normalization](#-volume-normalization-replaygain) to turn it on.
 * **Virtual Volume Scaling:** High-fidelity volume control mapped to the player's internal engine.
-* **Per-Track Volume:** Support for specifying volume levels within a track's queue label (e.g., `[Label, v:42] URL`).
+* **Per-Track Volume:** Set a volume for an individual track via its queue label (e.g. `[Label, v:42] URL`) — see [`::play` syntax](#-play-syntax).
 
 ### 📱 Remote Control & Integration
 * **REST API:** Fully featured API to control the player, manage the queue, and update configuration programmatically.
@@ -62,6 +62,50 @@ The default prefix is `::`. Each command's aliases are shown in parentheses.
 | `::say <text>` | Repeat the given text back as a message. |
 | `::exit` | Shut down the bot gracefully (owner only). |
 | `::help` (`h`, `?`) `[command]` | List all commands, or show help for a specific one. |
+
+### 🎶 `::play` syntax
+
+A play request is one or more **identifiers** (a URL, a search like `ytsearch:...`, or a local file path). Each identifier may be prefixed with an optional `[...]` label.
+
+```
+::play [optional label] <url-or-path>
+```
+
+**Multiple tracks at once.** Separate identifiers with a pipe (`|`) to queue several in a single command:
+
+```
+::play https://youtu.be/aaa | https://youtu.be/bbb | ytsearch:lofi beats
+```
+
+**Labels.** Anything inside the leading `[...]` is a label for that track. If `prependQueueLabelToTitle` is enabled in your config, the label is shown in front of the track title in the queue:
+
+```
+::play [Morning Mix] https://youtu.be/aaa
+```
+
+**Per-track volume (`v:`).** Add a `v:<n>` attribute inside the label to set that track's volume (1–150) when it starts playing — handy for taming a track that's much louder or quieter than the rest. It's case-insensitive and can sit anywhere in the label:
+
+```
+::play [Quiet Intro, v:42] https://youtu.be/aaa | [v:120] https://youtu.be/bbb
+```
+
+Here the first track plays at 42% and the second at 120%, independent of the player's current volume.
+
+> [!NOTE]
+> When [Volume Normalization](#-volume-normalization-replaygain) is enabled, a track's `v:` volume is skipped for any track that already has ReplayGain applied — normalization takes precedence. The `v:` value still applies to tracks without ReplayGain data.
+
+### 🔉 Volume Normalization (ReplayGain)
+
+ReplayGain levels each track to a consistent loudness so you aren't constantly riding the volume control. It relies on the custom Lavaplayer fork and is **off by default**.
+
+To enable it, set `normalization` to `true` under the `config:` block in your `ukulele.yml`:
+
+```yaml
+config:
+  normalization: true
+```
+
+When enabled, the player applies ReplayGain on track start; tracks without ReplayGain data fall back to the player's current volume (and any per-track `v:` label).
 
 ---
 

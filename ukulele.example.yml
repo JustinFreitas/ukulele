@@ -14,6 +14,11 @@ config:
     false # When a queue label is defined when playing tracks (i.e. [Label] URL),
     # use that value in front of the title when listing queue.
   apiToken: "secret" # Token for API authentication
+  normalization: false # Enable ReplayGain volume normalization across tracks, default is false. Requires the custom Lavaplayer fork.
+  minVolume: 0 # Real volume (%) that the virtual minimum (0%) maps to, default is 0.
+  maxVolume: 80 # Real volume (%) that the virtual maximum (100%) maps to, default is 80.
+  useWebsockets: false # Push real-time player updates over STOMP websockets, default is false.
+  ownerId: "" # Discord user ID of the bot owner. Required for the ::exit command and the "owner" API channel target.
 
 server:
   port: 8080 # Port for the REST API
