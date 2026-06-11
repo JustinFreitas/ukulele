@@ -1,8 +1,25 @@
 config:
-  token: ""              # Your discord bot token
-  shards: 1              # Number of shards to create. 1 works for most bots
-  prefix: "::"           # Prefix to invoke commands with
+  token: "" # Your discord bot token
+  shards: 1 # Number of shards to create. 1 works for most bots
+  prefix: ";;" # Prefix to invoke commands with. ;; is used here as it needs no Shift key (easier to type than ::).
   database: "./database" # Database filename
-  game: ""               # Status message shown when your bot is online
-  trackDurationLimit: 0  # Maximum limit of track duration in minutes. Set to 0 for unlimited
-  announceTracks: false  # Announce the start of a track
+  game: "music in the channel" # Status message shown when your bot is online. Starts with 'Playing'
+  trackDurationLimit: 0 # Maximum limit of track duration in minutes. Set to 0 for unlimited
+  announceTracks: true # Announce the start of a track, default is false.
+  queueLooping: true # Queue looping true/false, default is false.
+  repeatTrack: true # Repeat track true/false, default is false.
+  playlist: "" # A list pipe delimited of play identifiers Ex: [Queue Label] SomeUrlOrLocalPath | ...
+  showQueueOnSkip: false # Prints the queue when tracks are skipped, default is true.
+  prependQueueLabelToTitle:
+    false # When a queue label is defined when playing tracks (i.e. [Label] URL),
+    # use that value in front of the title when listing queue.
+  apiToken: "secret" # Token for API authentication
+  normalization: false # Enable ReplayGain volume normalization across tracks, default is false. Requires the custom Lavaplayer fork.
+  minVolume: 0 # Real volume (%) that the virtual minimum (0%) maps to, default is 0.
+  maxVolume: 80 # Real volume (%) that the virtual maximum (100%) maps to, default is 80.
+  useWebsockets: false # Push real-time player updates over STOMP websockets, default is false.
+  ownerId: "" # Discord user ID of the bot owner. Required for the ::exit command and the "owner" API channel target.
+
+server:
+  port: 8080 # Port for the REST API
+

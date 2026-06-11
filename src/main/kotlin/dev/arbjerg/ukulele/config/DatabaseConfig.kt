@@ -6,22 +6,27 @@ import io.r2dbc.spi.ConnectionFactory
 import org.flywaydb.core.Flyway
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
 
 @Configuration
-class DatabaseConfig(private val botProps: BotProps, private val env: Environment) {
-
+class DatabaseConfig(
+    private val botProps: BotProps,
+) {
     @Bean
-    fun connectionFactory(): ConnectionFactory = H2ConnectionFactory(H2ConnectionConfiguration.builder()
-            .file(botProps.database  + ";DATABASE_TO_UPPER=false")
-            .build())
+    fun connectionFactory(): ConnectionFactory =
+        H2ConnectionFactory(
+            H2ConnectionConfiguration
+                .builder()
+                .file(botProps.database + ";DATABASE_TO_UPPER=false")
+                .build(),
+        )
 
     @Bean(initMethod = "migrate")
-    fun flyway(): Flyway {
-        return Flyway(Flyway.configure().dataSource(
+    fun flyway(): Flyway =
+        Flyway(
+            Flyway.configure().dataSource(
                 "jdbc:h2:" + botProps.database + ";DATABASE_TO_UPPER=false",
                 "",
-                ""
-        ))
-    }
+                "",
+            ),
+        )
 }

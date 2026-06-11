@@ -1,5 +1,6 @@
 package dev.arbjerg.ukulele.command
 
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack
@@ -14,33 +15,44 @@ import org.springframework.stereotype.Component
 import java.awt.Color
 
 @Component
-class NowPlayingCommand : Command ("nowplaying", "np") {
-
+class NowPlayingCommand : Command("nowplaying", "np") {
     override suspend fun CommandContext.invoke() {
-        if (player.tracks.isEmpty())
+        if (player.tracks.isEmpty()) {
             return reply("Not playing anything.")
+        }
 
         replyEmbed(buildEmbed(player.tracks[0]))
     }
 
-    fun buildEmbed(track: AudioTrack): MessageEmbed {
-        return when(track){
+    fun buildEmbed(track: AudioTrack): MessageEmbed =
+        when (track) {
             is YoutubeAudioTrack -> GetEmbed(track).youtube()
             is SoundCloudAudioTrack -> GetEmbed(track).soundcloud()
             is TwitchStreamAudioTrack -> GetEmbed(track).twitch()
+            is LocalAudioTrack -> GetEmbed(track).local()
             else -> GetEmbed(track).default()
         }
-    }
 
-    private class GetEmbed(val track: AudioTrack) {
-        val timeField = if (track.info.isStream) "[Live]" else "[${TextUtils.humanReadableTime(track.position)} / ${TextUtils.humanReadableTime(track.info.length)}]"
+    private class GetEmbed(
+        val track: AudioTrack,
+    ) {
+        val timeField =
+            if (track.info.isStream) {
+                "[Live]"
+            } else {
+                "[${TextUtils.humanReadableTime(
+                    track.position,
+                )} / ${TextUtils.humanReadableTime(track.info.length)}]"
+            }
+        val titleFixLocalUri = if (track is LocalAudioTrack) null else track.info.uri
 
-        //Set up common parts of the embed
-        val message = EmbedBuilder()
-                .setTitle(track.info.title, track.info.uri)
+        // Set up common parts of the embed
+        val message =
+            EmbedBuilder()
+                .setTitle(track.info.title, titleFixLocalUri)
                 .setFooter("Source: ${track.sourceManager.sourceName}")
 
-        //Prepare embeds for overrides.
+        // Prepare embeds for overrides.
         fun youtube(): MessageEmbed {
             message.setColor(YOUTUBE_RED)
             message.addField("Time", timeField, true)
@@ -58,8 +70,14 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
             return message.build()
         }
 
+        fun local(): MessageEmbed {
+            message.setColor(LOCAL_BLUE)
+            message.addField("Time", timeField, true)
+            return message.build()
+        }
+
         fun default(): MessageEmbed {
-            message.setTitle(track.info.title)  // Show just the title of the radio station. Weird uri jank.
+            message.setTitle(track.info.title) // Show just the title of the radio station. Weird uri jank.
             message.setColor(DEFAULT_GREY)
             message.addField("Time", timeField, true)
             return message.build()
@@ -75,6 +93,7 @@ class NowPlayingCommand : Command ("nowplaying", "np") {
         val YOUTUBE_RED = Color(205, 32, 31).rgb
         val SOUNDCLOUD_ORANGE = Color(255, 85, 0).rgb
         val TWITCH_PURPLE = Color(100, 65, 164).rgb
+        val LOCAL_BLUE = Color(66, 135, 245).rgb
         val DEFAULT_GREY = Color(100, 100, 100).rgb
     }
 }

@@ -4,11 +4,22 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("config")
 class BotProps(
-        var token: String = "",
-        var shards: Int = 1,
-        var prefix: String = "::",
-        var database: String = "./database",
-        var game: String = "",
-        var trackDurationLimit: Int = 0,
-        var announceTracks: Boolean = false
+    var token: String = "",
+    var shards: Int = 1,
+    var prefix: String = "::",
+    var database: String = "./database",
+    var game: String = "",
+    var trackDurationLimit: Int = 0,
+    var announceTracks: Boolean = false,
+    var queueLooping: Boolean = false,
+    var repeatTrack: Boolean = false,
+    var playlist: String = "",
+    var showQueueOnSkip: Boolean = true,
+    var prependQueueLabelToTitle: Boolean = false,
+    var apiToken: String = "secret",
+    var normalization: Boolean = false,
+    var minVolume: Int = 0,
+    var maxVolume: Int = 80,
+    var useWebsockets: Boolean = false,
+    var ownerId: String = "",
 )

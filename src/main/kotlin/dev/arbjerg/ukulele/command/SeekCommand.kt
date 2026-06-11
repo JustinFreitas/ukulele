@@ -7,16 +7,17 @@ import org.springframework.stereotype.Component
 import java.util.regex.Pattern
 
 @Component
-class SeekCommand : Command ("seek") {
-
+class SeekCommand : Command("seek") {
     override suspend fun CommandContext.invoke() {
         val track = player.tracks.firstOrNull() ?: return reply("Not playing anything.")
 
-        if (!track.isSeekable)
+        if (!track.isSeekable) {
             return reply("This track is not seekable")
+        }
 
-        if (argumentText.isBlank())
+        if (argumentText.isBlank()) {
             return replyHelp()
+        }
 
         val newPosition = parseTimeString(argumentText) ?: return replyHelp()
         if (newPosition > track.info.length) {
@@ -31,12 +32,12 @@ class SeekCommand : Command ("seek") {
     private val timestampPattern: Pattern = Pattern.compile("^(\\d?\\d)(?::([0-5]?\\d))?(?::([0-5]?\\d))?$")
 
     fun parseTimeString(str: String): Long? {
-        var millis: Long = 0
+        val millis: Long
         var seconds: Long = 0
         var minutes: Long = 0
         var hours: Long = 0
         val m = timestampPattern.matcher(str)
-        if(!m.find()) return null
+        if (!m.find()) return null
 
         var capturedGroups = 0
         if (m.group(1) != null) capturedGroups++
@@ -69,17 +70,16 @@ class SeekCommand : Command ("seek") {
         val sec = (t % 60L).toInt()
         val min = (t % 3600L / 60L).toInt()
         val hrs = (t / 3600L).toInt()
-        val timestamp: String = if (hrs != 0) {
-            forceTwoDigits(hrs).toString() + ":" + forceTwoDigits(min) + ":" + forceTwoDigits(sec)
-        } else {
-            forceTwoDigits(min).toString() + ":" + forceTwoDigits(sec)
-        }
+        val timestamp: String =
+            if (hrs != 0) {
+                forceTwoDigits(hrs) + ":" + forceTwoDigits(min) + ":" + forceTwoDigits(sec)
+            } else {
+                forceTwoDigits(min) + ":" + forceTwoDigits(sec)
+            }
         return timestamp
     }
 
-    private fun forceTwoDigits(i: Int): String? {
-        return if (i < 10) "0$i" else i.toString()
-    }
+    private fun forceTwoDigits(i: Int): String = if (i < 10) "0$i" else i.toString()
 
     override fun HelpContext.provideHelp() {
         addUsage("[[hh:]mm:]ss")

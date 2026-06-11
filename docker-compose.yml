@@ -2,10 +2,12 @@ version: "3.7"
 
 services:
   ukulele:
-    image: ghcr.io/freyacodes/ukulele:master
+    build: . # This tells docker-compose to build the image from the Dockerfile in the current directory
     restart: always
     environment:
       CONFIG_DATABASE: ./db/database # Database location overwrite so mounting works
     volumes:
       - ./ukulele.yml:/opt/ukulele/ukulele.yml
       - ./db:/opt/ukulele/db
+    ports:
+      - "8080:8080"

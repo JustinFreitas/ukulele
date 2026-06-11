@@ -1,2 +1,2 @@
-ALTER TABLE guild_properties
+ALTER TABLE "guild_properties"
 ADD COLUMN prefix char default null;
