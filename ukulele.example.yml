@@ -1,7 +1,7 @@
 config:
   token: "" # Your discord bot token
   shards: 1 # Number of shards to create. 1 works for most bots
-  prefix: ";;" # Prefix to invoke commands with
+  prefix: ";;" # Prefix to invoke commands with. ;; is used here as it needs no Shift key (easier to type than ::).
   database: "./database" # Database filename
   game: "music in the channel" # Status message shown when your bot is online. Starts with 'Playing'
   trackDurationLimit: 0 # Maximum limit of track duration in minutes. Set to 0 for unlimited
