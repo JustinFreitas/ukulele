@@ -117,12 +117,35 @@ When enabled, the player applies ReplayGain on track start; tracks without Repla
 3. **Run:** Execute `./ukulele` (Linux/macOS) or `ukulele.bat` (Windows) to build and start the bot.
 
 ### Using Docker
+
+**Option A — Prebuilt image (no build required).** A public image is published to GitHub Container Registry on every push:
+
+```shell script
+# 1. Prepare environment
+mkdir db && chown -R 999 db/
+cp ukulele.example.yml ukulele.yml   # then edit ukulele.yml and add your bot token
+
+# 2. Pull and run the prebuilt image
+docker pull ghcr.io/justinfreitas/ukulele:modernize-java25
+docker run -d --restart always \
+  -v "$(pwd)/ukulele.yml:/opt/ukulele/ukulele.yml" \
+  -v "$(pwd)/db:/opt/ukulele/db" \
+  -e CONFIG_DATABASE=./db/database \
+  -p 8080:8080 \
+  ghcr.io/justinfreitas/ukulele:modernize-java25
+```
+
+> [!TIP]
+> To use the prebuilt image with `docker-compose` instead of building locally, swap `build: .` for `image: ghcr.io/justinfreitas/ukulele:modernize-java25` in `docker-compose.yml`.
+
+**Option B — Build from source.** The included `docker-compose.yml` builds the image locally from the `Dockerfile`:
+
 ```shell script
 # 1. Prepare environment
 mkdir db && chown -R 999 db/
 cp ukulele.example.yml ukulele.yml
 
-# 2. Start the bot
+# 2. Build and start the bot
 docker-compose up -d
 ```
 
