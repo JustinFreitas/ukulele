@@ -16,12 +16,7 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '25'
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.gradle/caches
-        key: "${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}"
-        restore-keys: ${{ runner.os }}-gradle
+        cache: 'gradle'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
@@ -34,15 +29,17 @@ jobs:
         username: ${{github.repository_owner}}
         password: ${{secrets.DOCKER_TOKEN}}
     - name: Get branch name
+      if: github.repository == 'freyacodes/ukulele'
       run: echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
     - name: Lowercase repo name
+      if: github.repository == 'freyacodes/ukulele'
       run: echo "REPO_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
     - name: Docker build and push
       uses: docker/build-push-action@v6
+      if: github.repository == 'freyacodes/ukulele'
       with:
         tags: ghcr.io/${{ env.REPO_NAME }}:${{ github.ref_name }}
         load: true
         context: .
     - run: docker push ghcr.io/freyacodes/ukulele:${{env.BRANCH_NAME}}
       if: github.repository == 'freyacodes/ukulele'
-
