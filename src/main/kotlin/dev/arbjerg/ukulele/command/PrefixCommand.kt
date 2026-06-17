@@ -18,10 +18,12 @@ class PrefixCommand(
                 guildPropertiesService.transformAwait(guild.idLong) { it.prefix = null }
                 reply("Reset prefix to `${botProps.prefix}`")
             }
+
             argumentText.isNotBlank() -> {
                 val props = guildPropertiesService.transformAwait(guild.idLong) { it.prefix = argumentText }
                 reply("Set prefix to `${props.prefix}`")
             }
+
             else -> {
                 replyHelp()
             }

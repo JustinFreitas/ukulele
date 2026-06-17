@@ -1,19 +1,23 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    val kotlinVersion = "2.3.21"
+    val kotlinVersion = "2.4.0"
     java
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "4.0.6"
+    id("org.springframework.boot") version "4.1.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
     kotlin("jvm") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-    id("org.flywaydb.flyway") version "12.7.0"
+    id("org.flywaydb.flyway") version "12.8.1"
     // https://plugins.gradle.org/plugin/com.github.ben-manes.versions
     id("com.github.ben-manes.versions") version "0.54.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
+}
+
+ktlint {
+    version.set("1.8.0")
 }
 
 tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
@@ -26,8 +30,8 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 }
 
 // Version Constants
-val kotlinVersion = "2.3.21"
-val springBootVersion = "4.0.6"
+val kotlinVersion = "2.4.0"
+val springBootVersion = "4.1.0"
 val springFrameworkVersion = "7.0.7"
 val jacksonVersion = "3.1.2"
 // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
@@ -81,7 +85,7 @@ dependencies {
     // implementation("dev.arbjerg:lavaplayer:2.2.6")
     // Above broken for YouTube links.  Use Justin's fork.
     // https://github.com/JustinFreitas/lavaplayer
-    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_13")
+    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_14")
     // https://mvnrepository.com/artifact/club.minnced/jdave-api
     implementation("club.minnced:jdave-api:$jdaveVersion")
     implementation("club.minnced:jdave-native-win-x86-64:$jdaveVersion")
@@ -124,7 +128,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:12.7.0")
+    implementation("org.flywaydb:flyway-core:12.8.1")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
 
@@ -135,7 +139,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")
     // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.3.0")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.3.1")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
@@ -148,7 +152,7 @@ dependencies {
 val mockitoAgent: Configuration by configurations.creating
 
 dependencies {
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.8") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.10") {
         isTransitive = false
     }
 }
@@ -185,8 +189,8 @@ configurations.all {
         substitute(module("commons-codec:commons-codec")).using(module("commons-codec:commons-codec:1.21.0"))
         // https://mvnrepository.com/artifact/commons-io/commons-io
         substitute(module("commons-io:commons-io")).using(module("commons-io:commons-io:2.21.0"))
-        substitute(module("net.bytebuddy:byte-buddy")).using(module("net.bytebuddy:byte-buddy:1.18.8"))
-        substitute(module("net.bytebuddy:byte-buddy-agent")).using(module("net.bytebuddy:byte-buddy-agent:1.18.8"))
+        substitute(module("net.bytebuddy:byte-buddy")).using(module("net.bytebuddy:byte-buddy:1.18.10"))
+        substitute(module("net.bytebuddy:byte-buddy-agent")).using(module("net.bytebuddy:byte-buddy-agent:1.18.10"))
         substitute(module("net.minidev:json-smart")).using(module("net.minidev:json-smart:2.5.2"))
         substitute(module("org.assertj:assertj-core")).using(module("org.assertj:assertj-core:3.27.7"))
         substitute(module("org.checkerframework:checker-qual")).using(module("org.checkerframework:checker-qual:2.43.0"))

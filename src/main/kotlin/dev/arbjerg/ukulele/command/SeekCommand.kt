@@ -44,12 +44,19 @@ class SeekCommand : Command("seek") {
         if (m.group(2) != null) capturedGroups++
         if (m.group(3) != null) capturedGroups++
         when (capturedGroups) {
-            0 -> return null
-            1 -> seconds = m.group(1).toLongOrNull() ?: 0
+            0 -> {
+                return null
+            }
+
+            1 -> {
+                seconds = m.group(1).toLongOrNull() ?: 0
+            }
+
             2 -> {
                 minutes = m.group(1).toLongOrNull() ?: 0
                 seconds = m.group(2).toLongOrNull() ?: 0
             }
+
             3 -> {
                 hours = m.group(1).toLongOrNull() ?: 0
                 minutes = m.group(2).toLongOrNull() ?: 0
