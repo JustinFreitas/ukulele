@@ -3,6 +3,9 @@
 build/
 bin/
 out/
+
+# Claude Code
+.claude/
 .apt_generated
 .classpath
 .factorypath

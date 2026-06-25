@@ -10,7 +10,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.spring
     kotlin("plugin.spring") version kotlinVersion
     // https://plugins.gradle.org/plugin/org.flywaydb.flyway
-    id("org.flywaydb.flyway") version "12.8.1"
+    id("org.flywaydb.flyway") version "12.9.0"
     // https://plugins.gradle.org/plugin/com.github.ben-manes.versions
     id("com.github.ben-manes.versions") version "0.54.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
@@ -85,7 +85,7 @@ dependencies {
     // implementation("dev.arbjerg:lavaplayer:2.2.6")
     // Above broken for YouTube links.  Use Justin's fork.
     // https://github.com/JustinFreitas/lavaplayer
-    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_14")
+    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_16")
     // https://mvnrepository.com/artifact/club.minnced/jdave-api
     implementation("club.minnced:jdave-api:$jdaveVersion")
     implementation("club.minnced:jdave-native-win-x86-64:$jdaveVersion")
@@ -109,7 +109,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
     implementation("org.apache.httpcomponents.client5:httpclient5:5.6.1")
     // Explicit httpcore5 to access SocketConfig
-    implementation("org.apache.httpcomponents.core5:httpcore5:5.4.2")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.4.3")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation("tools.jackson.core:jackson-core:$jacksonVersion")
@@ -128,7 +128,7 @@ dependencies {
         exclude(group = "com.h2database", module = "h2")
     }
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-    implementation("org.flywaydb:flyway-core:12.8.1")
+    implementation("org.flywaydb:flyway-core:12.9.0")
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
 
