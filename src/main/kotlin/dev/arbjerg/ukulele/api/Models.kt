@@ -5,11 +5,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 data class GuildDto(
     val id: String,
     val name: String,
+    @get:com.fasterxml.jackson.annotation.JsonProperty("isPlaying")
     val isPlaying: Boolean,
 )
 
 data class PlayerStatusDto(
     val guildId: String,
+    @get:com.fasterxml.jackson.annotation.JsonProperty("isPaused")
     val isPaused: Boolean,
     val volume: Int,
     val repeatTrack: Boolean,

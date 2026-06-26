@@ -53,7 +53,7 @@ class Player(
     private val buffer = ByteBuffer.allocate(4096)
     private val frame: MutableAudioFrame = MutableAudioFrame().apply { setBuffer(buffer) }
 
-    // Virtual volume (0-100)
+    // Virtual volume (0-1000); scaled into the real min..max range by scaleVolume
     var volume: Int = guildProperties.volume
         set(value) {
             field = value
@@ -92,9 +92,7 @@ class Player(
     private fun scaleVolume(v: Int): Int {
         val min = beans.botProps.minVolume
         val max = beans.botProps.maxVolume
-        val result = if (v == 0) 0 else min + (v / 1000.0 * (max - min)).roundToInt()
-        log.info("DEBUG VIRTUAL VOLUME: Input=$v, Min=$min, Max=$max -> Real=$result")
-        return result
+        return if (v == 0) 0 else min + (v / 1000.0 * (max - min)).roundToInt()
     }
 
     fun getOptimalVolumeStep(): Int {
