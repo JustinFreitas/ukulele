@@ -1,0 +1,6 @@
+{
+  "name": "ukulele",
+  "version": "2.25.1",
+  "private": true,
+  "description": "Discord music bot (Java/Kotlin, Spring Boot). package.json exists only so PM2 shows a version in `pm2 list`."
+}
