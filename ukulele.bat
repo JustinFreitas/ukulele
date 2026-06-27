@@ -10,4 +10,4 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b %ERRORLEVEL%
 )
 
-if "%1"=="-d" (start javaw -jar "build\libs\ukulele.jar") else (java -jar "build\libs\ukulele.jar")
+if "%1"=="-d" (start javaw --enable-native-access=ALL-UNNAMED -jar "build\libs\ukulele.jar") else (java --enable-native-access=ALL-UNNAMED -jar "build\libs\ukulele.jar")
