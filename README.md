@@ -149,6 +149,25 @@ cp ukulele.example.yml ukulele.yml
 docker-compose up -d
 ```
 
+### Running under PM2
+
+The repo ships a [PM2](https://pm2.keymetrics.io/) ecosystem file (`ukulele.config.js`) so the bot can run as a managed, auto-restarting process. Build the jar first (`./gradlew build`), then:
+
+```shell script
+pm2 start ukulele.config.js
+pm2 list
+```
+
+The config runs the bot as `java -jar build/libs/ukulele.jar` by declaring the **jar as the `script`** and `java` as the `interpreter`. This is deliberate: PM2 derives the `version` column in `pm2 list` by walking up from the script path looking for a `package.json`. Pointing the script at the jar (inside the repo) lets PM2 find this project's `package.json` and show the real version (kept in sync with `version` in `build.gradle.kts`); pointing it directly at `java.exe` would resolve to the JDK and show `N/A`. PM2 still spawns the JVM directly, so it owns the JVM PID and crash-restart works.
+
+> [!IMPORTANT]
+> PM2 does **not** persist its process list automatically. After your processes are running the way you want, run `pm2 save` to write the dump (`~/.pm2/dump.pm2`). PM2 restores from that dump on `pm2 resurrect` (and on boot, if you've set up `pm2 startup`). If you skip `pm2 save`, the bot will be gone after a reboot or `pm2 kill`.
+
+```shell script
+pm2 save        # persist the current process list to ~/.pm2/dump.pm2
+pm2 resurrect   # restore the saved processes (e.g. after a reboot or pm2 kill)
+```
+
 ---
 
 ## 📡 Remote API
