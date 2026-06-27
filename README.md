@@ -168,6 +168,35 @@ pm2 save        # persist the current process list to ~/.pm2/dump.pm2
 pm2 resurrect   # restore the saved processes (e.g. after a reboot or pm2 kill)
 ```
 
+#### Monitoring logs
+
+The bot writes everything to stdout/stderr, which PM2 captures — there's no separate app log file. Use the process name (`ukulele`) to inspect it:
+
+```shell script
+pm2 logs ukulele               # live tail of stdout + stderr
+pm2 logs ukulele --lines 200   # backfill more history when attaching
+pm2 logs ukulele --err         # errors/stderr only (fastest way to read a crash trace)
+pm2 list                       # status, uptime, restart count (↺), cpu/mem
+pm2 show ukulele               # details, incl. the exact log file paths
+pm2 monit                      # live dashboard: logs + resource graphs
+```
+
+By default the log files live at `~/.pm2/logs/ukulele-out.log` and `ukulele-error.log` (`pm2 show ukulele` prints the resolved paths). A climbing ↺ count in `pm2 list` means the JVM is crash-looping — check `pm2 logs ukulele --err`.
+
+#### Log rotation
+
+PM2 does **not** rotate logs on its own, so they grow unbounded. This is handled by the global [`pm2-logrotate`](https://github.com/keymetrics/pm2-logrotate) module, which rotates the logs of **all** PM2 processes (not just `ukulele`). Install and configure it once:
+
+```shell script
+pm2 install pm2-logrotate
+pm2 set pm2-logrotate:max_size 10M           # rotate when a log file passes 10 MB
+pm2 set pm2-logrotate:retain 30              # keep 30 rotated files, then delete oldest
+pm2 set pm2-logrotate:compress true          # gzip rotated logs to save disk
+pm2 set pm2-logrotate:rotateInterval "0 0 * * *"  # also rotate daily at midnight
+```
+
+These settings persist in `~/.pm2/module_conf.json` and survive restarts, so they don't need to be re-applied after `pm2 resurrect`.
+
 ---
 
 ## 📡 Remote API
