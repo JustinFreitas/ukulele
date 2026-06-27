@@ -85,7 +85,14 @@ dependencies {
     // implementation("dev.arbjerg:lavaplayer:2.2.6")
     // Above broken for YouTube links.  Use Justin's fork.
     // https://github.com/JustinFreitas/lavaplayer
-    implementation("com.github.JustinFreitas:lavaplayer:v2.2.6_16")
+    // Depend on the concrete submodules, not the jitpack aggregator
+    // (com.github.JustinFreitas:lavaplayer). The aggregator's own artifact is an
+    // empty manifest-only jar that collides with the real submodule jar by filename
+    // in BOOT-INF/lib, so the bootJar classloader binds to the empty copy and fails
+    // with ClassNotFoundException for AudioPlayerManager.
+    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer:v2.2.6_16")
+    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm:v2.2.6_16")
+    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator:v2.2.6_16")
     // https://mvnrepository.com/artifact/club.minnced/jdave-api
     implementation("club.minnced:jdave-api:$jdaveVersion")
     implementation("club.minnced:jdave-native-win-x86-64:$jdaveVersion")
