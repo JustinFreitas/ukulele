@@ -98,9 +98,14 @@ dependencies {
     implementation("club.minnced:jdave-native-win-x86-64:$jdaveVersion")
     implementation("club.minnced:jdave-native-linux-x86-64:$jdaveVersion")
     // https://github.com/lavalink-devs/youtube-source
-    implementation("dev.lavalink.youtube:v2:1.18.1")
-    implementation("dev.lavalink.youtube:common:1.18.1")
-    implementation("dev.lavalink.youtube:youtube-plugin:1.18.1")
+    // Justin's HttpClient-5 fork of youtube-source, rebuilt against the HC5 lavaplayer fork.
+    // The upstream dev.lavalink.youtube:*:1.18.1 jars are compiled against HttpClient 4 and fail at
+    // runtime against the HC5 lavaplayer fork with:
+    //   AbstractMethodError: ... onContextOpen(org.apache.hc.client5.http.protocol.HttpClientContext)
+    // https://github.com/JustinFreitas/youtube-source (tag v1.18.1_1)
+    // The "youtube-plugin" module is the standalone Lavalink-server plugin and is unused here.
+    implementation("com.github.JustinFreitas.youtube-source:v2:v1.18.1_1")
+    implementation("com.github.JustinFreitas.youtube-source:common:v1.18.1_1")
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.21.0")
     // https://mvnrepository.com/artifact/org.json/json
