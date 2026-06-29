@@ -6,7 +6,9 @@ import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -73,9 +75,31 @@ class CommandManager(
             }
 
             val command = registry[name] ?: return@launch
-            val ctx = CommandContext(contextBeans, guildProperties, guild, channel, member, message, command, prefix, trigger)
+            val ctx = MessageCommandContext(contextBeans, guildProperties, guild, channel, member, message, command, prefix, trigger)
 
             log.info("Invocation: ${message.contentRaw}")
+            command.invoke0(ctx)
+        }
+    }
+
+    /** Dispatch a Discord slash command. The caller (EventHandler) must have already deferred the reply. */
+    fun onSlash(event: SlashCommandInteractionEvent) {
+        val guild = event.guild ?: return
+        val member = event.member ?: return
+        val command = registry[event.name] ?: return
+
+        commandScope.launch {
+            val guildProperties = guildProperties.getAwait(guild.idLong)
+
+            if (event.channelType != ChannelType.TEXT) {
+                event.hook.sendMessage("This command can only be used in a text channel.").queue()
+                return@launch
+            }
+
+            val channel = event.channel.asTextChannel()
+            val ctx = SlashCommandContext(contextBeans, guildProperties, guild, channel, member, event, command, "/", "/${event.name}")
+
+            log.info("Slash invocation: /${event.name} ${event.getOption("args")?.asString ?: ""}")
             command.invoke0(ctx)
         }
     }

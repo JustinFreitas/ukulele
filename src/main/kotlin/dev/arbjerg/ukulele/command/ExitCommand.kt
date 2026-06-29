@@ -12,7 +12,7 @@ class ExitCommand(
     val botProps: BotProps,
 ) : Command("exit") {
     override suspend fun CommandContext.invoke() {
-        if (message.author.id != botProps.ownerId) {
+        if (invoker.id != botProps.ownerId) {
             reply("You do not have permission to run this command.")
             return
         }

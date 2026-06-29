@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.utils.MarkdownUtil
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 
 class HelpContext(
-    private val commandContext: CommandContext,
+    // Nullable so the slash-command registration can run provideHelp() purely to extract the
+    // description text, without constructing a full live CommandContext.
+    private val commandContext: CommandContext?,
     private val command: Command,
 ) {
     private val lines = mutableListOf<String>()
@@ -15,9 +17,10 @@ class HelpContext(
 
     private fun addUsages(vararg usages: String) {
         if (usages.isEmpty()) throw IllegalArgumentException("Expected at least one usage!")
+        val prefix = commandContext?.prefix ?: "/"
         lines.add(
             usages.joinToString(" OR ") {
-                commandContext.prefix + command.name + " " + it.trim()
+                prefix + command.name + " " + it.trim()
             },
         )
     }
@@ -25,6 +28,10 @@ class HelpContext(
     fun addDescription(text: String) {
         lines.add("# " + text.trim())
     }
+
+    /** First description line (without the leading "# "), used as a slash command description. */
+    fun firstDescription(): String? =
+        lines.firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim()?.ifBlank { null }
 
     fun buildMessage() =
         MessageCreateBuilder()

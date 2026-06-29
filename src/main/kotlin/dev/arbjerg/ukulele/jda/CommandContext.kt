@@ -9,16 +9,23 @@ import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
+import net.dv8tion.jda.api.utils.messages.MessageEditData
 import org.springframework.stereotype.Component
+import java.util.concurrent.atomic.AtomicBoolean
 
-class CommandContext(
+/**
+ * Invocation context for a command. Commands are written against this abstraction (argumentText +
+ * the reply* methods), so the same command body serves both the legacy prefix/message path
+ * ([MessageCommandContext]) and Discord slash commands ([SlashCommandContext]).
+ */
+abstract class CommandContext(
     val beans: Beans,
     val guildProperties: GuildProperties,
     val guild: Guild,
     val channel: TextChannel,
     val invoker: Member,
-    val message: Message,
     val command: Command,
     val prefix: String,
     /** Prefix + command name */
@@ -33,26 +40,19 @@ class CommandContext(
 
     val player: Player by lazy { beans.players.get(guild, guildProperties) }
 
-    /** The command argument text after the trigger */
-    val argumentText: String by lazy {
-        message.contentRaw.drop(trigger.length).trim()
-    }
     val selfMember: Member get() = guild.selfMember
 
-    fun reply(msg: String) {
-        channel.sendMessage(msg).queue()
-    }
+    /** The command argument text (after the trigger for messages, or the `args` option for slash). */
+    abstract val argumentText: String
 
-    fun replyMsg(msg: MessageCreateData) {
-        channel.sendMessage(msg).queue()
-    }
+    abstract fun reply(msg: String)
 
-    fun replyEmbed(embed: MessageEmbed) {
-        channel.sendMessage(MessageCreateData.fromEmbeds(embed)).queue()
-    }
+    abstract fun replyMsg(msg: MessageCreateData)
+
+    abstract fun replyEmbed(embed: MessageEmbed)
 
     fun replyHelp(forCommand: Command = command) {
-        channel.sendMessage(getHelp(forCommand)).queue()
+        replyMsg(getHelp(forCommand))
     }
 
     private fun getHelp(forCommand: Command): MessageCreateData {
@@ -64,5 +64,80 @@ class CommandContext(
     fun handleException(t: Throwable) {
         command.log.error("Handled exception occurred", t)
         reply("An exception occurred!\n`${t.message}`")
+    }
+}
+
+/** Context for the legacy prefix/mention message command path. */
+class MessageCommandContext(
+    beans: Beans,
+    guildProperties: GuildProperties,
+    guild: Guild,
+    channel: TextChannel,
+    invoker: Member,
+    val message: Message,
+    command: Command,
+    prefix: String,
+    trigger: String,
+) : CommandContext(beans, guildProperties, guild, channel, invoker, command, prefix, trigger) {
+    override val argumentText: String by lazy {
+        message.contentRaw.drop(trigger.length).trim()
+    }
+
+    override fun reply(msg: String) {
+        channel.sendMessage(msg).queue()
+    }
+
+    override fun replyMsg(msg: MessageCreateData) {
+        channel.sendMessage(msg).queue()
+    }
+
+    override fun replyEmbed(embed: MessageEmbed) {
+        channel.sendMessage(MessageCreateData.fromEmbeds(embed)).queue()
+    }
+}
+
+/**
+ * Context for Discord slash commands. The dispatcher calls [SlashCommandInteractionEvent.deferReply]
+ * first, so replies go through the interaction hook. The first reply edits the deferred ("thinking")
+ * response and any further replies are sent as follow-ups, which keeps multi-reply commands such as
+ * /play working cleanly.
+ */
+class SlashCommandContext(
+    beans: Beans,
+    guildProperties: GuildProperties,
+    guild: Guild,
+    channel: TextChannel,
+    invoker: Member,
+    val event: SlashCommandInteractionEvent,
+    command: Command,
+    prefix: String,
+    trigger: String,
+) : CommandContext(beans, guildProperties, guild, channel, invoker, command, prefix, trigger) {
+    private val firstReply = AtomicBoolean(true)
+
+    override val argumentText: String = event.getOption("args")?.asString?.trim() ?: ""
+
+    override fun reply(msg: String) {
+        if (firstReply.getAndSet(false)) {
+            event.hook.editOriginal(msg).queue()
+        } else {
+            event.hook.sendMessage(msg).queue()
+        }
+    }
+
+    override fun replyMsg(msg: MessageCreateData) {
+        if (firstReply.getAndSet(false)) {
+            event.hook.editOriginal(MessageEditData.fromCreateData(msg)).queue()
+        } else {
+            event.hook.sendMessage(msg).queue()
+        }
+    }
+
+    override fun replyEmbed(embed: MessageEmbed) {
+        if (firstReply.getAndSet(false)) {
+            event.hook.editOriginalEmbeds(embed).queue()
+        } else {
+            event.hook.sendMessageEmbeds(embed).queue()
+        }
     }
 }
