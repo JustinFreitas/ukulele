@@ -6,7 +6,10 @@ management:
   server:
     # The main app port (server.port, 11111) is exposed publicly, so actuator is moved to its own
     # port bound to loopback only. This keeps health/metrics/info reachable for local monitoring
-    # (curl http://127.0.0.1:11112/actuator/health) while keeping them OFF the public interface.
+    # while keeping them OFF the public interface. NOTE: when server.ssl is enabled the management
+    # port inherits TLS, so local checks use https with -k, e.g.
+    # curl -k https://127.0.0.1:11112/actuator/health
+    # (set management.server.ssl.enabled: false here if you prefer plain HTTP on loopback).
     port: 11112
     address: 127.0.0.1
   endpoints:

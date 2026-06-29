@@ -22,4 +22,16 @@ config:
 
 server:
   port: 8080 # Port for the REST API
+  # If you expose this port publicly, enable TLS so the apiToken isn't sent in cleartext.
+  # Generate a keystore:
+  #   keytool -genkeypair -alias ukulele -keyalg RSA -keysize 2048 -validity 3650 \
+  #     -storetype PKCS12 -keystore ukulele-keystore.p12 -storepass <PASSWORD> \
+  #     -dname "CN=ukulele" -ext "SAN=dns:localhost,ip:127.0.0.1"
+  # Then uncomment (the .p12 is gitignored; clients must trust this self-signed cert):
+  # ssl:
+  #   enabled: true
+  #   key-store: ukulele-keystore.p12
+  #   key-store-type: PKCS12
+  #   key-store-password: <PASSWORD>
+  #   key-alias: ukulele
 

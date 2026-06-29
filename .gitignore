@@ -29,6 +29,10 @@ tmp/
 /ukulele.yml
 /ukulele.yml.bak
 /gradle.properties
+# TLS keystore (self-signed cert + private key) — never commit
+*.p12
+*.jks
+/ukulele-keystore.p12
 
 # IDE specific files
 .idea/
