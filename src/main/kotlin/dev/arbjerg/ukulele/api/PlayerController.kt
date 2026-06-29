@@ -11,7 +11,6 @@ import dev.arbjerg.ukulele.data.GuildPropertiesService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,7 +22,6 @@ import kotlin.coroutines.resume
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = ["*"])
 class PlayerController(
     val playerRegistry: PlayerRegistry,
     val guildPropertiesService: GuildPropertiesService,
