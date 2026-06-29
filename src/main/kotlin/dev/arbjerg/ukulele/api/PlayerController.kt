@@ -134,6 +134,20 @@ class PlayerController(
                 .compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
         val errors = mutableListOf<String>()
 
+        // Resolve every identifier first, accumulating the tracks, then add them to the queue in a
+        // single bulk operation (one queue insert + one websocket player-status update).
+        val accepted = mutableListOf<AudioTrack>()
+
+        fun labelled(
+            track: AudioTrack,
+            queueLabel: String,
+        ): AudioTrack {
+            if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
+                track.info.title = "$queueLabel - ${track.info.title}"
+            }
+            return track
+        }
+
         identifiers.forEach { identifier ->
             val matcher = pattern.matcher(identifier)
             var source = identifier
@@ -154,22 +168,15 @@ class PlayerController(
                         source,
                         object : AudioLoadResultHandler {
                             override fun trackLoaded(track: AudioTrack) {
-                                if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
-                                    track.info.title = "$queueLabel - ${track.info.title}"
-                                }
-                                player.add(track)
+                                accepted.add(labelled(track, queueLabel))
                                 cont.resume(Unit)
                             }
 
                             override fun playlistLoaded(playlist: AudioPlaylist) {
                                 if (playlist.isSearchResult) {
-                                    val track = playlist.tracks.first()
-                                    if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
-                                        track.info.title = "$queueLabel - ${track.info.title}"
-                                    }
-                                    player.add(track)
+                                    playlist.tracks.firstOrNull()?.let { accepted.add(labelled(it, queueLabel)) }
                                 } else {
-                                    player.add(*playlist.tracks.toTypedArray())
+                                    accepted.addAll(playlist.tracks)
                                 }
                                 cont.resume(Unit)
                             }
@@ -191,7 +198,12 @@ class PlayerController(
             }
         }
 
-        if (errors.isNotEmpty()) {
+        if (accepted.isNotEmpty()) {
+            player.add(*accepted.toTypedArray())
+        }
+
+        // Surface load errors only when nothing could be added; otherwise the partial success stands.
+        if (accepted.isEmpty() && errors.isNotEmpty()) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, errors.joinToString("\n"))
         }
     }
