@@ -36,7 +36,7 @@ val springFrameworkVersion = "7.0.7"
 val jacksonVersion = "3.1.2"
 // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
 val jacksonAnnotationsVersion = "2.21"
-val nettyVersion = "4.2.12.Final"
+val nettyVersion = "4.2.15.Final"
 val jdaveVersion = "0.1.8"
 
 kotlin {
@@ -62,6 +62,12 @@ repositories {
 }
 
 dependencies {
+    // Align every io.netty:* module to a single version. Spring Boot 4 / reactor-netty pull the
+    // newer split modules (netty-codec-base, -http3, -classes-quic, ...) which used to mismatch the
+    // modules we pinned by hand, producing a fat jar with both 4.2.12 and 4.2.15 on the classpath.
+    // The BOM (enforced) guarantees one version across all modules, including ones added upstream.
+    implementation(enforcedPlatform("io.netty:netty-bom:$nettyVersion"))
+
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
@@ -258,30 +264,8 @@ configurations.all {
         substitute(module("io.micrometer:micrometer-observation")).using(module("io.micrometer:micrometer-observation:1.16.4"))
         // https://mvnrepository.com/artifact/org.yaml/snakeyaml
         substitute(module("org.yaml:snakeyaml")).using(module("org.yaml:snakeyaml:2.6"))
-        // https://mvnrepository.com/artifact/io.netty/netty-codec
-        substitute(module("io.netty:netty-buffer")).using(module("io.netty:netty-buffer:$nettyVersion"))
-        substitute(module("io.netty:netty-codec")).using(module("io.netty:netty-codec:$nettyVersion"))
-        substitute(module("io.netty:netty-codec-dns")).using(module("io.netty:netty-codec-dns:$nettyVersion"))
-        substitute(module("io.netty:netty-codec-http")).using(module("io.netty:netty-codec-http:$nettyVersion"))
-        substitute(module("io.netty:netty-codec-http2")).using(module("io.netty:netty-codec-http2:$nettyVersion"))
-        substitute(module("io.netty:netty-codec-socks")).using(module("io.netty:netty-codec-socks:$nettyVersion"))
-        substitute(module("io.netty:netty-common")).using(module("io.netty:netty-common:$nettyVersion"))
-        substitute(module("io.netty:netty-handler")).using(module("io.netty:netty-handler:$nettyVersion"))
-        substitute(module("io.netty:netty-handler-proxy")).using(module("io.netty:netty-handler-proxy:$nettyVersion"))
-        substitute(module("io.netty:netty-resolver")).using(module("io.netty:netty-resolver:$nettyVersion"))
-        substitute(module("io.netty:netty-resolver-dns")).using(module("io.netty:netty-resolver-dns:$nettyVersion"))
-        substitute(
-            module("io.netty:netty-resolver-dns-classes-macos"),
-        ).using(module("io.netty:netty-resolver-dns-classes-macos:$nettyVersion"))
-        substitute(
-            module("io.netty:netty-resolver-dns-native-macos"),
-        ).using(module("io.netty:netty-resolver-dns-native-macos:$nettyVersion"))
-        substitute(module("io.netty:netty-transport")).using(module("io.netty:netty-transport:$nettyVersion"))
-        substitute(module("io.netty:netty-transport-classes-epoll")).using(module("io.netty:netty-transport-classes-epoll:$nettyVersion"))
-        substitute(module("io.netty:netty-transport-native-epoll")).using(module("io.netty:netty-transport-native-epoll:$nettyVersion"))
-        substitute(
-            module("io.netty:netty-transport-native-unix-common"),
-        ).using(module("io.netty:netty-transport-native-unix-common:$nettyVersion"))
+        // Netty alignment is handled by the enforced netty-bom platform in the dependencies block
+        // above, so individual io.netty module substitutions are intentionally not listed here.
     }
 }
 
