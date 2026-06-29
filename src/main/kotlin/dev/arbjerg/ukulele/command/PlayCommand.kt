@@ -169,8 +169,10 @@ class PlayCommand(
                 if (failures.isNotEmpty()) {
                     append("\n").append(failures.joinToString("\n"))
                 }
-                // Show the current queue after adding, like running the queue command.
-                append("\n\n").append(queueCommand.printQueue(player, 1))
+                // Show the current queue after adding multiple tracks, like running the queue command.
+                if (accepted.size >= 2) {
+                    append("\n\n").append(queueCommand.printQueue(player, 1))
+                }
             }
         reply(message)
     }
