@@ -34,6 +34,8 @@ data class TrackDto(
     val position: Long,
     @get:com.fasterxml.jackson.annotation.JsonProperty("isReplayGain")
     val isReplayGain: Boolean,
+    /** Applied ReplayGain in dB, or null if none (only known once the track is playing). */
+    val replayGainDb: Float?,
 )
 
 fun AudioTrack.toDto() =
@@ -44,6 +46,7 @@ fun AudioTrack.toDto() =
         duration = duration,
         position = position,
         isReplayGain = isReplayGainApplied(),
+        replayGainDb = replayGainDb,
     )
 
 data class VoiceChannelDto(

@@ -51,6 +51,9 @@ class NowPlayingCommand : Command("nowplaying", "np") {
             EmbedBuilder()
                 .setTitle(track.info.title, titleFixLocalUri)
                 .setFooter("Source: ${track.sourceManager.sourceName}")
+                .also { builder ->
+                    TextUtils.replayGainLabel(track)?.let { builder.addField("ReplayGain", it, true) }
+                }
 
         // Prepare embeds for overrides.
         fun youtube(): MessageEmbed {

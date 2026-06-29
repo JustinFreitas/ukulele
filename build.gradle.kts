@@ -98,9 +98,9 @@ dependencies {
     // empty manifest-only jar that collides with the real submodule jar by filename
     // in BOOT-INF/lib, so the bootJar classloader binds to the empty copy and fails
     // with ClassNotFoundException for AudioPlayerManager.
-    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer:v2.2.6_17")
-    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm:v2.2.6_17")
-    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator:v2.2.6_17")
+    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer:v2.2.6_18")
+    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm:v2.2.6_18")
+    implementation("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator:v2.2.6_18")
     // https://mvnrepository.com/artifact/club.minnced/jdave-api
     implementation("club.minnced:jdave-api:$jdaveVersion")
     implementation("club.minnced:jdave-native-win-x86-64:$jdaveVersion")

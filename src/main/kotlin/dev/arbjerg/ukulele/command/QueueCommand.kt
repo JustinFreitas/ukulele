@@ -60,8 +60,9 @@ class QueueCommand : Command("queue", "q", "list") {
         val pageEnd = (offset + pageSize).coerceAtMost(tracks.size)
 
         tracks.subList(offset, pageEnd).forEachIndexed { i, t ->
+            val rg = TextUtils.replayGainLabel(t)?.let { " `🔊 RG $it`" } ?: ""
             appendLine(
-                "`[${offset + i + 1}]` **${t.info.title}** `[${if (t.info.isStream) "Live" else TextUtils.humanReadableTime(t.duration)}]`",
+                "`[${offset + i + 1}]` **${t.info.title}** `[${if (t.info.isStream) "Live" else TextUtils.humanReadableTime(t.duration)}]`$rg",
             )
         }
     }
