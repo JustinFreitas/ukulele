@@ -3,14 +3,21 @@
 # external ukulele.yml in the working directory, which is merged over these defaults and wins on
 # any overlapping keys.
 management:
+  server:
+    # The main app port (server.port, 11111) is exposed publicly, so actuator is moved to its own
+    # port bound to loopback only. This keeps health/metrics/info reachable for local monitoring
+    # (curl http://127.0.0.1:11112/actuator/health) while keeping them OFF the public interface.
+    port: 11112
+    address: 127.0.0.1
   endpoints:
     web:
       exposure:
-        # health/info/metrics only. Sensitive endpoints (env, beans, configprops) stay disabled.
+        # health/info/metrics only. Sensitive endpoints (env, beans, configprops, heapdump,
+        # shutdown) stay disabled.
         include: health,info,metrics
   endpoint:
     health:
-      # status only (UP/DOWN); details are not exposed since there is no auth in front of actuator.
-      show-details: never
+      # Safe to show details since the management port is loopback-only.
+      show-details: always
       probes:
         enabled: true

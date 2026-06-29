@@ -175,101 +175,13 @@ dependencies {
     }
 }
 
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        // logback issue requiring both substitutions: https://github.com/qos-ch/logback/issues/890
-        // https://mvnrepository.com/artifact/tools.jackson.core/jackson-core
-        substitute(module("tools.jackson:jackson-bom")).using(module("tools.jackson:jackson-bom:$jacksonVersion"))
-        substitute(module("tools.jackson.core:jackson-core")).using(module("tools.jackson.core:jackson-core:$jacksonVersion"))
-        substitute(module("tools.jackson.core:jackson-databind")).using(module("tools.jackson.core:jackson-databind:$jacksonVersion"))
-        substitute(
-            module("tools.jackson.dataformat:jackson-dataformat-toml"),
-        ).using(module("tools.jackson.dataformat:jackson-dataformat-toml:$jacksonVersion"))
-        // jackson-datatype-jsr310 consolidated in 3.0 databind, but for legacy transitive overrides:
-        substitute(
-            module("tools.jackson.datatype:jackson-datatype-jsr310"),
-        ).using(module("tools.jackson.core:jackson-databind:$jacksonVersion"))
-
-        // Legacy 2.x Substitutions (to keep JDA and others happy on the same classpath)
-        substitute(
-            module("com.fasterxml.jackson.core:jackson-annotations"),
-        ).using(module("com.fasterxml.jackson.core:jackson-annotations:$jacksonAnnotationsVersion"))
-        substitute(module("com.fasterxml.jackson.core:jackson-core")).using(module("com.fasterxml.jackson.core:jackson-core:2.21.2"))
-        substitute(
-            module("com.fasterxml.jackson.core:jackson-databind"),
-        ).using(module("com.fasterxml.jackson.core:jackson-databind:2.21.2"))
-        // https://mvnrepository.com/artifact/com.google.code.gson/gson
-        substitute(module("com.google.code.gson:gson")).using(module("com.google.code.gson:gson:2.13.2"))
-        substitute(
-            module("com.google.errorprone:error_prone_annotations"),
-        ).using(module("com.google.errorprone:error_prone_annotations:2.36.0"))
-        // https://mvnrepository.com/artifact/commons-codec/commons-codec
-        substitute(module("commons-codec:commons-codec")).using(module("commons-codec:commons-codec:1.21.0"))
-        // https://mvnrepository.com/artifact/commons-io/commons-io
-        substitute(module("commons-io:commons-io")).using(module("commons-io:commons-io:2.21.0"))
-        substitute(module("net.bytebuddy:byte-buddy")).using(module("net.bytebuddy:byte-buddy:1.18.10"))
-        substitute(module("net.bytebuddy:byte-buddy-agent")).using(module("net.bytebuddy:byte-buddy-agent:1.18.10"))
-        substitute(module("net.minidev:json-smart")).using(module("net.minidev:json-smart:2.5.2"))
-        substitute(module("org.assertj:assertj-core")).using(module("org.assertj:assertj-core:3.27.7"))
-        substitute(module("org.checkerframework:checker-qual")).using(module("org.checkerframework:checker-qual:2.43.0"))
-        substitute(module("org.hamcrest:hamcrest:2.1")).using(module("org.hamcrest:hamcrest:3.0"))
-//        // https://mvnrepository.com/artifact/org.jetbrains/annotations
-        substitute(module("org.jetbrains:annotations")).using(module("org.jetbrains:annotations:26.1.0"))
-        // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
-        substitute(
-            module("org.jetbrains.kotlin:kotlin-stdlib-common"),
-        ).using(module("org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"))
-        substitute(
-            module("org.jetbrains.kotlin:kotlin-stdlib-jdk7"),
-        ).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"))
-        substitute(
-            module("org.jetbrains.kotlin:kotlin-stdlib-jdk8"),
-        ).using(module("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"))
-        substitute(module("org.jetbrains.kotlin:kotlin-stdlib")).using(module("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"))
-        // https://mvnrepository.com/artifact/org.json/json
-        substitute(module("org.json:json")).using(module("org.json:json:20251224"))
-        // https://mvnrepository.com/artifact/org.jsoup/jsoup
-        substitute(module("org.jsoup:jsoup")).using(module("org.jsoup:jsoup:1.22.1"))
-        // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
-        substitute(module("org.junit.jupiter:junit-jupiter")).using(module("org.junit.jupiter:junit-jupiter:5.14.3"))
-        substitute(module("org.junit.jupiter:junit-jupiter-api")).using(module("org.junit.jupiter:junit-jupiter-api:5.14.3"))
-        // https://mvnrepository.com/artifact/org.mozilla/rhino-engine
-        substitute(module("org.mozilla:rhino-engine")).using(module("org.mozilla:rhino-engine:1.9.1"))
-        // https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams
-        substitute(module("org.reactivestreams:reactive-streams")).using(module("org.reactivestreams:reactive-streams:1.0.4"))
-        // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-        substitute(module("org.slf4j:slf4j-api")).using(module("org.slf4j:slf4j-api:2.0.17"))
-        // https://mvnrepository.com/artifact/org.springframework/spring-core
-        substitute(module("org.springframework:spring-aop")).using(module("org.springframework:spring-aop:$springFrameworkVersion"))
-        substitute(module("org.springframework:spring-beans")).using(module("org.springframework:spring-beans:$springFrameworkVersion"))
-        substitute(module("org.springframework:spring-context")).using(module("org.springframework:spring-context:$springFrameworkVersion"))
-        substitute(module("org.springframework:spring-core")).using(module("org.springframework:spring-core:$springFrameworkVersion"))
-        substitute(
-            module("org.springframework:spring-expression"),
-        ).using(module("org.springframework:spring-expression:$springFrameworkVersion"))
-        substitute(
-            module("org.springframework:spring-messaging"),
-        ).using(module("org.springframework:spring-messaging:$springFrameworkVersion"))
-        substitute(module("org.springframework:spring-web")).using(module("org.springframework:spring-web:$springFrameworkVersion"))
-        substitute(
-            module("org.springframework:spring-websocket"),
-        ).using(module("org.springframework:spring-websocket:$springFrameworkVersion"))
-
-        // --- H2 Database Hard Overrides ---
-        // We declare the true versions up in the `dependencies {}` block above to keep it clean and idiomatic.
-        // However, the Spring Boot plugin (3.5.x) imports its own internal BOM which can silently downgrade these
-        // dependencies backwards against our will if its internal libraries ask for an older 2.3.x schema driver.
-        // We use this dependencySubstitution block as a failsafe to forcefully guarantee 2.4.x is locked in regardless.
-        substitute(module("com.h2database:h2")).using(module("com.h2database:h2:2.4.240"))
-        substitute(module("io.r2dbc:r2dbc-h2")).using(module("io.r2dbc:r2dbc-h2:1.1.0.RELEASE"))
-        // https://mvnrepository.com/artifact/io.micrometer/micrometer-observation
-        substitute(module("io.micrometer:micrometer-observation")).using(module("io.micrometer:micrometer-observation:1.16.4"))
-        // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-        substitute(module("org.yaml:snakeyaml")).using(module("org.yaml:snakeyaml:2.6"))
-        // Netty alignment is handled by the enforced netty-bom platform in the dependencies block
-        // above, so individual io.netty module substitutions are intentionally not listed here.
-    }
-}
+// Dependency versions are managed by the Spring Boot 4 BOM (applied by the Spring Boot Gradle
+// plugin) plus the enforced io.netty:netty-bom platform declared in the dependencies block above.
+// The previous ~31-entry hand-pinned resolutionStrategy.dependencySubstitution block was removed:
+// a runtimeClasspath diff (with vs without it) showed it was either a no-op or merely held
+// BOM-managed deps *below* their BOM versions — the same brittleness that produced the earlier
+// Netty skew. App libraries not covered by the BOM (gson, org.json, jsoup, rhino via lavaplayer,
+// etc.) keep their versions via their direct dependency declarations above.
 
 tasks.withType<BootJar> {
     archiveFileName.set("ukulele.jar")
