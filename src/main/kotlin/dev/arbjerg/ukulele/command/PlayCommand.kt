@@ -21,6 +21,7 @@ class PlayCommand(
     val players: PlayerRegistry,
     val apm: AudioPlayerManager,
     val botProps: BotProps,
+    val queueCommand: QueueCommand,
 ) : Command("play", "p") {
     val pattern: Pattern = Pattern.compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
 
@@ -168,6 +169,8 @@ class PlayCommand(
                 if (failures.isNotEmpty()) {
                     append("\n").append(failures.joinToString("\n"))
                 }
+                // Show the current queue after adding, like running the queue command.
+                append("\n\n").append(queueCommand.printQueue(player, 1))
             }
         reply(message)
     }

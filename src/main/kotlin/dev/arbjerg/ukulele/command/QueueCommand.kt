@@ -16,7 +16,7 @@ class QueueCommand : Command("queue", "q", "list") {
         reply(printQueue(player, argumentText.toIntOrNull() ?: 1))
     }
 
-    private fun printQueue(
+    fun printQueue(
         player: Player,
         pageIndex: Int,
     ): String {
