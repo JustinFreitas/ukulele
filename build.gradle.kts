@@ -78,6 +78,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
+    implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.6")
 

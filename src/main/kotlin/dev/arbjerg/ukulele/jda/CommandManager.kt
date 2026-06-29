@@ -2,8 +2,6 @@ package dev.arbjerg.ukulele.jda
 
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildPropertiesService
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
@@ -18,6 +16,7 @@ class CommandManager(
     private val contextBeans: CommandContext.Beans,
     private val guildProperties: GuildPropertiesService,
     private val botProps: BotProps,
+    private val commandScope: CommandScope,
     commands: Collection<Command>,
 ) {
     private final val registry: Map<String, Command>
@@ -39,14 +38,13 @@ class CommandManager(
 
     fun getCommands() = registry.values.distinct()
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun onMessage(
         guild: Guild,
         channel: TextChannel,
         member: Member,
         message: Message,
     ) {
-        GlobalScope.launch {
+        commandScope.launch {
             val guildProperties = guildProperties.getAwait(guild.idLong)
             val prefix = guildProperties.prefix ?: botProps.prefix
 

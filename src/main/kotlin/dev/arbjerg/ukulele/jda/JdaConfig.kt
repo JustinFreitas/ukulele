@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent.DIRECT_MESSAGES
 import net.dv8tion.jda.api.requests.GatewayIntent.GUILD_MESSAGES
 import net.dv8tion.jda.api.requests.GatewayIntent.GUILD_MODERATION
-import net.dv8tion.jda.api.requests.GatewayIntent.GUILD_PRESENCES
 import net.dv8tion.jda.api.requests.GatewayIntent.GUILD_VOICE_STATES
 import net.dv8tion.jda.api.requests.GatewayIntent.MESSAGE_CONTENT
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
@@ -34,11 +33,12 @@ class JdaConfig {
         if (botProps.token.isBlank()) throw RuntimeException("Discord token not configured!")
         val activity = if (botProps.game.isBlank()) Activity.playing("music") else Activity.playing(botProps.game)
 
+        // NOTE: MESSAGE_CONTENT is privileged and only needed for the legacy prefix command path;
+        // it can be removed once slash commands fully replace prefix commands.
         val intents =
             listOf(
                 DIRECT_MESSAGES,
                 GUILD_VOICE_STATES,
-                GUILD_PRESENCES,
                 GUILD_MESSAGES,
                 GUILD_MODERATION,
                 MESSAGE_CONTENT,

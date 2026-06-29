@@ -1,0 +1,16 @@
+# Baked-in framework defaults, loaded because the app sets spring.config.name=ukulele
+# (see UkuleleApplication.kt). User configuration — the Discord token, prefix, etc. — lives in the
+# external ukulele.yml in the working directory, which is merged over these defaults and wins on
+# any overlapping keys.
+management:
+  endpoints:
+    web:
+      exposure:
+        # health/info/metrics only. Sensitive endpoints (env, beans, configprops) stay disabled.
+        include: health,info,metrics
+  endpoint:
+    health:
+      # status only (UP/DOWN); details are not exposed since there is no auth in front of actuator.
+      show-details: never
+      probes:
+        enabled: true
