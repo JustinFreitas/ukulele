@@ -1,0 +1,1536 @@
+
+> Task :dependencies
+
+------------------------------------------------------------
+Root project 'ukulele'
+------------------------------------------------------------
+
+annotationProcessor - Annotation processors and their dependencies for source set 'main'.
+No dependencies
+
+api - API dependencies for null/main (n)
+No dependencies
+
+apiDependenciesMetadata
+No dependencies
+
+apiElements - API elements for the 'main' feature. (n)
+No dependencies
+
+apiElements-published (n)
+No dependencies
+
+bootArchives - Configuration for Spring Boot archive artifacts. (n)
+No dependencies
+
+compileClasspath - Compile classpath for null/main.
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- com.squareup.okio:okio-jvm:3.6.0
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 -> 2.0.0-RC3
+|    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         |    |    +--- org.jetbrains:annotations:13.0 -> 23.0.0
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1
+|         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|         |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|         \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta
+|    |         +--- org.jetbrains:annotations:23.0.0
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta (c)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+compileOnly - Compile only dependencies for null/main. (n)
+No dependencies
+
+compileOnlyDependenciesMetadata
+No dependencies
+
+default - Configuration for default artifacts. (n)
+No dependencies
+
+dependencySources
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23 FAILED
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 FAILED
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 FAILED
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 FAILED
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    \--- org.reactivestreams:reactive-streams:1.0.3
+|    \--- io.projectreactor:reactor-core:3.5.0 FAILED
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 FAILED
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta FAILED
+\--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2 FAILED
+
+developmentOnly - Configuration for development-only dependencies such as Spring Boot's DevTools.
+No dependencies
+
+implementation - Implementation only dependencies for null/main. (n)
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5 (n)
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5 (n)
++--- org.yaml:snakeyaml:2.2 (n)
++--- net.dv8tion:JDA:5.0.0-beta.23 (n)
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT (n)
++--- commons-io:commons-io:2.16.1 (n)
++--- org.json:json:20240303 (n)
++--- org.jsoup:jsoup:1.17.2 (n)
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (n)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (n)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (n)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE (n)
++--- org.flywaydb:flyway-core:10.12.0 (n)
++--- com.github.ben-manes.caffeine:caffeine:3.1.8 (n)
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3 (n)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (n)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (n)
+\--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2 (n)
+
+implementationDependenciesMetadata
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1
+|         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|         |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|         \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlinx:atomicfu:0.23.1
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+intransitiveDependenciesMetadata
+No dependencies
+
+kotlinBuildToolsApiClasspath
+\--- org.jetbrains.kotlin:kotlin-build-tools-impl:{strictly 2.0.0-RC3} -> 2.0.0-RC3
+     +--- org.jetbrains.kotlin:kotlin-build-tools-api:2.0.0-RC3
+     +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+     |    \--- org.jetbrains:annotations:13.0
+     +--- org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.0-RC3
+     |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+     |    +--- org.jetbrains.kotlin:kotlin-script-runtime:2.0.0-RC3
+     |    +--- org.jetbrains.kotlin:kotlin-reflect:1.6.10
+     |    +--- org.jetbrains.kotlin:kotlin-daemon-embeddable:2.0.0-RC3
+     |    \--- org.jetbrains.intellij.deps:trove4j:1.0.20200330
+     +--- org.jetbrains.kotlin:kotlin-compiler-runner:2.0.0-RC3
+     |    +--- org.jetbrains.kotlin:kotlin-build-common:2.0.0-RC3
+     |    +--- org.jetbrains.kotlin:kotlin-daemon-client:2.0.0-RC3
+     |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+     |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0
+     |    \--- org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.0-RC3 (*)
+     +--- org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:2.0.0-RC3
+     |    +--- org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:2.0.0-RC3
+     |    |    +--- org.jetbrains.kotlin:kotlin-scripting-common:2.0.0-RC3
+     |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+     |    |    +--- org.jetbrains.kotlin:kotlin-scripting-jvm:2.0.0-RC3
+     |    |    |    +--- org.jetbrains.kotlin:kotlin-script-runtime:2.0.0-RC3
+     |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+     |    |    |    \--- org.jetbrains.kotlin:kotlin-scripting-common:2.0.0-RC3 (*)
+     |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+     |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+     \--- org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:2.0.0-RC3 (*)
+
+kotlinCompilerClasspath
+\--- org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.0-RC3
+     +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+     |    \--- org.jetbrains:annotations:13.0
+     +--- org.jetbrains.kotlin:kotlin-script-runtime:2.0.0-RC3
+     +--- org.jetbrains.kotlin:kotlin-reflect:1.6.10
+     +--- org.jetbrains.kotlin:kotlin-daemon-embeddable:2.0.0-RC3
+     \--- org.jetbrains.intellij.deps:trove4j:1.0.20200330
+
+kotlinCompilerPluginClasspath
+No dependencies
+
+kotlinCompilerPluginClasspathMain - Kotlin compiler plugins for compilation
++--- org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:2.0.0-RC3
+|    +--- org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:2.0.0-RC3
+|    |    +--- org.jetbrains.kotlin:kotlin-scripting-common:2.0.0-RC3
+|    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         \--- org.jetbrains:annotations:13.0
+|    |    +--- org.jetbrains.kotlin:kotlin-scripting-jvm:2.0.0-RC3
+|    |    |    +--- org.jetbrains.kotlin:kotlin-script-runtime:2.0.0-RC3
+|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |    \--- org.jetbrains.kotlin:kotlin-scripting-common:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+\--- org.jetbrains.kotlin:kotlin-allopen-compiler-plugin-embeddable:2.0.0-RC3
+
+kotlinCompilerPluginClasspathTest - Kotlin compiler plugins for compilation
++--- org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:2.0.0-RC3
+|    +--- org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:2.0.0-RC3
+|    |    +--- org.jetbrains.kotlin:kotlin-scripting-common:2.0.0-RC3
+|    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         \--- org.jetbrains:annotations:13.0
+|    |    +--- org.jetbrains.kotlin:kotlin-scripting-jvm:2.0.0-RC3
+|    |    |    +--- org.jetbrains.kotlin:kotlin-script-runtime:2.0.0-RC3
+|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |    \--- org.jetbrains.kotlin:kotlin-scripting-common:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+\--- org.jetbrains.kotlin:kotlin-allopen-compiler-plugin-embeddable:2.0.0-RC3
+
+kotlinKlibCommonizerClasspath
+\--- org.jetbrains.kotlin:kotlin-klib-commonizer-embeddable:2.0.0-RC3
+     +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+     |    \--- org.jetbrains:annotations:13.0
+     \--- org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.0-RC3
+          +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+          +--- org.jetbrains.kotlin:kotlin-script-runtime:2.0.0-RC3
+          +--- org.jetbrains.kotlin:kotlin-reflect:1.6.10
+          +--- org.jetbrains.kotlin:kotlin-daemon-embeddable:2.0.0-RC3
+          \--- org.jetbrains.intellij.deps:trove4j:1.0.20200330
+
+kotlinNativeBundleConfiguration
+\--- org.jetbrains.kotlin:kotlin-native-prebuilt:2.0.0-RC3
+
+kotlinNativeCompilerPluginClasspath
+No dependencies
+
+kotlinScriptDef - Script filename extensions discovery classpath configuration (n)
+No dependencies
+
+kotlinScriptDefExtensions
+No dependencies
+
+mainSourceElements - List of source directories contained in the Main SourceSet. (n)
+No dependencies
+
+productionRuntimeClasspath
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- net.sf.trove4j:core:3.1.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.16.0 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    +--- com.fasterxml.jackson.core:jackson-databind:2.16.0 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|    |    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- com.squareup.okio:okio-jvm:3.6.0
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 -> 2.0.0-RC3
+|    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         |    |    +--- org.jetbrains:annotations:13.0 -> 23.0.0
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    |    \--- net.java.dev.jna:jna:4.4.0
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lavaplayer-natives:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.walkyst:JAADec-fork:0.1.3
+|    |    +--- com.github.walkyst.JAADec-fork:jaadec-ext-aac:0.1.3
+|    |    \--- com.github.walkyst.JAADec-fork:jaadec-ext-mp4:0.1.3
+|    +--- org.mozilla:rhino-engine:1.7.14
+|    |    \--- org.mozilla:rhino:1.7.14
+|    +--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    +--- commons-io:commons-io:2.13.0 -> 2.16.1
+|    +--- org.jsoup:jsoup:1.16.1 -> 1.17.2
+|    +--- net.iharder:base64:2.3.9
+|    +--- org.json:json:20230618 -> 20240303
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    |    +--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    \--- commons-io:commons-io:2.13.0 -> 2.16.1
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1 (*)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta
+|    |         +--- org.jetbrains:annotations:23.0.0
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta (c)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
++--- com.h2database:h2:2.2.224
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+runtimeClasspath - Runtime classpath of null/main.
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- net.sf.trove4j:core:3.1.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.16.0 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    +--- com.fasterxml.jackson.core:jackson-databind:2.16.0 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|    |    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- com.squareup.okio:okio-jvm:3.6.0
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 -> 2.0.0-RC3
+|    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         |    |    +--- org.jetbrains:annotations:13.0 -> 23.0.0
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    |    \--- net.java.dev.jna:jna:4.4.0
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lavaplayer-natives:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.walkyst:JAADec-fork:0.1.3
+|    |    +--- com.github.walkyst.JAADec-fork:jaadec-ext-aac:0.1.3
+|    |    \--- com.github.walkyst.JAADec-fork:jaadec-ext-mp4:0.1.3
+|    +--- org.mozilla:rhino-engine:1.7.14
+|    |    \--- org.mozilla:rhino:1.7.14
+|    +--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    +--- commons-io:commons-io:2.13.0 -> 2.16.1
+|    +--- org.jsoup:jsoup:1.16.1 -> 1.17.2
+|    +--- net.iharder:base64:2.3.9
+|    +--- org.json:json:20230618 -> 20240303
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    |    +--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    \--- commons-io:commons-io:2.13.0 -> 2.16.1
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1 (*)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta
+|    |         +--- org.jetbrains:annotations:23.0.0
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta (c)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
++--- com.h2database:h2:2.2.224
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+runtimeElements - Runtime elements for the 'main' feature. (n)
+No dependencies
+
+runtimeElements-published (n)
+No dependencies
+
+runtimeOnly - Runtime only dependencies for null/main. (n)
+\--- com.h2database:h2:2.2.224 (n)
+
+testAndDevelopmentOnly - Configuration for test and development-only dependencies such as Spring Boot's DevTools.
+No dependencies
+
+testAnnotationProcessor - Annotation processors and their dependencies for source set 'test'.
+No dependencies
+
+testApi - API dependencies for null/test (n)
+No dependencies
+
+testApiDependenciesMetadata
+No dependencies
+
+testCompileClasspath - Compile classpath for null/test.
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- com.squareup.okio:okio-jvm:3.6.0
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 -> 2.0.0-RC3
+|    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         |    |    +--- org.jetbrains:annotations:13.0 -> 23.0.0
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1
+|         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|         |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|         \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta
+|    |         +--- org.jetbrains:annotations:23.0.0
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta (c)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
++--- org.springframework.boot:spring-boot-starter-test:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5 (*)
+|    +--- org.springframework.boot:spring-boot-test:3.2.5
+|    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    +--- org.springframework.boot:spring-boot-test-autoconfigure:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-test:3.2.5 (*)
+|    |    \--- org.springframework.boot:spring-boot-autoconfigure:3.2.5 (*)
+|    +--- com.jayway.jsonpath:json-path:2.9.0
+|    +--- jakarta.xml.bind:jakarta.xml.bind-api:4.0.2
+|    |    \--- jakarta.activation:jakarta.activation-api:2.1.3
+|    +--- net.minidev:json-smart:2.5.1
+|    |    \--- net.minidev:accessors-smart:2.5.1
+|    |         \--- org.ow2.asm:asm:9.6
+|    +--- org.assertj:assertj-core:3.24.2
+|    |    \--- net.bytebuddy:byte-buddy:1.12.21 -> 1.14.9
+|    +--- org.awaitility:awaitility:4.2.1
+|    |    \--- org.hamcrest:hamcrest:2.1 -> 2.2
+|    +--- org.hamcrest:hamcrest:2.2
+|    +--- org.junit.jupiter:junit-jupiter:5.10.2
+|    |    +--- org.junit:junit-bom:5.10.2
+|    |    |    +--- org.junit.jupiter:junit-jupiter:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-api:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-params:5.10.2 (c)
+|    |    |    \--- org.junit.platform:junit-platform-commons:1.10.2 (c)
+|    |    +--- org.junit.jupiter:junit-jupiter-api:5.10.2
+|    |    |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |    |    +--- org.opentest4j:opentest4j:1.3.0
+|    |    |    +--- org.junit.platform:junit-platform-commons:1.10.2
+|    |    |    |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |    |    |    \--- org.apiguardian:apiguardian-api:1.1.2
+|    |    |    \--- org.apiguardian:apiguardian-api:1.1.2
+|    |    \--- org.junit.jupiter:junit-jupiter-params:5.10.2
+|    |         +--- org.junit:junit-bom:5.10.2 (*)
+|    |         +--- org.junit.jupiter:junit-jupiter-api:5.10.2 (*)
+|    |         \--- org.apiguardian:apiguardian-api:1.1.2
+|    +--- org.mockito:mockito-core:5.7.0
+|    |    +--- net.bytebuddy:byte-buddy:1.14.9
+|    |    \--- net.bytebuddy:byte-buddy-agent:1.14.9
+|    +--- org.mockito:mockito-junit-jupiter:5.7.0
+|    |    \--- org.mockito:mockito-core:5.7.0 (*)
+|    +--- org.skyscreamer:jsonassert:1.5.1
+|    |    \--- com.vaadin.external.google:android-json:0.0.20131108.vaadin1
+|    +--- org.springframework:spring-core:6.1.6 (*)
+|    +--- org.springframework:spring-test:6.1.6
+|    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    \--- org.xmlunit:xmlunit-core:2.9.1
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+testCompileOnly - Compile only dependencies for null/test. (n)
+No dependencies
+
+testCompileOnlyDependenciesMetadata
+No dependencies
+
+testDependencySources
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23 FAILED
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 FAILED
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 FAILED
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 FAILED
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    \--- org.reactivestreams:reactive-streams:1.0.3
+|    \--- io.projectreactor:reactor-core:3.5.0 FAILED
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 FAILED
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta FAILED
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2 FAILED
+\--- org.springframework.boot:spring-boot-starter-test:3.2.5
+
+testImplementation - Implementation only dependencies for null/test. (n)
+\--- org.springframework.boot:spring-boot-starter-test:3.2.5 (n)
+
+testImplementationDependenciesMetadata
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1
+|         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|         |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|         \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlinx:atomicfu:0.23.1
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
++--- org.springframework.boot:spring-boot-starter-test:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5 (*)
+|    +--- org.springframework.boot:spring-boot-test:3.2.5
+|    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    +--- org.springframework.boot:spring-boot-test-autoconfigure:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-test:3.2.5 (*)
+|    |    \--- org.springframework.boot:spring-boot-autoconfigure:3.2.5 (*)
+|    +--- com.jayway.jsonpath:json-path:2.9.0
+|    +--- jakarta.xml.bind:jakarta.xml.bind-api:4.0.2
+|    |    \--- jakarta.activation:jakarta.activation-api:2.1.3
+|    +--- net.minidev:json-smart:2.5.1
+|    |    \--- net.minidev:accessors-smart:2.5.1
+|    |         \--- org.ow2.asm:asm:9.6
+|    +--- org.assertj:assertj-core:3.24.2
+|    |    \--- net.bytebuddy:byte-buddy:1.12.21 -> 1.14.9
+|    +--- org.awaitility:awaitility:4.2.1
+|    |    \--- org.hamcrest:hamcrest:2.1 -> 2.2
+|    +--- org.hamcrest:hamcrest:2.2
+|    +--- org.junit.jupiter:junit-jupiter:5.10.2
+|    |    +--- org.junit:junit-bom:5.10.2
+|    |    |    +--- org.junit.jupiter:junit-jupiter:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-api:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-params:5.10.2 (c)
+|    |    |    \--- org.junit.platform:junit-platform-commons:1.10.2 (c)
+|    |    +--- org.junit.jupiter:junit-jupiter-api:5.10.2
+|    |    |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |    |    +--- org.opentest4j:opentest4j:1.3.0
+|    |    |    +--- org.junit.platform:junit-platform-commons:1.10.2
+|    |    |    |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |    |    |    \--- org.apiguardian:apiguardian-api:1.1.2
+|    |    |    \--- org.apiguardian:apiguardian-api:1.1.2
+|    |    \--- org.junit.jupiter:junit-jupiter-params:5.10.2
+|    |         +--- org.junit:junit-bom:5.10.2 (*)
+|    |         +--- org.junit.jupiter:junit-jupiter-api:5.10.2 (*)
+|    |         \--- org.apiguardian:apiguardian-api:1.1.2
+|    +--- org.mockito:mockito-core:5.7.0
+|    |    +--- net.bytebuddy:byte-buddy:1.14.9
+|    |    \--- net.bytebuddy:byte-buddy-agent:1.14.9
+|    +--- org.mockito:mockito-junit-jupiter:5.7.0
+|    |    \--- org.mockito:mockito-core:5.7.0 (*)
+|    +--- org.skyscreamer:jsonassert:1.5.1
+|    |    \--- com.vaadin.external.google:android-json:0.0.20131108.vaadin1
+|    +--- org.springframework:spring-core:6.1.6 (*)
+|    +--- org.springframework:spring-test:6.1.6
+|    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    \--- org.xmlunit:xmlunit-core:2.9.1
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+testIntransitiveDependenciesMetadata
+No dependencies
+
+testKotlinScriptDef - Script filename extensions discovery classpath configuration (n)
+No dependencies
+
+testKotlinScriptDefExtensions
+No dependencies
+
+testRuntimeClasspath - Runtime classpath of null/test.
++--- org.springframework.boot:spring-boot-configuration-processor:3.2.5
++--- org.springframework.boot:spring-boot-starter-data-r2dbc:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5
+|    |    |    +--- org.springframework:spring-core:6.1.6
+|    |    |    |    \--- org.springframework:spring-jcl:6.1.6
+|    |    |    \--- org.springframework:spring-context:6.1.6
+|    |    |         +--- org.springframework:spring-aop:6.1.6
+|    |    |         |    +--- org.springframework:spring-beans:6.1.6
+|    |    |         |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         +--- org.springframework:spring-expression:6.1.6
+|    |    |         |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |         \--- io.micrometer:micrometer-observation:1.12.5
+|    |    |              \--- io.micrometer:micrometer-commons:1.12.5
+|    |    +--- org.springframework.boot:spring-boot-autoconfigure:3.2.5
+|    |    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-starter-logging:3.2.5
+|    |    |    +--- ch.qos.logback:logback-classic:1.4.14
+|    |    |    |    +--- ch.qos.logback:logback-core:1.4.14
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.21.1
+|    |    |    |    \--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    |    |    \--- org.slf4j:jul-to-slf4j:2.0.13
+|    |    |         \--- org.slf4j:slf4j-api:2.0.13
+|    |    +--- jakarta.annotation:jakarta.annotation-api:2.1.1
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    \--- org.yaml:snakeyaml:2.2
+|    +--- org.springframework.data:spring-data-r2dbc:3.2.5
+|    |    +--- org.springframework.data:spring-data-relational:3.2.5
+|    |    |    +--- org.springframework.data:spring-data-commons:3.2.5
+|    |    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    |    +--- org.springframework:spring-tx:6.1.6
+|    |    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- com.github.jsqlparser:jsqlparser:4.6
+|    |    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    |    +--- org.springframework.data:spring-data-commons:3.2.5 (*)
+|    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-context:6.1.6 (*)
+|    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    +--- org.springframework:spring-jdbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    \--- org.springframework:spring-tx:6.1.6 (*)
+|    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    +--- org.springframework:spring-r2dbc:6.1.6
+|    |    |    +--- org.springframework:spring-beans:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-core:6.1.6 (*)
+|    |    |    +--- org.springframework:spring-tx:6.1.6 (*)
+|    |    |    +--- io.projectreactor:reactor-core:3.6.5
+|    |    |    |    \--- org.reactivestreams:reactive-streams:1.0.4
+|    |    |    \--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE
+|    |    |         \--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    |    +--- io.projectreactor:reactor-core:3.6.5 (*)
+|    |    \--- org.slf4j:slf4j-api:2.0.2 -> 2.0.13
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.r2dbc:r2dbc-pool:1.0.1.RELEASE
+|         +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|         +--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
+|         \--- io.projectreactor.addons:reactor-pool:1.0.1
+|              \--- io.projectreactor:reactor-core:3.5.8 -> 3.6.5 (*)
++--- org.yaml:snakeyaml:2.2
++--- net.dv8tion:JDA:5.0.0-beta.23
+|    +--- net.sf.trove4j:core:3.1.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.16.0 -> 2.17.1
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1
+|    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (c)
+|    |         +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (c)
+|    |         \--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.17.1 (c)
+|    +--- com.fasterxml.jackson.core:jackson-databind:2.16.0 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-annotations:2.17.1
+|    |    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    +--- org.slf4j:slf4j-api:1.7.36 -> 2.0.13
+|    +--- com.neovisionaries:nv-websocket-client:2.14
+|    +--- com.squareup.okhttp3:okhttp:4.12.0
+|    |    +--- com.squareup.okio:okio:3.6.0
+|    |    |    \--- com.squareup.okio:okio-jvm:3.6.0
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 -> 2.0.0-RC3
+|    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3
+|    |    |         |    |    +--- org.jetbrains:annotations:13.0 -> 23.0.0
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0 -> 2.0.0-RC3 (c)
+|    |    |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:2.0.0-RC3 (c)
+|    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0-RC3
+|    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 -> 2.0.0-RC3
+|    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21 -> 2.0.0-RC3 (*)
+|    +--- club.minnced:opus-java:1.1.1
+|    |    +--- club.minnced:opus-java-api:1.1.1
+|    |    |    \--- net.java.dev.jna:jna:4.4.0
+|    |    \--- club.minnced:opus-java-natives:1.1.1
+|    \--- org.apache.commons:commons-collections4:4.4
++--- com.github.justinfreitas:lavaplayer:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.justinfreitas:lavaplayer-natives:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    +--- com.github.walkyst:JAADec-fork:0.1.3
+|    |    +--- com.github.walkyst.JAADec-fork:jaadec-ext-aac:0.1.3
+|    |    \--- com.github.walkyst.JAADec-fork:jaadec-ext-mp4:0.1.3
+|    +--- org.mozilla:rhino-engine:1.7.14
+|    |    \--- org.mozilla:rhino:1.7.14
+|    +--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    +--- commons-io:commons-io:2.13.0 -> 2.16.1
+|    +--- org.jsoup:jsoup:1.16.1 -> 1.17.2
+|    +--- net.iharder:base64:2.3.9
+|    +--- org.json:json:20230618 -> 20240303
+|    +--- com.github.justinfreitas:lava-common:a9745272cd73440d0106047937acae3665b91ba2-SNAPSHOT
+|    |    +--- org.slf4j:slf4j-api:2.0.7 -> 2.0.13
+|    |    \--- commons-io:commons-io:2.13.0 -> 2.16.1
+|    +--- org.apache.httpcomponents:httpclient:4.5.14
+|    |    +--- org.apache.httpcomponents:httpcore:4.4.16
+|    |    +--- commons-logging:commons-logging:1.2
+|    |    \--- commons-codec:commons-codec:1.11 -> 1.17.0
+|    +--- com.fasterxml.jackson.core:jackson-core:2.15.2 -> 2.17.1 (*)
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.15.2 -> 2.17.1 (*)
++--- commons-io:commons-io:2.16.1
++--- org.json:json:20240303
++--- org.jsoup:jsoup:1.17.2
++--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
++--- com.fasterxml.jackson.core:jackson-annotations:2.17.1 (*)
++--- io.r2dbc:r2dbc-h2:1.0.0.RELEASE
+|    +--- io.r2dbc:r2dbc-spi:1.0.0.RELEASE (*)
+|    \--- io.projectreactor:reactor-core:3.5.0 -> 3.6.5 (*)
++--- org.flywaydb:flyway-core:10.12.0
+|    +--- com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 -> 2.17.1
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.17.1 (*)
+|    |    +--- com.fasterxml.jackson.core:jackson-core:2.17.1 (*)
+|    |    \--- com.fasterxml.jackson:jackson-bom:2.17.1 (*)
+|    \--- com.google.code.gson:gson:2.10.1
++--- com.github.ben-manes.caffeine:caffeine:3.1.8
+|    +--- org.checkerframework:checker-qual:3.37.0
+|    \--- com.google.errorprone:error_prone_annotations:2.21.1
++--- org.jetbrains.kotlin:kotlin-reflect:2.0.0-RC3
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.0-RC3 (*)
++--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0-RC3 (*)
++--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta
+|    |         +--- org.jetbrains:annotations:23.0.0
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta (c)
+|    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1-Beta (c)
+|    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1-Beta (c)
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    +--- io.projectreactor:reactor-core:3.4.1 -> 3.6.5 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.1-Beta
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.1-Beta (*)
+|    |    +--- org.reactivestreams:reactive-streams:1.0.3 -> 1.0.4
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.0.0-RC3 (*)
++--- io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2
+|    \--- io.projectreactor:reactor-core:3.5.4 -> 3.6.5 (*)
++--- com.h2database:h2:2.2.224
++--- org.springframework.boot:spring-boot-starter-test:3.2.5
+|    +--- org.springframework.boot:spring-boot-starter:3.2.5 (*)
+|    +--- org.springframework.boot:spring-boot-test:3.2.5
+|    |    \--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    +--- org.springframework.boot:spring-boot-test-autoconfigure:3.2.5
+|    |    +--- org.springframework.boot:spring-boot:3.2.5 (*)
+|    |    +--- org.springframework.boot:spring-boot-test:3.2.5 (*)
+|    |    \--- org.springframework.boot:spring-boot-autoconfigure:3.2.5 (*)
+|    +--- com.jayway.jsonpath:json-path:2.9.0
+|    |    +--- net.minidev:json-smart:2.5.0 -> 2.5.1
+|    |    |    \--- net.minidev:accessors-smart:2.5.1
+|    |    |         \--- org.ow2.asm:asm:9.6
+|    |    \--- org.slf4j:slf4j-api:2.0.11 -> 2.0.13
+|    +--- jakarta.xml.bind:jakarta.xml.bind-api:4.0.2
+|    |    \--- jakarta.activation:jakarta.activation-api:2.1.3
+|    +--- net.minidev:json-smart:2.5.1 (*)
+|    +--- org.assertj:assertj-core:3.24.2
+|    |    \--- net.bytebuddy:byte-buddy:1.12.21 -> 1.14.9
+|    +--- org.awaitility:awaitility:4.2.1
+|    |    \--- org.hamcrest:hamcrest:2.1 -> 2.2
+|    +--- org.hamcrest:hamcrest:2.2
+|    +--- org.junit.jupiter:junit-jupiter:5.10.2
+|    |    +--- org.junit:junit-bom:5.10.2
+|    |    |    +--- org.junit.jupiter:junit-jupiter:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-api:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-engine:5.10.2 (c)
+|    |    |    +--- org.junit.jupiter:junit-jupiter-params:5.10.2 (c)
+|    |    |    +--- org.junit.platform:junit-platform-commons:1.10.2 (c)
+|    |    |    \--- org.junit.platform:junit-platform-engine:1.10.2 (c)
+|    |    +--- org.junit.jupiter:junit-jupiter-api:5.10.2
+|    |    |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |    |    +--- org.opentest4j:opentest4j:1.3.0
+|    |    |    \--- org.junit.platform:junit-platform-commons:1.10.2
+|    |    |         \--- org.junit:junit-bom:5.10.2 (*)
+|    |    +--- org.junit.jupiter:junit-jupiter-params:5.10.2
+|    |    |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |    |    \--- org.junit.jupiter:junit-jupiter-api:5.10.2 (*)
+|    |    \--- org.junit.jupiter:junit-jupiter-engine:5.10.2
+|    |         +--- org.junit:junit-bom:5.10.2 (*)
+|    |         +--- org.junit.platform:junit-platform-engine:1.10.2
+|    |         |    +--- org.junit:junit-bom:5.10.2 (*)
+|    |         |    +--- org.opentest4j:opentest4j:1.3.0
+|    |         |    \--- org.junit.platform:junit-platform-commons:1.10.2 (*)
+|    |         \--- org.junit.jupiter:junit-jupiter-api:5.10.2 (*)
+|    +--- org.mockito:mockito-core:5.7.0
+|    |    +--- net.bytebuddy:byte-buddy:1.14.9
+|    |    +--- net.bytebuddy:byte-buddy-agent:1.14.9
+|    |    \--- org.objenesis:objenesis:3.3
+|    +--- org.mockito:mockito-junit-jupiter:5.7.0
+|    |    +--- org.mockito:mockito-core:5.7.0 (*)
+|    |    \--- org.junit.jupiter:junit-jupiter-api:5.10.0 -> 5.10.2 (*)
+|    +--- org.skyscreamer:jsonassert:1.5.1
+|    |    \--- com.vaadin.external.google:android-json:0.0.20131108.vaadin1
+|    +--- org.springframework:spring-core:6.1.6 (*)
+|    +--- org.springframework:spring-test:6.1.6
+|    |    \--- org.springframework:spring-core:6.1.6 (*)
+|    \--- org.xmlunit:xmlunit-core:2.9.1
+\--- commons-codec:commons-codec:1.17.0 (c)
+
+testRuntimeOnly - Runtime only dependencies for null/test. (n)
+No dependencies
+
+(c) - A dependency constraint, not a dependency. The dependency affected by the constraint occurs elsewhere in the tree.
+(*) - Indicates repeated occurrences of a transitive dependency subtree. Gradle expands transitive dependency subtrees only once per project; repeat occurrences only display the root of the subtree, followed by this annotation.
+
+(n) - A dependency or dependency configuration that cannot be resolved.
+
+A web-based, searchable dependency report is available by adding the --scan option.
+
+BUILD SUCCESSFUL in 5s
+1 actionable task: 1 executed

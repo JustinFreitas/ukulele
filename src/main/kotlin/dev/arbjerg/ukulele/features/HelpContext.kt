@@ -31,7 +31,11 @@ class HelpContext(
 
     /** First description line (without the leading "# "), used as a slash command description. */
     fun firstDescription(): String? =
-        lines.firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim()?.ifBlank { null }
+        lines
+            .firstOrNull { it.startsWith("# ") }
+            ?.removePrefix("# ")
+            ?.trim()
+            ?.ifBlank { null }
 
     fun buildMessage() =
         MessageCreateBuilder()

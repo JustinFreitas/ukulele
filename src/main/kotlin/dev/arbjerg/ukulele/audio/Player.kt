@@ -221,18 +221,6 @@ class Player(
             adjustVolumeFromQueueLabelVolumeMatcher(player, track)
         }
 
-        // Workaround for ReplayGain not being applied correctly at the start of a track
-        if (beans.botProps.normalization) {
-            java.util.Timer().schedule(
-                object : java.util.TimerTask() {
-                    override fun run() {
-                        player.volume = scaleVolume(volume)
-                    }
-                },
-                500,
-            )
-        }
-
         isFadeInArmed = false
         publishState()
     }

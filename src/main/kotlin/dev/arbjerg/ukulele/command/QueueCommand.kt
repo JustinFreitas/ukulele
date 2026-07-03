@@ -76,7 +76,13 @@ class QueueCommand(
                 TextUtils.replayGainLabel(t)?.let { " `🔊 RG $it`" }
                     ?: if (botProps.normalization) " `🔊 RG`" else ""
             appendLine(
-                "`[${offset + i + 1}]` **${t.info.title}** `[${if (t.info.isStream) "Live" else TextUtils.humanReadableTime(t.duration)}]`$rg",
+                "`[${offset + i + 1}]` **${t.info.title}** `[${if (t.info.isStream) {
+                    "Live"
+                } else {
+                    TextUtils.humanReadableTime(
+                        t.duration,
+                    )
+                }}]`$rg",
             )
         }
     }

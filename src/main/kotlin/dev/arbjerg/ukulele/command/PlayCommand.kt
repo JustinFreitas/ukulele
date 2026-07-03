@@ -61,7 +61,10 @@ class PlayCommand(
 
             awaitLoad(source) { item ->
                 when (item) {
-                    is AudioTrack -> collect(item, queueLabel, accepted) { filteredCount++ }
+                    is AudioTrack -> {
+                        collect(item, queueLabel, accepted) { filteredCount++ }
+                    }
+
                     is AudioPlaylist -> {
                         if (item.isSearchResult) {
                             item.tracks.firstOrNull()?.let { collect(it, queueLabel, accepted) { filteredCount++ } }
@@ -69,8 +72,14 @@ class PlayCommand(
                             item.tracks.forEach { collect(it, queueLabel, accepted) { filteredCount++ } }
                         }
                     }
-                    LoadOutcome.NoMatch -> failures.add("Nothing found for “$identifier”")
-                    is LoadOutcome.Failed -> failures.add(item.message)
+
+                    LoadOutcome.NoMatch -> {
+                        failures.add("Nothing found for “$identifier”")
+                    }
+
+                    is LoadOutcome.Failed -> {
+                        failures.add(item.message)
+                    }
                 }
             }
         }
@@ -144,10 +153,17 @@ class PlayCommand(
     ) {
         if (accepted.isEmpty()) {
             when {
-                failures.isNotEmpty() -> reply(failures.joinToString("\n"))
-                filteredCount > 0 ->
+                failures.isNotEmpty() -> {
+                    reply(failures.joinToString("\n"))
+                }
+
+                filteredCount > 0 -> {
                     reply("Refusing to play $filteredCount tracks because they are all over ${botProps.trackDurationLimit} minutes long")
-                else -> reply("Nothing found.")
+                }
+
+                else -> {
+                    reply("Nothing found.")
+                }
             }
             return
         }
