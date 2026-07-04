@@ -8,6 +8,7 @@ services:
       CONFIG_DATABASE: ./db/database # Database location overwrite so mounting works
     volumes:
       - ./ukulele.yml:/opt/ukulele/ukulele.yml
+      # Ensure ./db is chown'ed to 999:999 on Linux hosts so the non-root container user can write to it
       - ./db:/opt/ukulele/db
     ports:
       - "8080:8080"

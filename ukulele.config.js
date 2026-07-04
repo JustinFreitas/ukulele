@@ -8,7 +8,6 @@ module.exports = {
     // --enable-native-access=ALL-UNNAMED silences the Java 25 restricted-method
     // warning from lavaplayer's native loader (matches bootRun's jvmArgs).
     interpreter_args: "--enable-native-access=ALL-UNNAMED -jar", // -> java --enable-native-access=ALL-UNNAMED -jar build\libs\ukulele.jar
-    cwd: "C:\\Users\\justi\\Projects\\ukulele",
     autorestart: true,          // pm2 owns the JVM PID, so crash-restart works
     watch: false
   }]
