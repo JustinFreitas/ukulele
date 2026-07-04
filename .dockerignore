@@ -1,0 +1,39 @@
+# Build artifacts and gradle caches
+.gradle/
+build/
+bin/
+out/
+ukulele.jar
+
+# Databases and local runtime data
+db/
+*.db
+*.trace.db
+
+# Secrets and local configurations
+ukulele.yml
+ukulele.yml.bak
+ukulele-keystore.p12
+*.p12
+*.jks
+
+# IDEs and development tools
+.idea/
+.vscode/
+.kotlin/
+.run/
+*.iws
+*.iml
+*.ipr
+
+# Log files
+*.log
+hs_err_pid*
+replay_pid*
+
+# Version control
+.git/
+.github/
+
+# Temp files
+tmp/
