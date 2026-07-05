@@ -1,0 +1,41 @@
+name: Bump Dependencies
+
+on:
+  repository_dispatch:
+    types: [bump-deps]
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PIPELINE_PAT }}
+
+      - name: Update gradle/libs.versions.toml
+        run: |
+          YOUTUBE_VERSION="${{ github.event.client_payload.youtube_version }}"
+          LAVAPLAYER_VERSION="${{ github.event.client_payload.lavaplayer_version }}"
+          sed -i "s/youtubeSource = \".*\"/youtubeSource = \"$YOUTUBE_VERSION\"/g" gradle/libs.versions.toml
+          sed -i "s/lavaplayer = \".*\"/lavaplayer = \"$LAVAPLAYER_VERSION\"/g" gradle/libs.versions.toml
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: ./gradlew build --no-daemon
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "build: bump lavaplayer to ${{ github.event.client_payload.lavaplayer_version }} and youtube-source to ${{ github.event.client_payload.youtube_version }}"
+          git push
