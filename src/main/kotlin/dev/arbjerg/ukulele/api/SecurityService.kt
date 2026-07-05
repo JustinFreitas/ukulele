@@ -72,9 +72,7 @@ class SecurityService {
         }
     }
 
-    fun isBanned(ip: String): Boolean {
-        return bannedIps.getIfPresent(ip) != null
-    }
+    fun isBanned(ip: String): Boolean = bannedIps.getIfPresent(ip) != null
 
     fun getUnauthorizedCount(): Long = unauthorizedAttempts.get()
 

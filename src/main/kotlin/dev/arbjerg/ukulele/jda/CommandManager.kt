@@ -39,7 +39,6 @@ class CommandManager(
 
     fun getCommands() = registry.values.distinct()
 
-
     /** Dispatch a Discord slash command. The caller (EventHandler) must have already deferred the reply. */
     fun onSlash(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return

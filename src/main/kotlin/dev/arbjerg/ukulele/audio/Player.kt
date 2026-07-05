@@ -216,7 +216,10 @@ class Player(
         return removed
     }
 
-    fun reorderQueue(fromIndex: Int, toIndex: Int): Boolean {
+    fun reorderQueue(
+        fromIndex: Int,
+        toIndex: Int,
+    ): Boolean {
         val success = queue.reorder(fromIndex, toIndex)
         if (success) {
             publishState()
@@ -331,7 +334,10 @@ class Player(
     fun destroy() {
         queue.clear()
         player.destroy()
-        beans.shardManager.getGuildById(guildId)?.audioManager?.closeAudioConnection()
+        beans.shardManager
+            .getGuildById(guildId)
+            ?.audioManager
+            ?.closeAudioConnection()
     }
 
     override fun canProvide(): Boolean = player.provide(frame)

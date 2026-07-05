@@ -45,36 +45,39 @@ class WebSocketConfig(
             .addEndpoint("/ws")
             // Configurable via config.corsOrigins (default "*"); lock to the dashboard origin to harden.
             .setAllowedOriginPatterns(*allowedOrigins)
-            .addInterceptors(object : HandshakeInterceptor {
-                override fun beforeHandshake(
-                    request: ServerHttpRequest,
-                    response: ServerHttpResponse,
-                    wsHandler: WebSocketHandler,
-                    attributes: MutableMap<String, Any>,
-                ): Boolean {
-                    val xForwardedFor = request.headers.getFirst("X-Forwarded-For")
-                    val ip = if (!xForwardedFor.isNullOrEmpty()) {
-                        xForwardedFor.split(",").first().trim()
-                    } else {
-                        request.remoteAddress.address?.hostAddress ?: "unknown"
-                    }
-                    attributes["clientIp"] = ip
+            .addInterceptors(
+                object : HandshakeInterceptor {
+                    override fun beforeHandshake(
+                        request: ServerHttpRequest,
+                        response: ServerHttpResponse,
+                        wsHandler: WebSocketHandler,
+                        attributes: MutableMap<String, Any>,
+                    ): Boolean {
+                        val xForwardedFor = request.headers.getFirst("X-Forwarded-For")
+                        val ip =
+                            if (!xForwardedFor.isNullOrEmpty()) {
+                                xForwardedFor.split(",").first().trim()
+                            } else {
+                                request.remoteAddress.address?.hostAddress ?: "unknown"
+                            }
+                        attributes["clientIp"] = ip
 
-                    if (securityService.isBanned(ip)) {
-                        response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS)
-                        return false
+                        if (securityService.isBanned(ip)) {
+                            response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS)
+                            return false
+                        }
+                        return true
                     }
-                    return true
-                }
 
-                override fun afterHandshake(
-                    request: ServerHttpRequest,
-                    response: ServerHttpResponse,
-                    wsHandler: WebSocketHandler,
-                    exception: Exception?,
-                ) {
-                }
-            })
+                    override fun afterHandshake(
+                        request: ServerHttpRequest,
+                        response: ServerHttpResponse,
+                        wsHandler: WebSocketHandler,
+                        exception: Exception?,
+                    ) {
+                    }
+                },
+            )
     }
 
     /**
@@ -92,7 +95,7 @@ class WebSocketConfig(
                 ): Message<*> {
                     val accessor = StompHeaderAccessor.wrap(message)
                     val ip = accessor.sessionAttributes?.get("clientIp") as? String ?: "unknown"
-                    
+
                     if (StompCommand.CONNECT == accessor.command) {
                         if (securityService.isBanned(ip)) {
                             throw MessagingException("Your IP is temporarily banned due to excessive unauthorized attempts.")
@@ -100,11 +103,12 @@ class WebSocketConfig(
 
                         val auth = accessor.getFirstNativeHeader("Authorization")
                         val expected = botProps.apiToken
-                        val valid = auth != null && (
-                            java.security.MessageDigest.isEqual(auth.toByteArray(), expected.toByteArray()) ||
-                            java.security.MessageDigest.isEqual(auth.toByteArray(), "Bearer $expected".toByteArray())
-                        )
-                        
+                        val valid =
+                            auth != null && (
+                                java.security.MessageDigest.isEqual(auth.toByteArray(), expected.toByteArray()) ||
+                                    java.security.MessageDigest.isEqual(auth.toByteArray(), "Bearer $expected".toByteArray())
+                            )
+
                         if (botProps.requireWebsocketAuth) {
                             if (!valid) {
                                 securityService.registerFailedAttempt(ip)
@@ -128,7 +132,7 @@ class WebSocketConfig(
                                 throw MessagingException("Unauthorized WebSocket subscription")
                             }
                         }
-                        
+
                         // Validate subscription destination: must be /topic/player/{guildId} and the guild must exist
                         val destination = accessor.destination
                         if (destination == null) {

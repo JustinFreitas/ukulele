@@ -32,7 +32,6 @@ class EventHandler(
             )
     }
 
-
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.guild == null || event.member == null) {
             event.reply("Commands can only be used in a server.").setEphemeral(true).queue()
@@ -56,7 +55,7 @@ class EventHandler(
 
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
         val self = event.guild.selfMember
-        
+
         // If the bot itself was disconnected
         if (event.member == self && event.channelJoined == null) {
             log.info("Bot was disconnected from voice channel in guild {}", event.guild.name)

@@ -65,7 +65,6 @@ abstract class CommandContext(
     }
 }
 
-
 /**
  * Context for Discord slash commands. The dispatcher calls [SlashCommandInteractionEvent.deferReply]
  * first, so replies go through the interaction hook. The first reply edits the deferred ("thinking")

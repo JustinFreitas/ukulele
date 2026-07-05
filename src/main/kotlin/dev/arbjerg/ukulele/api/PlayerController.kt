@@ -116,14 +116,20 @@ class PlayerController(
                 log.error("Failed to run resolveAndPlay asynchronously", e)
             }
         }
-        return org.springframework.http.ResponseEntity.accepted().build()
+        return org.springframework.http.ResponseEntity
+            .accepted()
+            .build()
     }
 
-    private suspend fun resolveAndPlay(guildId: Long, body: PlayRequest) {
-        val guild = shardManager.getGuildById(guildId) ?: run {
-            log.error("Guild $guildId not found for play request")
-            return
-        }
+    private suspend fun resolveAndPlay(
+        guildId: Long,
+        body: PlayRequest,
+    ) {
+        val guild =
+            shardManager.getGuildById(guildId) ?: run {
+                log.error("Guild $guildId not found for play request")
+                return
+            }
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)
 
