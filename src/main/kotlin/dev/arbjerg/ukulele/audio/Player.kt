@@ -38,7 +38,7 @@ class Player(
         val nowPlayingCommand: NowPlayingCommand,
         val botProps: BotProps,
         val publisher: PlayerEventPublisher,
-        val shardManager: net.dv8tion.jda.api.sharding.ShardManager,
+        @org.springframework.context.annotation.Lazy val shardManager: net.dv8tion.jda.api.sharding.ShardManager,
     )
 
     private val log: Logger = LoggerFactory.getLogger(Player::class.java)
