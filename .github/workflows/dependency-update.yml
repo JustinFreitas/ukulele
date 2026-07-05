@@ -1,0 +1,50 @@
+name: Dependency Autopilot
+
+on:
+  schedule:
+    # Run every Sunday at 04:00 UTC (after youtube-source autopilot has completed)
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PIPELINE_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Dependency Scan
+        run: ./gradlew dependencyUpdates --no-daemon
+
+      - name: Run Dependency Update Script
+        id: run-script
+        run: python .github/scripts/check_and_update.py
+
+      - name: Commit and Push Version Catalog changes (if any)
+        if: steps.run-script.outputs.updated == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add gradle/libs.versions.toml
+          git add gradle/wrapper/gradle-wrapper.properties gradle/wrapper/gradle-wrapper.jar gradlew gradlew.bat || true
+          
+          git commit -m "chore(deps): automatically update dependencies"
+          git push origin HEAD

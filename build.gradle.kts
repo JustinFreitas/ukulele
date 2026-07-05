@@ -21,6 +21,7 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
         val isStable = stableKeyword || regex.matches(candidate.version)
         !isStable
     }
+    outputFormatter = "json,plain"
 }
 
 kotlin {
@@ -170,6 +171,7 @@ dependencies {
 tasks.withType<BootJar> {
     archiveFileName.set("ukulele.jar")
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    classpath(tasks.jar.get().archiveFile)
     doLast {
         // copies the jar into a place where the Dockerfile can find it easily (and users maybe too)
         copy {
@@ -187,3 +189,5 @@ tasks.withType<Test> {
 tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
     jvmArgs = listOf("--enable-native-access=ALL-UNNAMED")
 }
+
+
