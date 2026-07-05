@@ -146,6 +146,7 @@ class Player(
     fun add(vararg tracks: AudioTrack): Boolean {
         queue.add(*tracks)
         if (player.playingTrack == null) {
+            player.isPaused = false
             player.playTrack(queue.take()!!)
             publishState()
             return true

@@ -51,13 +51,14 @@ class QueueCommand(
             append(repeatTrackMessage)
             append(queueLoopingMessage)
             append(replayGainMessage)
-            append(paginateQueue(tracks, pageIndex))
+            append(paginateQueue(tracks, player.currentTrack, pageIndex))
             listQueueDurationAndLength(tracks, totalDuration)
         }
     }
 
     private fun paginateQueue(
         tracks: List<AudioTrack>,
+        currentTrack: AudioTrack?,
         index: Int,
     ) = buildString {
         val pageCount: Int = (tracks.size + pageSize - 1) / pageSize
@@ -74,7 +75,7 @@ class QueueCommand(
             // is enabled, show a bare badge meaning "ReplayGain will be applied if this track is tagged".
             val rg =
                 TextUtils.replayGainLabel(t)?.let { " `🔊 RG $it`" }
-                    ?: if (botProps.normalization) " `🔊 RG`" else ""
+                    ?: if (botProps.normalization && t != currentTrack) " `🔊 RG`" else ""
             appendLine(
                 "`[${offset + i + 1}]` **${t.info.title}** `[${if (t.info.isStream) {
                     "Live"
