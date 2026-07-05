@@ -17,4 +17,10 @@ class PlayerRegistry(
     ) = players.computeIfAbsent(guild.idLong) { Player(playerBeans, guildProperties) }
 
     fun getExisting(guildId: Long): Player? = players[guildId]
+
+    fun remove(guildId: Long): Player? {
+        val player = players.remove(guildId)
+        player?.destroy()
+        return player
+    }
 }

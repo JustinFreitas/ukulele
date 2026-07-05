@@ -5,7 +5,6 @@ import dev.arbjerg.ukulele.data.GuildPropertiesService
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -40,47 +39,6 @@ class CommandManager(
 
     fun getCommands() = registry.values.distinct()
 
-    fun onMessage(
-        guild: Guild,
-        channel: TextChannel,
-        member: Member,
-        message: Message,
-    ) {
-        commandScope.launch {
-            val guildProperties = guildProperties.getAwait(guild.idLong)
-            val prefix = guildProperties.prefix ?: botProps.prefix
-
-            val name: String
-            val trigger: String
-
-            // match result: a mention of us at the beginning
-            val mention = Regex("^(<@!?${guild.selfMember.id}>\\s*)").find(message.contentRaw)?.value
-            if (mention != null) {
-                val commandText = message.contentRaw.drop(mention.length)
-                if (commandText.isEmpty()) {
-                    channel.sendMessage("The prefix here is `$prefix`, or just mention me followed by a command.").queue()
-                    return@launch
-                }
-
-                name = commandText.trim().takeWhile { !it.isWhitespace() }
-                trigger = mention + name
-            } else if (message.contentRaw.startsWith(prefix)) {
-                name =
-                    message.contentRaw
-                        .drop(prefix.length)
-                        .takeWhile { !it.isWhitespace() }
-                trigger = prefix + name
-            } else {
-                return@launch
-            }
-
-            val command = registry[name] ?: return@launch
-            val ctx = MessageCommandContext(contextBeans, guildProperties, guild, channel, member, message, command, prefix, trigger)
-
-            log.info("Invocation: ${message.contentRaw}")
-            command.invoke0(ctx)
-        }
-    }
 
     /** Dispatch a Discord slash command. The caller (EventHandler) must have already deferred the reply. */
     fun onSlash(event: SlashCommandInteractionEvent) {

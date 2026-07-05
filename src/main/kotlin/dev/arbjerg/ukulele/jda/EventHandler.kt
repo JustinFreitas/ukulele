@@ -1,9 +1,11 @@
 package dev.arbjerg.ukulele.jda
 
+import dev.arbjerg.ukulele.audio.PlayerRegistry
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.StatusChangeEvent
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.Logger
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class EventHandler(
     @param:Lazy private val commandManager: CommandManager,
+    private val playerRegistry: PlayerRegistry,
 ) : ListenerAdapter() {
     private val log: Logger = LoggerFactory.getLogger(EventHandler::class.java)
 
@@ -29,12 +32,6 @@ class EventHandler(
             )
     }
 
-    override fun onMessageReceived(event: MessageReceivedEvent) {
-        if (event.isWebhookMessage || event.author.isBot) return
-        if (event.channelType != ChannelType.TEXT) return
-
-        commandManager.onMessage(event.guild, event.channel.asTextChannel(), event.member!!, event.message)
-    }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.guild == null || event.member == null) {
@@ -50,5 +47,32 @@ class EventHandler(
 
     override fun onStatusChange(event: StatusChangeEvent) {
         log.info("{}: {} -> {}", event.entity.shardInfo, event.oldStatus, event.newStatus)
+    }
+
+    override fun onGuildLeave(event: GuildLeaveEvent) {
+        log.info("Left guild {}, cleaning up player resources", event.guild.name)
+        playerRegistry.remove(event.guild.idLong)
+    }
+
+    override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
+        val self = event.guild.selfMember
+        
+        // If the bot itself was disconnected
+        if (event.member == self && event.channelJoined == null) {
+            log.info("Bot was disconnected from voice channel in guild {}", event.guild.name)
+            playerRegistry.getExisting(event.guild.idLong)?.pause()
+            return
+        }
+
+        // If a voice channel the bot is connected to became empty of human listeners
+        val connectedChannel = event.guild.audioManager.connectedChannel
+        if (connectedChannel != null) {
+            val hasHumans = connectedChannel.members.any { !it.user.isBot }
+            if (!hasHumans) {
+                log.info("Voice channel {} became empty in guild {}, pausing and disconnecting", connectedChannel.name, event.guild.name)
+                playerRegistry.getExisting(event.guild.idLong)?.pause()
+                event.guild.audioManager.closeAudioConnection()
+            }
+        }
     }
 }

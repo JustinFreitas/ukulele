@@ -6,7 +6,6 @@ import dev.arbjerg.ukulele.data.GuildProperties
 import dev.arbjerg.ukulele.features.HelpContext
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -17,8 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Invocation context for a command. Commands are written against this abstraction (argumentText +
- * the reply* methods), so the same command body serves both the legacy prefix/message path
- * ([MessageCommandContext]) and Discord slash commands ([SlashCommandContext]).
+ * the reply* methods) serving Discord slash commands ([SlashCommandContext]).
  */
 abstract class CommandContext(
     val beans: Beans,
@@ -67,34 +65,6 @@ abstract class CommandContext(
     }
 }
 
-/** Context for the legacy prefix/mention message command path. */
-class MessageCommandContext(
-    beans: Beans,
-    guildProperties: GuildProperties,
-    guild: Guild,
-    channel: TextChannel,
-    invoker: Member,
-    val message: Message,
-    command: Command,
-    prefix: String,
-    trigger: String,
-) : CommandContext(beans, guildProperties, guild, channel, invoker, command, prefix, trigger) {
-    override val argumentText: String by lazy {
-        message.contentRaw.drop(trigger.length).trim()
-    }
-
-    override fun reply(msg: String) {
-        channel.sendMessage(msg).queue()
-    }
-
-    override fun replyMsg(msg: MessageCreateData) {
-        channel.sendMessage(msg).queue()
-    }
-
-    override fun replyEmbed(embed: MessageEmbed) {
-        channel.sendMessage(MessageCreateData.fromEmbeds(embed)).queue()
-    }
-}
 
 /**
  * Context for Discord slash commands. The dispatcher calls [SlashCommandInteractionEvent.deferReply]

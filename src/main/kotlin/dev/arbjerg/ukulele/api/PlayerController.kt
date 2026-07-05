@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.audio.PlayerRegistry
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildPropertiesService
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.http.HttpStatus
@@ -101,12 +102,28 @@ class PlayerController(
         }
     }
 
+    private val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO)
+
     @PostMapping("/player/{guildId}/play")
-    suspend fun play(
+    fun play(
         @PathVariable guildId: Long,
         @RequestBody body: PlayRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: throw RuntimeException("Guild not found")
+    ): org.springframework.http.ResponseEntity<Unit> {
+        scope.launch {
+            try {
+                resolveAndPlay(guildId, body)
+            } catch (e: Exception) {
+                log.error("Failed to run resolveAndPlay asynchronously", e)
+            }
+        }
+        return org.springframework.http.ResponseEntity.accepted().build()
+    }
+
+    private suspend fun resolveAndPlay(guildId: Long, body: PlayRequest) {
+        val guild = shardManager.getGuildById(guildId) ?: run {
+            log.error("Guild $guildId not found for play request")
+            return
+        }
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)
 
@@ -202,9 +219,9 @@ class PlayerController(
             player.add(*accepted.toTypedArray())
         }
 
-        // Surface load errors only when nothing could be added; otherwise the partial success stands.
-        if (accepted.isEmpty() && errors.isNotEmpty()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errors.joinToString("\n"))
+        if (errors.isNotEmpty()) {
+            log.warn("Some load errors occurred while processing play request for guild $guildId: {}", errors.joinToString("; "))
+            player.lastChannel?.sendMessage("Failed to load some tracks:\n" + errors.joinToString("\n"))?.queue()
         }
     }
 
@@ -327,5 +344,25 @@ class PlayerController(
             guild.audioManager.openAudioConnection(channel)
             guild.audioManager.sendingHandler = player
         }
+    }
+
+    @PostMapping("/player/{guildId}/remove")
+    suspend fun remove(
+        @PathVariable guildId: Long,
+        @RequestBody body: RemoveRequest,
+    ) {
+        val guild = shardManager.getGuildById(guildId) ?: return
+        val properties = guildPropertiesService.getAwait(guildId)
+        playerRegistry.get(guild, properties).removeTrackAt(body.index)
+    }
+
+    @PostMapping("/player/{guildId}/reorder")
+    suspend fun reorder(
+        @PathVariable guildId: Long,
+        @RequestBody body: ReorderRequest,
+    ) {
+        val guild = shardManager.getGuildById(guildId) ?: return
+        val properties = guildPropertiesService.getAwait(guildId)
+        playerRegistry.get(guild, properties).reorderQueue(body.fromIndex, body.toIndex)
     }
 }

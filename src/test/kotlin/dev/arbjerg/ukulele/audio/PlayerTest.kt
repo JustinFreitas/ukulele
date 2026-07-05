@@ -73,4 +73,52 @@ class PlayerTest {
         verify(audioPlayer, times(1)).stopTrack()
         verify(track, times(0)).position = 0 // Verify we didn't just seek to 0
     }
+
+    @Test
+    fun `removeTrackAt removes track from queue and publishes state`() {
+        // Arrange
+        val track1 = mock(AudioTrack::class.java)
+        val track2 = mock(AudioTrack::class.java)
+        val info1 = AudioTrackInfo("Title1", "Author1", 1000L, "id1", false, "uri1")
+        val info2 = AudioTrackInfo("Title2", "Author2", 1000L, "id2", false, "uri2")
+        `when`(track1.info).thenReturn(info1)
+        `when`(track2.info).thenReturn(info2)
+        `when`(audioPlayer.playingTrack).thenReturn(track1)
+        player.add(track2)
+        assert(player.upcomingTracks.size == 1)
+
+        // Act
+        val removed = player.removeTrackAt(0)
+
+        // Assert
+        assert(removed == track2)
+        assert(player.upcomingTracks.isEmpty())
+    }
+
+    @Test
+    fun `reorderQueue reorders tracks in queue and publishes state`() {
+        // Arrange
+        val track1 = mock(AudioTrack::class.java)
+        val track2 = mock(AudioTrack::class.java)
+        val track3 = mock(AudioTrack::class.java)
+        val info1 = AudioTrackInfo("Title1", "Author1", 1000L, "id1", false, "uri1")
+        val info2 = AudioTrackInfo("Title2", "Author2", 1000L, "id2", false, "uri2")
+        val info3 = AudioTrackInfo("Title3", "Author3", 1000L, "id3", false, "uri3")
+        `when`(track1.info).thenReturn(info1)
+        `when`(track2.info).thenReturn(info2)
+        `when`(track3.info).thenReturn(info3)
+        `when`(audioPlayer.playingTrack).thenReturn(track1)
+        player.add(track2)
+        player.add(track3)
+        assert(player.upcomingTracks[0] == track2)
+        assert(player.upcomingTracks[1] == track3)
+
+        // Act
+        val success = player.reorderQueue(0, 1)
+
+        // Assert
+        assert(success)
+        assert(player.upcomingTracks[0] == track3)
+        assert(player.upcomingTracks[1] == track2)
+    }
 }

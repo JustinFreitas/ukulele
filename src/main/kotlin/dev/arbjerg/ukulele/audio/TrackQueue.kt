@@ -39,4 +39,26 @@ class TrackQueue {
     fun shuffle() {
         synchronized(queue) { queue.shuffle() }
     }
+
+    fun removeAt(index: Int): AudioTrack? = synchronized(queue) {
+        if (index in 0 until queue.size) {
+            queue.removeAt(index)
+        } else {
+            null
+        }
+    }
+
+    fun reorder(fromIndex: Int, toIndex: Int): Boolean = synchronized(queue) {
+        if (fromIndex in 0 until queue.size && toIndex in 0 until queue.size) {
+            val track = queue.removeAt(fromIndex)
+            queue.add(toIndex, track)
+            true
+        } else {
+            false
+        }
+    }
+
+    fun get(index: Int): AudioTrack? = synchronized(queue) {
+        queue.getOrNull(index)
+    }
 }

@@ -189,5 +189,3 @@ tasks.withType<Test> {
 tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
     jvmArgs = listOf("--enable-native-access=ALL-UNNAMED")
 }
-
-

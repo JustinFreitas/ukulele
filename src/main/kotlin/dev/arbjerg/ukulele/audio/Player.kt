@@ -208,6 +208,26 @@ class Player(
         publishState()
     }
 
+    fun removeTrackAt(index: Int): AudioTrack? {
+        val removed = queue.removeAt(index)
+        if (removed != null) {
+            publishState()
+        }
+        return removed
+    }
+
+    fun reorderQueue(fromIndex: Int, toIndex: Int): Boolean {
+        val success = queue.reorder(fromIndex, toIndex)
+        if (success) {
+            publishState()
+        }
+        return success
+    }
+
+    fun triggerStateUpdate() {
+        publishState()
+    }
+
     fun seek(position: Long) {
         player.playingTrack?.position = position
     }
@@ -306,6 +326,12 @@ class Player(
         thresholdMs: Long,
     ) {
         log.error("Track $track got stuck!")
+    }
+
+    fun destroy() {
+        queue.clear()
+        player.destroy()
+        beans.shardManager.getGuildById(guildId)?.audioManager?.closeAudioConnection()
     }
 
     override fun canProvide(): Boolean = player.provide(frame)

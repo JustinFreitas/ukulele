@@ -25,5 +25,5 @@ class BotProps(
     /** Comma-separated allowed CORS / WebSocket origins for the remote-control API. "*" allows any. */
     var corsOrigins: String = "*",
     /** When true, the /ws STOMP endpoint requires the apiToken on CONNECT (same token as /api). */
-    var requireWebsocketAuth: Boolean = false,
+    var requireWebsocketAuth: Boolean = true,
 )

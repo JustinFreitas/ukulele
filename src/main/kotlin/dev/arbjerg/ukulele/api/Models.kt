@@ -87,3 +87,12 @@ data class SayRequest(
 data class MoveRequest(
     val channelId: String,
 )
+
+data class RemoveRequest(
+    val index: Int,
+)
+
+data class ReorderRequest(
+    val fromIndex: Int,
+    val toIndex: Int,
+)
