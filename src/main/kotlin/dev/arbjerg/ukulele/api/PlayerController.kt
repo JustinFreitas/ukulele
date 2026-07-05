@@ -325,10 +325,13 @@ class PlayerController(
         @RequestBody body: MoveRequest,
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
+        val properties = guildPropertiesService.getAwait(guildId)
+        val player = playerRegistry.get(guild, properties)
         val channelId = body.channelId
         val channel = getChannel(guild, channelId)
         if (channel != null) {
             guild.audioManager.openAudioConnection(channel)
+            guild.audioManager.sendingHandler = player
         }
     }
 }

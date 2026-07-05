@@ -16,7 +16,13 @@ abstract class Command(
     val log: Logger = LoggerFactory.getLogger(javaClass)
 
     suspend fun invoke0(ctx: CommandContext) {
-        ctx.apply { invoke() }
+        try {
+            ctx.apply { invoke() }
+        } catch (t: kotlinx.coroutines.CancellationException) {
+            throw t
+        } catch (t: Throwable) {
+            ctx.handleException(t)
+        }
     }
 
     fun provideHelp0(ctx: HelpContext) {

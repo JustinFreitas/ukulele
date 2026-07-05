@@ -78,7 +78,7 @@ class Player(
                 minVolume = beans.botProps.minVolume,
                 maxVolume = beans.botProps.maxVolume,
                 isReplayGainEnabled = beans.botProps.normalization,
-                queueSize = queue.tracks.size,
+                queueSize = queue.size,
                 channelId =
                     beans.shardManager
                         .getGuildById(guildId)
@@ -124,7 +124,15 @@ class Player(
         get() = player.isPaused
 
     var repeatTrack: Boolean = beans.botProps.repeatTrack
+        set(value) {
+            field = value
+            publishState()
+        }
     var queueLooping: Boolean = beans.botProps.queueLooping
+        set(value) {
+            field = value
+            publishState()
+        }
     var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
     var lastChannel: TextChannel? = null
@@ -147,8 +155,8 @@ class Player(
     }
 
     fun skip(range: IntRange): List<AudioTrack> {
-        val rangeFirst = range.first.coerceAtMost(queue.tracks.size)
-        val rangeLast = range.last.coerceAtMost(queue.tracks.size)
+        val rangeFirst = range.first.coerceAtMost(queue.size)
+        val rangeLast = range.last.coerceAtMost(queue.size)
         val skipped = mutableListOf<AudioTrack>()
         var newRange = rangeFirst..rangeLast
         // Skip the first track if it is stored here
@@ -201,7 +209,7 @@ class Player(
     }
 
     fun seek(position: Long) {
-        player.playingTrack.position = position
+        player.playingTrack?.position = position
     }
 
     override fun onTrackStart(

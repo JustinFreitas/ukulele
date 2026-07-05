@@ -25,20 +25,20 @@ class QueueCommand(
     ): String {
         val repeatTrackMessage =
             when (player.repeatTrack) {
-                true -> "Repeat Track is on.\r"
-                false -> "Repeat Track is off.\r"
+                true -> "Repeat Track is on.\n"
+                false -> "Repeat Track is off.\n"
             }
 
         val queueLoopingMessage =
             when (player.queueLooping) {
-                true -> "Queue Looping is on.\r"
-                false -> "Queue Looping is off.\r"
+                true -> "Queue Looping is on.\n"
+                false -> "Queue Looping is off.\n"
             }
 
         val replayGainMessage =
             when (botProps.normalization) {
-                true -> "ReplayGain normalization is on.\r"
-                false -> "ReplayGain normalization is off.\r"
+                true -> "ReplayGain normalization is on.\n"
+                false -> "ReplayGain normalization is off.\n"
             }
 
         val totalDuration = player.remainingDuration

@@ -19,7 +19,7 @@ class ExitCommand(
 
         reply("Shutting down...")
         // Give JDA a moment to send the reply
-        Thread.sleep(1000)
+        kotlinx.coroutines.delay(1000)
         exitProcess(0)
     }
 

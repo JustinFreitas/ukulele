@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 @Component
 class SeekCommand : Command("seek") {
     override suspend fun CommandContext.invoke() {
-        val track = player.tracks.firstOrNull() ?: return reply("Not playing anything.")
+        val track = player.currentTrack ?: return reply("Not playing anything.")
 
         if (!track.isSeekable) {
             return reply("This track is not seekable")

@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 class TrackQueue {
     private val queue = mutableListOf<AudioTrack>()
     val tracks: List<AudioTrack> get() = synchronized(queue) { queue.toList() }
+    val size: Int get() = synchronized(queue) { queue.size }
     val duration: Long get() =
         synchronized(queue) {
             queue.filterNot { it.info.isStream }.sumOf { it.info.length }

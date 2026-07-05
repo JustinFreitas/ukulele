@@ -17,11 +17,9 @@ import java.awt.Color
 @Component
 class NowPlayingCommand : Command("nowplaying", "np") {
     override suspend fun CommandContext.invoke() {
-        if (player.tracks.isEmpty()) {
-            return reply("Not playing anything.")
-        }
+        val track = player.currentTrack ?: return reply("Not playing anything.")
 
-        replyEmbed(buildEmbed(player.tracks[0]))
+        replyEmbed(buildEmbed(track))
     }
 
     fun buildEmbed(track: AudioTrack): MessageEmbed =
