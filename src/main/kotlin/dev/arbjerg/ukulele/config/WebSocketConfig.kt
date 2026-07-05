@@ -61,7 +61,10 @@ class WebSocketConfig(
                     if (StompCommand.CONNECT == accessor.command) {
                         val auth = accessor.getFirstNativeHeader("Authorization")
                         val expected = botProps.apiToken
-                        val valid = auth != null && (auth == expected || auth == "Bearer $expected")
+                        val valid = auth != null && (
+                            java.security.MessageDigest.isEqual(auth.toByteArray(), expected.toByteArray()) ||
+                            java.security.MessageDigest.isEqual(auth.toByteArray(), "Bearer $expected".toByteArray())
+                        )
                         if (!valid) {
                             throw MessagingException("Unauthorized WebSocket connection")
                         }

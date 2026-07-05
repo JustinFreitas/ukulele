@@ -308,15 +308,9 @@ class PlayerController(
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val text =
-            org.jsoup.Jsoup.clean(
-                body.text,
-                org.jsoup.safety.Safelist
-                    .none(),
-            )
         val player = playerRegistry.get(guild, properties)
         // Only say if there is a text channel the bot last spoke in
-        player.lastChannel?.sendMessage(text)?.queue()
+        player.lastChannel?.sendMessage(body.text)?.queue()
     }
 
     @PostMapping("/player/{guildId}/move")

@@ -56,8 +56,11 @@ class AuthFilter(
         val authHeader = req.getHeader("Authorization")
         val expectedToken = botProps.apiToken
 
-        // Simple check: "Bearer <token>" or just "<token>"
-        val isValid = authHeader != null && (authHeader == expectedToken || authHeader == "Bearer $expectedToken")
+        // Constant-time check to prevent timing attacks
+        val isValid = authHeader != null && (
+            java.security.MessageDigest.isEqual(authHeader.toByteArray(), expectedToken.toByteArray()) ||
+            java.security.MessageDigest.isEqual(authHeader.toByteArray(), "Bearer $expectedToken".toByteArray())
+        )
 
         if (!isValid) {
             securityService.registerFailedAttempt(ip)

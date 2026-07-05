@@ -1,17 +1,18 @@
 package dev.arbjerg.ukulele.api
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 @Service
 class SecurityService {
+    private val log: Logger = LoggerFactory.getLogger(SecurityService::class.java)
+
     private val unauthorizedAttempts = AtomicLong(0)
-    private val failedAttempts = ConcurrentHashMap<String, Int>()
-    private val bannedIps = ConcurrentHashMap<String, Long>()
 
     // Rate limiting buckets
     private val readRateLimitCache =
@@ -25,6 +26,19 @@ class SecurityService {
             .newBuilder()
             .expireAfterWrite(15, TimeUnit.MINUTES)
             .build<String, AtomicInteger>()
+
+    // Failed attempts and banned IPs caches with TTL to prevent unbounded memory growth
+    private val failedAttempts =
+        Caffeine
+            .newBuilder()
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build<String, Int>()
+
+    private val bannedIps =
+        Caffeine
+            .newBuilder()
+            .expireAfterWrite(BAN_DURATION_MS, TimeUnit.MILLISECONDS)
+            .build<String, Boolean>()
 
     companion object {
         const val MAX_FAILURES = 10
@@ -50,28 +64,23 @@ class SecurityService {
 
     fun registerFailedAttempt(ip: String) {
         incrementUnauthorized()
-        val current = failedAttempts.compute(ip) { _, count -> (count ?: 0) + 1 }!!
+        val current = failedAttempts.asMap().compute(ip) { _, count -> (count ?: 0) + 1 }!!
         if (current >= MAX_FAILURES) {
-            bannedIps[ip] = System.currentTimeMillis() + BAN_DURATION_MS
-            failedAttempts.remove(ip) // Reset failures after ban
-            println("BANNED IP: $ip for 10 minutes due to excessive failures.")
+            bannedIps.put(ip, true)
+            failedAttempts.invalidate(ip) // Reset failures after ban
+            log.warn("BANNED IP: {} for 10 minutes due to excessive failures.", ip)
         }
     }
 
     fun isBanned(ip: String): Boolean {
-        val expiration = bannedIps[ip] ?: return false
-        if (System.currentTimeMillis() > expiration) {
-            bannedIps.remove(ip)
-            return false
-        }
-        return true
+        return bannedIps.getIfPresent(ip) != null
     }
 
     fun getUnauthorizedCount(): Long = unauthorizedAttempts.get()
 
     fun resetUnauthorized() {
         unauthorizedAttempts.set(0)
-        failedAttempts.clear()
-        bannedIps.clear()
+        failedAttempts.invalidateAll()
+        bannedIps.invalidateAll()
     }
 }
