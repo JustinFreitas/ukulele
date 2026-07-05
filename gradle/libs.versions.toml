@@ -1,0 +1,99 @@
+[versions]
+kotlin = "2.4.0"
+springBoot = "4.1.0"
+springFramework = "7.0.7"
+jackson = "3.1.2"
+jacksonAnnotations = "2.21"
+netty = "4.2.15.Final"
+jdave = "0.1.8"
+flyway = "12.9.0"
+benManesVersions = "0.54.0"
+ktlint = "14.2.0"
+ktlintEngine = "1.8.0"
+snakeyaml = "2.6"
+jda = "6.4.2"
+lavaplayer = "v2.2.6_22"
+youtubeSource = "v1.18.1_1"
+commonsIo = "2.21.0"
+orgJson = "20251224"
+jsoup = "1.22.1"
+gson = "2.13.2"
+httpclient5 = "5.6.1"
+httpcore5 = "5.4.3"
+h2 = "2.4.240"
+r2dbcH2 = "1.1.0.RELEASE"
+caffeine = "3.2.4"
+kotlinxCoroutines = "1.11.0"
+reactorKotlinExtensions = "1.3.1"
+junit = "5.14.3"
+byteBuddy = "1.18.10"
+
+[libraries]
+# Platforms / BOMs
+netty-bom = { group = "io.netty", name = "netty-bom", version.ref = "netty" }
+
+# Spring Boot
+springboot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "springBoot" }
+springboot-starter-data-r2dbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-r2dbc", version.ref = "springBoot" }
+springboot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux", version.ref = "springBoot" }
+springboot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
+springboot-starter-websocket = { group = "org.springframework.boot", name = "spring-boot-starter-websocket", version.ref = "springBoot" }
+springboot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator", version.ref = "springBoot" }
+springboot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "springBoot" }
+
+# Database / ORM
+h2 = { group = "com.h2database", name = "h2", version.ref = "h2" }
+r2dbc-h2 = { group = "io.r2dbc", name = "r2dbc-h2", version.ref = "r2dbcH2" }
+flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }
+
+# Kotlin / Coroutines
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinx-coroutines-reactor = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-reactor", version.ref = "kotlinxCoroutines" }
+reactor-kotlin-extensions = { group = "io.projectreactor.kotlin", name = "reactor-kotlin-extensions", version.ref = "reactorKotlinExtensions" }
+
+# JDA / Discord
+jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
+
+# Lavaplayer (Forks)
+lavaplayer = { group = "com.github.JustinFreitas.lavaplayer", name = "lavaplayer", version.ref = "lavaplayer" }
+lavaplayer-ext-format-xm = { group = "com.github.JustinFreitas.lavaplayer", name = "lavaplayer-ext-format-xm", version.ref = "lavaplayer" }
+lavaplayer-ext-youtube-rotator = { group = "com.github.JustinFreitas.lavaplayer", name = "lavaplayer-ext-youtube-rotator", version.ref = "lavaplayer" }
+
+# Jdave (Minnced)
+jdave-api = { group = "club.minnced", name = "jdave-api", version.ref = "jdave" }
+jdave-native-win = { group = "club.minnced", name = "jdave-native-win-x86-64", version.ref = "jdave" }
+jdave-native-linux = { group = "club.minnced", name = "jdave-native-linux-x86-64", version.ref = "jdave" }
+
+# YouTube Source (Forks)
+youtube-source-v2 = { group = "com.github.JustinFreitas.youtube-source", name = "v2", version.ref = "youtubeSource" }
+youtube-source-common = { group = "com.github.JustinFreitas.youtube-source", name = "common", version.ref = "youtubeSource" }
+
+# Jackson
+jackson-core = { group = "tools.jackson.core", name = "jackson-core", version.ref = "jackson" }
+jackson-databind = { group = "tools.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jacksonAnnotations" }
+
+# Apache HttpComponents
+httpclient5 = { group = "org.apache.httpcomponents.client5", name = "httpclient5", version.ref = "httpclient5" }
+httpcore5 = { group = "org.apache.httpcomponents.core5", name = "httpcore5", version.ref = "httpcore5" }
+
+# Utilities
+snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
+org-json = { group = "org.json", name = "json", version.ref = "orgJson" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+
+# Testing
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
+byte-buddy-agent = { group = "net.bytebuddy", name = "byte-buddy-agent", version.ref = "byteBuddy" }
+
+[plugins]
+springboot = { id = "org.springframework.boot", version.ref = "springBoot" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }
+benmanes = { id = "com.github.ben-manes.versions", version.ref = "benManesVersions" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
