@@ -3,6 +3,7 @@ package dev.arbjerg.ukulele.config
 import dev.arbjerg.ukulele.api.SecurityService
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import org.springframework.http.HttpStatus
 import org.springframework.http.server.ServerHttpRequest
 import org.springframework.http.server.ServerHttpResponse
@@ -24,7 +25,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor
 @EnableWebSocketMessageBroker
 class WebSocketConfig(
     private val botProps: BotProps,
-    private val shardManager: ShardManager,
+    @Lazy private val shardManager: ShardManager,
     private val securityService: SecurityService,
 ) : WebSocketMessageBrokerConfigurer {
     private val allowedOrigins: Array<String>
