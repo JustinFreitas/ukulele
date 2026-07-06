@@ -46,13 +46,15 @@ repositories {
     maven { url = uri("https://jitpack.io") }
 }
 
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("com.github.JustinFreitas.lavaplayer:lavaplayer")).using(module("com.github.justinfreitas:lavaplayer:v2.2.6_27"))
-        substitute(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm")).using(module("com.github.justinfreitas:lavaplayer-ext-format-xm:v2.2.6_27"))
-        substitute(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator")).using(module("com.github.justinfreitas:lavaplayer-ext-youtube-rotator:v2.2.6_27"))
-        substitute(module("com.github.JustinFreitas.youtube-source:v2")).using(module("dev.lavalink.youtube:v2:v1.18.1_9"))
-        substitute(module("com.github.JustinFreitas.youtube-source:common")).using(module("dev.lavalink.youtube:common:v1.18.1_9"))
+if (System.getenv("CI") == null) {
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute(module("com.github.JustinFreitas.lavaplayer:lavaplayer")).using(module("com.github.justinfreitas:lavaplayer:v2.2.6_27"))
+            substitute(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm")).using(module("com.github.justinfreitas:lavaplayer-ext-format-xm:v2.2.6_27"))
+            substitute(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator")).using(module("com.github.justinfreitas:lavaplayer-ext-youtube-rotator:v2.2.6_27"))
+            substitute(module("com.github.JustinFreitas.youtube-source:v2")).using(module("dev.lavalink.youtube:v2:v1.18.1_9"))
+            substitute(module("com.github.JustinFreitas.youtube-source:common")).using(module("dev.lavalink.youtube:common:v1.18.1_9"))
+        }
     }
 }
 
