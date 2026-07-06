@@ -130,17 +130,20 @@ class Player(
             field = value
             publishState()
         }
+
     @Volatile
     var queueLooping: Boolean = beans.botProps.queueLooping
         set(value) {
             field = value
             publishState()
         }
+
     @Volatile
     var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
     @Volatile
     var lastChannel: TextChannel? = null
+
     @Volatile
     var isFadeInArmed: Boolean = false
 

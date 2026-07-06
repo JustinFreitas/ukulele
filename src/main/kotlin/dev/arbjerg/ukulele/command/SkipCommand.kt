@@ -13,8 +13,14 @@ class SkipCommand : Command("skip", "s") {
     override suspend fun CommandContext.invoke() {
         val args = argumentText.split("\\s+".toRegex())
         when {
-            args.isEmpty() || args[0].isEmpty() -> skipNext()
-            args[0] == "toggleshowqueue" -> toggleShowQueueOnSkip()
+            args.isEmpty() || args[0].isEmpty() -> {
+                skipNext()
+            }
+
+            args[0] == "toggleshowqueue" -> {
+                toggleShowQueueOnSkip()
+            }
+
             args.size == 1 -> {
                 val index = args[0].toIntOrNull()
                 if (index != null) {
@@ -23,7 +29,10 @@ class SkipCommand : Command("skip", "s") {
                     reply("Invalid index: ${args[0]}. Please provide a valid number.")
                 }
             }
-            else -> skipRange()
+
+            else -> {
+                skipRange()
+            }
         }
     }
 

@@ -16,17 +16,20 @@ class DatabaseConfig(
 ) {
     @Bean(destroyMethod = "dispose")
     fun connectionFactory(): ConnectionFactory {
-        val factory = H2ConnectionFactory(
-            H2ConnectionConfiguration
-                .builder()
-                .file(botProps.database + ";DATABASE_TO_UPPER=false")
-                .build(),
-        )
-        val config = ConnectionPoolConfiguration.builder(factory)
-            .maxIdleTime(Duration.ofMinutes(30))
-            .initialSize(5)
-            .maxSize(20)
-            .build()
+        val factory =
+            H2ConnectionFactory(
+                H2ConnectionConfiguration
+                    .builder()
+                    .file(botProps.database + ";DATABASE_TO_UPPER=false")
+                    .build(),
+            )
+        val config =
+            ConnectionPoolConfiguration
+                .builder(factory)
+                .maxIdleTime(Duration.ofMinutes(30))
+                .initialSize(5)
+                .maxSize(20)
+                .build()
         return ConnectionPool(config)
     }
 
