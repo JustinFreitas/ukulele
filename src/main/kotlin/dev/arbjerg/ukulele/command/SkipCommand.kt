@@ -15,7 +15,14 @@ class SkipCommand : Command("skip", "s") {
         when {
             args.isEmpty() || args[0].isEmpty() -> skipNext()
             args[0] == "toggleshowqueue" -> toggleShowQueueOnSkip()
-            args.size == 1 -> skipIndex(args[0].toInt())
+            args.size == 1 -> {
+                val index = args[0].toIntOrNull()
+                if (index != null) {
+                    skipIndex(index)
+                } else {
+                    reply("Invalid index: ${args[0]}. Please provide a valid number.")
+                }
+            }
             else -> skipRange()
         }
     }
@@ -51,15 +58,26 @@ class SkipCommand : Command("skip", "s") {
 
     private fun CommandContext.skipRange() {
         val args = argumentText.split("\\s+".toRegex())
+        if (args.size < 2) {
+            reply("Please provide both start and end positions for the range.")
+            return
+        }
 
-        val n1 = (args[0].toInt() - 1).coerceAtLeast(0)
-        var n2 = args[1].toInt()
-        if (n2 > player.tracks.size) {
+        val n1 = args[0].toIntOrNull()
+        val n2 = args[1].toIntOrNull()
+        if (n1 == null || n2 == null) {
+            reply("Invalid range. Please provide valid numbers for both start and end positions.")
+            return
+        }
+
+        val start = (n1 - 1).coerceAtLeast(0)
+        var end = n2
+        if (end > player.tracks.size) {
             player.stop()
             reply("Skipping past end of queue, player stopped.")
         } else {
-            n2 = (n2 - 1).coerceAtLeast(0)
-            printSkipped(player.skip(n1..n2))
+            end = (end - 1).coerceAtLeast(0)
+            printSkipped(player.skip(start..end))
         }
     }
 

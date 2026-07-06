@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 class LavaplayerConfig(
     val botProps: dev.arbjerg.ukulele.config.BotProps,
 ) {
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     fun playerManager(): AudioPlayerManager {
         val apm = DefaultAudioPlayerManager()
         apm.configuration.isReplayGainEnabled = botProps.normalization

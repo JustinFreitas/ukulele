@@ -54,6 +54,7 @@ class Player(
     private val frame: MutableAudioFrame = MutableAudioFrame().apply { setBuffer(buffer) }
 
     // Virtual volume (0-1000); scaled into the real min..max range by scaleVolume
+    @Volatile
     var volume: Int = guildProperties.volume
         set(value) {
             field = value
@@ -123,19 +124,24 @@ class Player(
     val isPaused: Boolean
         get() = player.isPaused
 
+    @Volatile
     var repeatTrack: Boolean = beans.botProps.repeatTrack
         set(value) {
             field = value
             publishState()
         }
+    @Volatile
     var queueLooping: Boolean = beans.botProps.queueLooping
         set(value) {
             field = value
             publishState()
         }
+    @Volatile
     var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
+    @Volatile
     var lastChannel: TextChannel? = null
+    @Volatile
     var isFadeInArmed: Boolean = false
 
     private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*[vV]:(\\d{1,3}).*]?.*$")

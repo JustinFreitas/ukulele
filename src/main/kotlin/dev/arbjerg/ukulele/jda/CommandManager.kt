@@ -43,7 +43,10 @@ class CommandManager(
     fun onSlash(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val member = event.member ?: return
-        val command = registry[event.name] ?: return
+        val command = registry[event.name] ?: run {
+            event.hook.sendMessage("Command not found.").queue()
+            return
+        }
 
         commandScope.launch {
             val guildProperties = guildProperties.getAwait(guild.idLong)

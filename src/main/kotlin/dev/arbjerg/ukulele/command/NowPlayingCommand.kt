@@ -3,7 +3,7 @@ package dev.arbjerg.ukulele.command
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioTrack
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack
+import dev.lavalink.youtube.track.YoutubeAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.features.HelpContext
 import dev.arbjerg.ukulele.jda.Command
@@ -48,7 +48,7 @@ class NowPlayingCommand : Command("nowplaying", "np") {
         val message =
             EmbedBuilder()
                 .setTitle(track.info.title, titleFixLocalUri)
-                .setFooter("Source: ${track.sourceManager.sourceName}")
+                .setFooter("Source: ${track.sourceManager?.sourceName ?: "Unknown"}")
                 .also { builder ->
                     TextUtils.replayGainLabel(track)?.let { builder.addField("ReplayGain", it, true) }
                 }

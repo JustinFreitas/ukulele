@@ -45,8 +45,9 @@ class GuildPropertiesService(
         cache[guildId]
             .toMono()
             .map {
-                func(it)
-                it
+                val clone = it.copy().apply { new = it.new }
+                func(clone)
+                clone
             }.flatMap { repo.save(it) }
             .map {
                 it.apply { new = false }

@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.beans.factory.DisposableBean
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlin.coroutines.resume
 
 @RestController
@@ -29,7 +32,7 @@ class PlayerController(
     val shardManager: ShardManager,
     val apm: AudioPlayerManager,
     val botProps: BotProps,
-) {
+) : DisposableBean {
     private val log = org.slf4j.LoggerFactory.getLogger(PlayerController::class.java)
 
     @GetMapping("/guilds")
@@ -102,7 +105,7 @@ class PlayerController(
         }
     }
 
-    private val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO)
+    private val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + SupervisorJob())
 
     @PostMapping("/player/{guildId}/play")
     fun play(
@@ -370,5 +373,9 @@ class PlayerController(
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
         playerRegistry.get(guild, properties).reorderQueue(body.fromIndex, body.toIndex)
+    }
+
+    override fun destroy() {
+        scope.cancel()
     }
 }
