@@ -46,7 +46,9 @@ repositories {
     maven { url = uri("https://jitpack.io") }
 }
 
-if (System.getenv("CI") == null) {
+val hasLocalDeps = file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/v2.2.6_27").exists()
+
+if (hasLocalDeps) {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
             substitute(
