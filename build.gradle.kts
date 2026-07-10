@@ -46,22 +46,27 @@ repositories {
     maven { url = uri("https://jitpack.io") }
 }
 
-val hasLocalDeps = file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/v2.2.6_27").exists()
+// Local-dev override: if the fork jars are installed to the local .m2, resolve against them instead of
+// jitpack. Track the version catalog for BOTH the probe and the substitution targets so this can never
+// silently pin an older lavaplayer/youtube-source than gradle/libs.versions.toml declares.
+val lavaplayerVersion = libs.versions.lavaplayer.get()
+val youtubeSourceVersion = libs.versions.youtubeSource.get()
+val hasLocalDeps = file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/$lavaplayerVersion").exists()
 
 if (hasLocalDeps) {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer"),
-            ).using(module("com.github.justinfreitas:lavaplayer:v2.2.6_27"))
+            ).using(module("com.github.justinfreitas:lavaplayer:$lavaplayerVersion"))
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm"),
-            ).using(module("com.github.justinfreitas:lavaplayer-ext-format-xm:v2.2.6_27"))
+            ).using(module("com.github.justinfreitas:lavaplayer-ext-format-xm:$lavaplayerVersion"))
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator"),
-            ).using(module("com.github.justinfreitas:lavaplayer-ext-youtube-rotator:v2.2.6_27"))
-            substitute(module("com.github.JustinFreitas.youtube-source:v2")).using(module("dev.lavalink.youtube:v2:v1.18.1_9"))
-            substitute(module("com.github.JustinFreitas.youtube-source:common")).using(module("dev.lavalink.youtube:common:v1.18.1_9"))
+            ).using(module("com.github.justinfreitas:lavaplayer-ext-youtube-rotator:$lavaplayerVersion"))
+            substitute(module("com.github.JustinFreitas.youtube-source:v2")).using(module("dev.lavalink.youtube:v2:$youtubeSourceVersion"))
+            substitute(module("com.github.JustinFreitas.youtube-source:common")).using(module("dev.lavalink.youtube:common:$youtubeSourceVersion"))
         }
     }
 }

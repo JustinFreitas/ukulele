@@ -159,10 +159,15 @@ class Player(
     fun add(vararg tracks: AudioTrack): Boolean {
         queue.add(*tracks)
         if (player.playingTrack == null) {
-            player.isPaused = false
-            player.playTrack(queue.take()!!)
-            publishState()
-            return true
+            // take() can return null if a concurrent stop()/skip() drained the queue between the
+            // playingTrack check and here, so guard rather than force-unwrap.
+            val next = queue.take()
+            if (next != null) {
+                player.isPaused = false
+                player.playTrack(next)
+                publishState()
+                return true
+            }
         }
         publishState()
         return false
