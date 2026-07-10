@@ -53,11 +53,15 @@ class Player(
     private val buffer = ByteBuffer.allocate(4096)
     private val frame: MutableAudioFrame = MutableAudioFrame().apply { setBuffer(buffer) }
 
+    private var trackVolumeOverride: Int? = null
+
     // Virtual volume (0-1000); scaled into the real min..max range by scaleVolume
     @Volatile
     var volume: Int = guildProperties.volume
+        get() = trackVolumeOverride ?: field
         set(value) {
             field = value
+            trackVolumeOverride = null
             player.volume = scaleVolume(value)
             beans.guildProperties
                 .transform(guildId) {
@@ -253,6 +257,8 @@ class Player(
             lastChannel?.sendMessageEmbeds(beans.nowPlayingCommand.buildEmbed(track))?.queue()
         }
 
+        trackVolumeOverride = null
+
         // Reset the volume to the current guild volume config
         player.volume = scaleVolume(this.volume)
 
@@ -284,6 +290,7 @@ class Player(
                     .coerceAtLeast(1)
                     .coerceAtMost(150)
             player.volume = volume
+            trackVolumeOverride = volume * 10
         }
     }
 
