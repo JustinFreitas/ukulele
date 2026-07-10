@@ -20,7 +20,7 @@ out/
 *.mv.db.backup
 /database-backup.sql
 /export.sql
-db/
+/db/
 new-databases/
 old-databases/
 tmp/

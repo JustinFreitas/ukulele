@@ -29,7 +29,7 @@ kotlin {
 }
 
 group = "dev.arbjerg"
-version = "2.25.4"
+version = "2.25.5"
 
 repositories {
     mavenLocal()
@@ -65,8 +65,12 @@ if (hasLocalDeps) {
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator"),
             ).using(module("com.github.justinfreitas:lavaplayer-ext-youtube-rotator:$lavaplayerVersion"))
-            substitute(module("com.github.JustinFreitas.youtube-source:v2")).using(module("dev.lavalink.youtube:v2:$youtubeSourceVersion"))
-            substitute(module("com.github.JustinFreitas.youtube-source:common")).using(module("dev.lavalink.youtube:common:$youtubeSourceVersion"))
+            substitute(
+                module("com.github.JustinFreitas.youtube-source:v2"),
+            ).using(module("dev.lavalink.youtube:v2:$youtubeSourceVersion"))
+            substitute(
+                module("com.github.JustinFreitas.youtube-source:common"),
+            ).using(module("dev.lavalink.youtube:common:$youtubeSourceVersion"))
         }
     }
 }

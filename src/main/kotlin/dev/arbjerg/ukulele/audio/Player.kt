@@ -53,7 +53,9 @@ class Player(
     private val buffer = ByteBuffer.allocate(4096)
     private val frame: MutableAudioFrame = MutableAudioFrame().apply { setBuffer(buffer) }
 
+    @Volatile
     private var trackVolumeOverride: Int? = null
+    private val playLock = Any()
 
     // Virtual volume (0-1000); scaled into the real min..max range by scaleVolume
     @Volatile
@@ -158,15 +160,17 @@ class Player(
      */
     fun add(vararg tracks: AudioTrack): Boolean {
         queue.add(*tracks)
-        if (player.playingTrack == null) {
-            // take() can return null if a concurrent stop()/skip() drained the queue between the
-            // playingTrack check and here, so guard rather than force-unwrap.
-            val next = queue.take()
-            if (next != null) {
-                player.isPaused = false
-                player.playTrack(next)
-                publishState()
-                return true
+        synchronized(playLock) {
+            if (player.playingTrack == null) {
+                // take() can return null if a concurrent stop()/skip() drained the queue between the
+                // playingTrack check and here, so guard rather than force-unwrap.
+                val next = queue.take()
+                if (next != null) {
+                    player.isPaused = false
+                    player.playTrack(next)
+                    publishState()
+                    return true
+                }
             }
         }
         publishState()
@@ -329,12 +333,14 @@ class Player(
             }
         }
 
-        val new =
-            queue.take() ?: run {
-                publishState()
-                return
-            }
-        player.playTrack(new)
+        synchronized(playLock) {
+            val new =
+                queue.take() ?: run {
+                    publishState()
+                    return
+                }
+            player.playTrack(new)
+        }
     }
 
     override fun onTrackException(

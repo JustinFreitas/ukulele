@@ -51,13 +51,20 @@ abstract class Command(
         tracks: List<AudioTrack>,
         totalDuration: Long,
     ) {
-        append("\nThere are **${tracks.size}** tracks with a remaining length of ")
+        val queuedCount = (tracks.size - 1).coerceAtLeast(0)
+        append("\nThere is **$queuedCount** queued track${if (queuedCount == 1) "" else "s"} with a remaining length of ")
 
-        if (tracks.any { it.info.isStream }) {
-            append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue excluding streams.")
-        } else {
-            append("**${TextUtils.humanReadableTime(totalDuration)}** in the queue.")
-        }
+        val hasStream =
+            tracks.any {
+                it.info.isStream
+            }
+        val suffix =
+            if (hasStream) {
+                " (excluding streams, including the current track)."
+            } else {
+                " (including the current track)."
+            }
+        append("**${TextUtils.humanReadableTime(totalDuration)}**$suffix")
     }
 
     abstract suspend fun CommandContext.invoke()
