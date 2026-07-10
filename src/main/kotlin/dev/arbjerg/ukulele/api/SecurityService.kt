@@ -44,7 +44,7 @@ class SecurityService {
         const val MAX_FAILURES = 10
         const val BAN_DURATION_MS = 10 * 60 * 1000L // 10 minutes
         const val MAX_READ_REQUESTS_15M = 5000
-        const val MAX_WRITE_REQUESTS_15M = 50
+        const val MAX_WRITE_REQUESTS_15M = 1000
     }
 
     fun isRateLimited(
