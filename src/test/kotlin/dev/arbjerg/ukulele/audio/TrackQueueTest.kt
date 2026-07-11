@@ -2,7 +2,10 @@ package dev.arbjerg.ukulele.audio
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -80,11 +83,11 @@ class TrackQueueTest {
     fun `removeRange removes specified index range and returns removed tracks`() {
         trackQueue.add(track1, track2, streamTrack)
         val removed = trackQueue.removeRange(0..1)
-        
+
         assertEquals(2, removed.size)
         assertEquals(track1, removed[0])
         assertEquals(track2, removed[1])
-        
+
         assertEquals(1, trackQueue.size)
         assertEquals(streamTrack, trackQueue.get(0))
     }
@@ -117,7 +120,7 @@ class TrackQueueTest {
     fun `reorder shifts track positions in queue`() {
         trackQueue.add(track1, track2, streamTrack)
         val success = trackQueue.reorder(0, 2)
-        
+
         assertTrue(success)
         assertEquals(track2, trackQueue.get(0))
         assertEquals(streamTrack, trackQueue.get(1))

@@ -8,7 +8,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 class TextUtilsTest {
-
     @Test
     fun `replayGainLabel returns formatted string when replayGainDb is present`() {
         val track = mock(AudioTrack::class.java)
