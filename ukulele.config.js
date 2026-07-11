@@ -11,7 +11,7 @@ module.exports = {
     interpreter: "C:/Users/justi/.jdks/azul-25.0.2/bin/java.exe",
     // --enable-native-access=ALL-UNNAMED silences the Java 25 restricted-method
     // warning from lavaplayer's native loader (matches bootRun's jvmArgs).
-    interpreter_args: "--enable-native-access=ALL-UNNAMED -jar", // -> java --enable-native-access=ALL-UNNAMED -jar build\libs\ukulele.jar
+    interpreter_args: "--enable-native-access=ALL-UNNAMED -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m -jar", // -> java --enable-native-access=ALL-UNNAMED -jar build\libs\ukulele.jar
     autorestart: true,          // pm2 owns the JVM PID, so crash-restart works
     watch: false
   }]

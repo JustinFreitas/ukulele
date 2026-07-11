@@ -27,8 +27,8 @@ class DatabaseConfig(
             ConnectionPoolConfiguration
                 .builder(factory)
                 .maxIdleTime(Duration.ofMinutes(30))
-                .initialSize(5)
-                .maxSize(20)
+                .initialSize(2)
+                .maxSize(5)
                 .build()
         return ConnectionPool(config)
     }
