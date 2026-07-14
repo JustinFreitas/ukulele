@@ -51,20 +51,21 @@ repositories {
 // silently pin an older lavaplayer/youtube-source than gradle/libs.versions.toml declares.
 val lavaplayerVersion = libs.versions.lavaplayer.get()
 val youtubeSourceVersion = libs.versions.youtubeSource.get()
-val hasLocalDeps = file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/$lavaplayerVersion").exists()
+val hasLocalDeps = file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/lavaplayer/$lavaplayerVersion").exists() ||
+                   file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/$lavaplayerVersion").exists()
 
 if (hasLocalDeps) {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer"),
-            ).using(module("com.github.justinfreitas:lavaplayer:$lavaplayerVersion"))
+            ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer:$lavaplayerVersion"))
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm"),
-            ).using(module("com.github.justinfreitas:lavaplayer-ext-format-xm:$lavaplayerVersion"))
+            ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm:$lavaplayerVersion"))
             substitute(
                 module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator"),
-            ).using(module("com.github.justinfreitas:lavaplayer-ext-youtube-rotator:$lavaplayerVersion"))
+            ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator:$lavaplayerVersion"))
             substitute(
                 module("com.github.JustinFreitas.youtube-source:v2"),
             ).using(module("dev.lavalink.youtube:v2:$youtubeSourceVersion"))
