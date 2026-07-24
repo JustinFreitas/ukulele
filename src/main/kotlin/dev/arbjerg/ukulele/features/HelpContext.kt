@@ -17,10 +17,9 @@ class HelpContext(
 
     private fun addUsages(vararg usages: String) {
         if (usages.isEmpty()) throw IllegalArgumentException("Expected at least one usage!")
-        val prefix = commandContext?.prefix ?: "/"
         lines.add(
             usages.joinToString(" OR ") {
-                prefix + command.name + " " + it.trim()
+                "/" + command.name + " " + it.trim()
             },
         )
     }

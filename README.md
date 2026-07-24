@@ -43,50 +43,49 @@ The bot is self-contained and requires **Java 25** to run.
 
 ## ⌨️ Commands
 
-The default prefix is `::`. Each command's aliases are shown in parentheses.
+Ukulele uses **Discord Slash Commands** (`/`). Each command's aliases are shown in parentheses.
 
 | Command | Description |
 | :--- | :--- |
-| `::play` (`p`) `<url>[\|<url>...]` | Add one or more tracks to the queue. |
-| `::skip` (`s`) `[range]` | Skip the current track or a range of tracks. |
-| `::nowplaying` (`np`) | Show detailed information about the current track. |
-| `::queue` (`q`, `list`) | Display the current playback queue. |
-| `::volume` (`v`) `<0-150>%` | Set the volume, or use `+` / `-` to step by the optimal amount. |
-| `::seek <time>` | Seek to a specific timestamp in the track. |
-| `::pause` / `::resume` | Pause or resume playback. |
-| `::shuffle` | Randomize the current queue. |
-| `::repeat` (`r`) | Toggle looping for the current track. |
-| `::loop` (`l`) | Toggle looping for the entire queue. |
-| `::stop` | Clear the queue and disconnect the player. |
-| `::prefix <new_prefix>` | Change the bot's command prefix for the guild. |
-| `::say <text>` | Repeat the given text back as a message. |
-| `::exit` | Shut down the bot gracefully (owner only). |
-| `::help` (`h`, `?`) `[command]` | List all commands, or show help for a specific one. |
+| `/play` (`p`) `<url>[\|<url>...]` | Add one or more tracks to the queue. |
+| `/skip` (`s`) `[range]` | Skip the current track or a range of tracks. |
+| `/nowplaying` (`np`) | Show detailed information about the current track. |
+| `/queue` (`q`, `list`) | Display the current playback queue. |
+| `/volume` (`v`) `<0-150>%` | Set the volume, or use `+` / `-` to step by the optimal amount. |
+| `/seek <time>` | Seek to a specific timestamp in the track. |
+| `/pause` / `/resume` | Pause or resume playback. |
+| `/shuffle` | Randomize the current queue. |
+| `/repeat` (`r`) | Toggle looping for the current track. |
+| `/loop` (`l`) | Toggle looping for the entire queue. |
+| `/stop` | Clear the queue and disconnect the player. |
+| `/say <text>` | Repeat the given text back as a message. |
+| `/exit` | Shut down the bot gracefully (owner only). |
+| `/help` (`h`, `?`) `[command]` | List all commands, or show help for a specific one. |
 
-### 🎶 `::play` syntax
+### 🎶 `/play` syntax
 
 A play request is one or more **identifiers** (a URL, a search like `ytsearch:...`, or a local file path). Each identifier may be prefixed with an optional `[...]` label.
 
 ```
-::play [optional label] <url-or-path>
+/play args: [optional label] <url-or-path>
 ```
 
 **Multiple tracks at once.** Separate identifiers with a pipe (`|`) to queue several in a single command:
 
 ```
-::play https://youtu.be/aaa | https://youtu.be/bbb | ytsearch:lofi beats
+/play args: https://youtu.be/aaa | https://youtu.be/bbb | ytsearch:lofi beats
 ```
 
 **Labels.** Anything inside the leading `[...]` is a label for that track. If `prependQueueLabelToTitle` is enabled in your config, the label is shown in front of the track title in the queue:
 
 ```
-::play [Morning Mix] https://youtu.be/aaa
+/play args: [Morning Mix] https://youtu.be/aaa
 ```
 
 **Per-track volume (`v:`).** Add a `v:<n>` attribute inside the label to set that track's volume (1–150) when it starts playing — handy for taming a track that's much louder or quieter than the rest. It's case-insensitive and can sit anywhere in the label:
 
 ```
-::play [Quiet Intro, v:42] https://youtu.be/aaa | [v:120] https://youtu.be/bbb
+/play args: [Quiet Intro, v:42] https://youtu.be/aaa | [v:120] https://youtu.be/bbb
 ```
 
 Here the first track plays at 42% and the second at 120%, independent of the player's current volume.

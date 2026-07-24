@@ -25,10 +25,11 @@ abstract class CommandContext(
     val channel: TextChannel,
     val invoker: Member,
     val command: Command,
-    val prefix: String,
-    /** Prefix + command name */
-    val trigger: String,
 ) {
+    val prefix: String = "/"
+    /** Trigger string (e.g. /play) */
+    val trigger: String get() = "/${command.name}"
+
     @Component
     class Beans(
         val players: PlayerRegistry,
@@ -40,7 +41,7 @@ abstract class CommandContext(
 
     val selfMember: Member get() = guild.selfMember
 
-    /** The command argument text (after the trigger for messages, or the `args` option for slash). */
+    /** The command argument text (from the `args` option for slash commands). */
     abstract val argumentText: String
 
     abstract fun reply(msg: String)
@@ -79,9 +80,7 @@ class SlashCommandContext(
     invoker: Member,
     val event: SlashCommandInteractionEvent,
     command: Command,
-    prefix: String,
-    trigger: String,
-) : CommandContext(beans, guildProperties, guild, channel, invoker, command, prefix, trigger) {
+) : CommandContext(beans, guildProperties, guild, channel, invoker, command) {
     private val firstReply = AtomicBoolean(true)
 
     override val argumentText: String = event.getOption("args")?.asString?.trim() ?: ""

@@ -182,7 +182,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
 }
 
-val mockitoAgent: Configuration by configurations.creating
+val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
     mockitoAgent(libs.byte.buddy.agent) {

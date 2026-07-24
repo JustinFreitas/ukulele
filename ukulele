@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 cd "$(dirname "$0")" || exit
-./gradlew --no-daemon build
+./gradlew --no-daemon bootJar || exit 1
 java --enable-native-access=ALL-UNNAMED -jar "build/libs/ukulele.jar"

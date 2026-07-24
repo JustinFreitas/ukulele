@@ -58,7 +58,7 @@ class CommandManager(
             }
 
             val channel = event.channel.asTextChannel()
-            val ctx = SlashCommandContext(contextBeans, guildProperties, guild, channel, member, event, command, "/", "/${event.name}")
+            val ctx = SlashCommandContext(contextBeans, guildProperties, guild, channel, member, event, command)
 
             log.info("Slash invocation: /${event.name} ${event.getOption("args")?.asString ?: ""}")
             command.invoke0(ctx)
