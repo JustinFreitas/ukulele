@@ -48,6 +48,7 @@ class JdaConfig {
                     CacheFlag.ACTIVITY,
                     CacheFlag.CLIENT_STATUS,
                     CacheFlag.EMOJI,
+                    CacheFlag.ONLINE_STATUS,
                     CacheFlag.STICKER,
                     CacheFlag.SCHEDULED_EVENTS,
                     CacheFlag.SOUNDBOARD_SOUNDS,
