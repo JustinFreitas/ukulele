@@ -25,8 +25,8 @@ class RecordingCommandContext(
     channel: TextChannel,
     invoker: Member,
     command: Command,
-    override val argumentText: String,
-) : CommandContext(beans, guildProperties, guild, channel, invoker, command, "!", "!" + command.name) {
+    override val argumentText: String = "",
+) : CommandContext(beans, guildProperties, guild, channel, invoker, command) {
     val replies = mutableListOf<String>()
     val replyMessages = mutableListOf<MessageCreateData>()
     val replyEmbeds = mutableListOf<MessageEmbed>()
