@@ -55,6 +55,21 @@ class Player(
 
     @Volatile
     private var trackVolumeOverride: Int? = null
+
+    /**
+     * Queue-label volume parsed at track start, held until the track's ReplayGain state is known. Null once applied
+     * or if the track carries no label volume.
+     */
+    @Volatile
+    private var pendingLabelVolume: Int? = null
+
+    /**
+     * Set when a track is re-queued by [repeatTrack] after the user changed the volume by hand, so the label volume
+     * does not overwrite their choice on the next loop. Consumed by the next [onTrackStart].
+     */
+    @Volatile
+    private var suppressLabelVolumeOnce: Boolean = false
+
     private val playLock = Any()
 
     // Virtual volume (0-1000); scaled into the real min..max range by scaleVolume
@@ -271,13 +286,40 @@ class Player(
         // Reset the volume to the current guild volume config
         player.volume = scaleVolume(this.volume)
 
-        // Only apply queue label volume if a fade-in is NOT armed.
-        // This allows the client to perform a seamless fade-in by arming it beforehand.
-        if (!isFadeInArmed && (!beans.botProps.normalization || !track.isReplayGainApplied())) {
-            adjustVolumeFromQueueLabelVolumeMatcher(player, track)
-        }
+        // Whether the label volume applies depends on the track's ReplayGain, which is not known yet: lavaplayer
+        // dispatches the start event before handing the track to its executor, so nothing has decoded. Park the
+        // parsed value and let onTrackReplayGainResolved decide, which still runs before the first frame.
+        //
+        // A fade-in being armed means the client is driving the volume itself, and the suppress flag means the user
+        // set the volume by hand during the previous pass of a repeating track; either way, leave the volume alone.
+        pendingLabelVolume =
+            if (isFadeInArmed || suppressLabelVolumeOnce) {
+                null
+            } else {
+                parseQueueLabelVolume(track)
+            }
 
         isFadeInArmed = false
+        suppressLabelVolumeOnce = false
+        publishState()
+    }
+
+    override fun onTrackReplayGainResolved(
+        player: AudioPlayer,
+        track: AudioTrack,
+        gainDb: Float?,
+    ) {
+        val labelVolume = pendingLabelVolume ?: return
+        pendingLabelVolume = null
+
+        // ReplayGain already levels the track against everything else, so a hand-tuned label volume would be
+        // fighting it. The label exists to do the same job for tracks that carry no ReplayGain data.
+        if (beans.botProps.normalization && gainDb != null) {
+            log.debug("Skipping queue label volume {} for {}: ReplayGain of {} dB applies", labelVolume, track.info.title, gainDb)
+            return
+        }
+
+        applyLabelVolume(player, labelVolume)
         publishState()
     }
 
@@ -285,37 +327,31 @@ class Player(
      * With the option to specify a queue label on the track added, there is also the ability to specify a volume for
      * the track.  It will be in the form "[Some Queue Label, v:42] TrackIdentifierUrlOrPath".  If found, the volume
      * will be set to that when the track starts.
+     *
+     * @return the label volume as a percentage (1-150), or null if the title carries none.
      */
-    private fun adjustVolumeFromQueueLabelVolumeMatcher(
-        player: AudioPlayer,
-        track: AudioTrack,
-    ) {
+    private fun parseQueueLabelVolume(track: AudioTrack): Int? {
         val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
-        if (matcher.find() && matcher.group(1) != null) {
-            val volume =
-                matcher
-                    .group(1)
-                    .toInt()
-                    .coerceAtLeast(1)
-                    .coerceAtMost(150)
-            player.volume = volume
-            trackVolumeOverride = volume * 10
-        }
+        if (!matcher.find() || matcher.group(1) == null) return null
+
+        return matcher
+            .group(1)
+            .toInt()
+            .coerceAtLeast(1)
+            .coerceAtMost(150)
     }
 
     /**
-     * The queue label volume feature was changing the volume when the track was repeated.
-     * This is a way to set the label volume to the current volume, if present, to
-     * keep the volume the same in the repeat track scenario.
+     * The label volume is a percentage on the same scale as the volume command, so it goes through [scaleVolume] like
+     * every other volume change. Writing it to the player raw would ignore the configured min/max range entirely.
      */
-    private fun adjustQueueLabelVolumeToCurrentPlayerVolume(
+    private fun applyLabelVolume(
         player: AudioPlayer,
-        track: AudioTrack,
+        labelVolume: Int,
     ) {
-        val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
-        if (matcher.find() && matcher.group(1) != null) {
-            track.info.title = matcher.replaceAll { player.volume.toString() }
-        }
+        val virtualVolume = labelVolume * 10
+        player.volume = scaleVolume(virtualVolume)
+        trackVolumeOverride = virtualVolume
     }
 
     override fun onTrackEnd(
@@ -325,9 +361,13 @@ class Player(
     ) {
         if (endReason.mayStartNext) {
             if (repeatTrack) {
-                val clonedTrack: AudioTrack = track.makeClone()
-                adjustQueueLabelVolumeToCurrentPlayerVolume(player, clonedTrack)
-                queue.addFirst(clonedTrack)
+                // trackVolumeOverride is set when the label volume is applied and cleared by the volume setter, so a
+                // null here means the user changed the volume by hand during this pass. Keep their value on the next
+                // loop instead of snapping back to the label.
+                if (trackVolumeOverride == null) {
+                    suppressLabelVolumeOnce = true
+                }
+                queue.addFirst(track.makeClone())
             } else if (queueLooping) {
                 queue.add(track.makeClone())
             }

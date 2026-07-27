@@ -253,20 +253,74 @@ class PlayerTest {
     }
 
     @Test
-    fun `onTrackStart applies the queue-label volume when present in the title`() {
+    fun `onTrackStart defers the queue-label volume until ReplayGain is known`() {
         val labeledTrack = track("[Some Label, v:42] Song")
 
         player.onTrackStart(audioPlayer, labeledTrack)
+
+        // Nothing has decoded yet at this point, so the label volume must not have been applied.
+        verify(audioPlayer, never()).volume = 42
+
+        player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
 
         verify(audioPlayer, times(1)).volume = 42
         assertEquals(420, player.volume)
     }
 
     @Test
+    fun `queue-label volume is scaled into the configured range rather than written raw`() {
+        // The bug this covers is invisible at maxVolume=100, where the scaled and raw values coincide.
+        `when`(botProps.maxVolume).thenReturn(20)
+        val labeledTrack = track("[Some Label, v:40] Song")
+
+        player.onTrackStart(audioPlayer, labeledTrack)
+        player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
+
+        // 40% of the 0..20 range is 8, not the raw 40 that would be double the slider's maximum.
+        verify(audioPlayer, times(1)).volume = 8
+        assertEquals(400, player.volume)
+    }
+
+    @Test
+    fun `queue-label volume is skipped when the track carries ReplayGain`() {
+        `when`(botProps.normalization).thenReturn(true)
+        val labeledTrack = track("[Some Label, v:42] Song")
+
+        player.onTrackStart(audioPlayer, labeledTrack)
+        player.onTrackReplayGainResolved(audioPlayer, labeledTrack, -2.52f)
+
+        verify(audioPlayer, never()).volume = 42
+        assertEquals(50, player.volume)
+    }
+
+    @Test
+    fun `queue-label volume still applies when normalization is on but the track has no ReplayGain`() {
+        `when`(botProps.normalization).thenReturn(true)
+        val labeledTrack = track("[Some Label, v:42] Song")
+
+        player.onTrackStart(audioPlayer, labeledTrack)
+        player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
+
+        verify(audioPlayer, times(1)).volume = 42
+    }
+
+    @Test
+    fun `queue-label volume is applied on a track with no label only as a no-op`() {
+        val plainTrack = track("Song with no label")
+
+        player.onTrackStart(audioPlayer, plainTrack)
+        player.onTrackReplayGainResolved(audioPlayer, plainTrack, null)
+
+        assertEquals(50, player.volume)
+    }
+
+    @Test
     fun `onTrackStart skips label-volume parsing while a fade-in is armed`() {
         player.isFadeInArmed = true
+        val labeledTrack = track("[Some Label, v:42] Song")
 
-        player.onTrackStart(audioPlayer, track("[Some Label, v:42] Song"))
+        player.onTrackStart(audioPlayer, labeledTrack)
+        player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
 
         verify(audioPlayer, never()).volume = 42
         assertFalse(player.isFadeInArmed)
@@ -282,6 +336,87 @@ class PlayerTest {
         player.onTrackEnd(audioPlayer, ending, AudioTrackEndReason.FINISHED)
 
         verify(audioPlayer, times(1)).playTrack(clone)
+    }
+
+    @Test
+    fun `repeating a labeled track leaves its title untouched`() {
+        player.repeatTrack = true
+        val labeled = track("[Some Label, v:42] Song")
+        val clone = track("[Some Label, v:42] Song")
+        `when`(labeled.makeClone()).thenReturn(clone)
+
+        player.onTrackStart(audioPlayer, labeled)
+        player.onTrackReplayGainResolved(audioPlayer, labeled, null)
+        player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
+
+        // The old implementation replaced the whole title with a bare number here.
+        assertEquals("[Some Label, v:42] Song", labeled.info.title)
+        assertEquals("[Some Label, v:42] Song", clone.info.title)
+    }
+
+    @Test
+    fun `repeating a labeled track re-applies the label volume when untouched`() {
+        player.repeatTrack = true
+        val labeled = track("[Some Label, v:42] Song")
+        val clone = track("[Some Label, v:42] Song")
+        `when`(labeled.makeClone()).thenReturn(clone)
+
+        player.onTrackStart(audioPlayer, labeled)
+        player.onTrackReplayGainResolved(audioPlayer, labeled, null)
+        player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
+
+        player.onTrackStart(audioPlayer, clone)
+        player.onTrackReplayGainResolved(audioPlayer, clone, null)
+
+        verify(audioPlayer, times(2)).volume = 42
+    }
+
+    @Test
+    fun `a manual volume change survives a repeat instead of snapping back to the label`() {
+        player.repeatTrack = true
+        val labeled = track("[Some Label, v:42] Song")
+        val clone = track("[Some Label, v:42] Song")
+        `when`(labeled.makeClone()).thenReturn(clone)
+
+        player.onTrackStart(audioPlayer, labeled)
+        player.onTrackReplayGainResolved(audioPlayer, labeled, null)
+
+        // The user overrides the label mid-track.
+        player.volume = 600
+        player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
+
+        player.onTrackStart(audioPlayer, clone)
+        player.onTrackReplayGainResolved(audioPlayer, clone, null)
+
+        // Only the first pass applied the label; the loop keeps the user's 60%.
+        verify(audioPlayer, times(1)).volume = 42
+        assertEquals(600, player.volume)
+    }
+
+    @Test
+    fun `the label-volume suppression only lasts a single track`() {
+        player.repeatTrack = true
+        val labeled = track("[Some Label, v:42] Song")
+        val clone = track("[Some Label, v:42] Song")
+        val second = track("[Some Label, v:42] Song")
+        `when`(labeled.makeClone()).thenReturn(clone)
+        `when`(clone.makeClone()).thenReturn(second)
+
+        player.onTrackStart(audioPlayer, labeled)
+        player.onTrackReplayGainResolved(audioPlayer, labeled, null)
+        player.volume = 600
+        player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
+
+        // First loop is suppressed...
+        player.onTrackStart(audioPlayer, clone)
+        player.onTrackReplayGainResolved(audioPlayer, clone, null)
+        player.onTrackEnd(audioPlayer, clone, AudioTrackEndReason.FINISHED)
+
+        // ...but the one after it is not, since the user did not touch the volume again.
+        player.onTrackStart(audioPlayer, second)
+        player.onTrackReplayGainResolved(audioPlayer, second, null)
+
+        verify(audioPlayer, times(1)).volume = 42
     }
 
     @Test

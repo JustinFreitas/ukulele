@@ -88,10 +88,10 @@ A play request is one or more **identifiers** (a URL, a search like `ytsearch:..
 /play args: [Quiet Intro, v:42] https://youtu.be/aaa | [v:120] https://youtu.be/bbb
 ```
 
-Here the first track plays at 42% and the second at 120%, independent of the player's current volume.
+Here the first track plays at 42% and the second at 120%, independent of the player's current volume. The number is a percentage on the same scale as the `volume` command, so it is mapped through `minVolume`/`maxVolume` exactly like `volume` is — `v:42` and `::volume 42` produce the same level.
 
 > [!NOTE]
-> When [Volume Normalization](#-volume-normalization-replaygain) is enabled, a track's `v:` volume is skipped for any track that already has ReplayGain applied — normalization takes precedence. The `v:` value still applies to tracks without ReplayGain data.
+> When [Volume Normalization](#-volume-normalization-replaygain) is enabled, a track's `v:` volume is skipped for any track that has ReplayGain data — normalization takes precedence, since the two would otherwise fight over the same track. The `v:` value still applies to tracks without ReplayGain data, which is what it is for.
 
 ### 🔉 Volume Normalization (ReplayGain)
 
@@ -105,6 +105,8 @@ config:
 ```
 
 When enabled, the player applies ReplayGain on track start; tracks without ReplayGain data fall back to the player's current volume (and any per-track `v:` label).
+
+Two details worth knowing if you tag your own library. Gain is limited against the track's peak, so a large positive ReplayGain on a file with little headroom is reduced rather than allowed to clip. And `R128_TRACK_GAIN` (what Opus files normally carry) is referenced to −23 LUFS while `REPLAYGAIN_TRACK_GAIN` is referenced to −18 LUFS; the fork corrects for that, so a tagged `.opus` and a tagged `.mp3` sit at the same level.
 
 ---
 
