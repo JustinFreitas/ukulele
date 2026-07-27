@@ -51,8 +51,12 @@ repositories {
 // silently pin an older lavaplayer/youtube-source than gradle/libs.versions.toml declares.
 val lavaplayerVersion = libs.versions.lavaplayer.get()
 val youtubeSourceVersion = libs.versions.youtubeSource.get()
-val hasLocalDeps = file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/lavaplayer/$lavaplayerVersion").exists() ||
-                   file("${System.getProperty("user.home")}/.m2/repository/com/github/justinfreitas/lavaplayer/$lavaplayerVersion").exists()
+// Casing matters: the published groupId is com.github.JustinFreitas.lavaplayer, and on a case-sensitive
+// filesystem a lower-cased probe path would never match, silently disabling the override.
+val forkRepo = file("${System.getProperty("user.home")}/.m2/repository/com/github/JustinFreitas/lavaplayer")
+val hasLocalDeps =
+    forkRepo.resolve("lavaplayer/$lavaplayerVersion").exists() ||
+        forkRepo.resolve(lavaplayerVersion).exists()
 
 if (hasLocalDeps) {
     configurations.all {

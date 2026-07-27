@@ -64,11 +64,13 @@ class Player(
     private var pendingLabelVolume: Int? = null
 
     /**
-     * Set when a track is re-queued by [repeatTrack] after the user changed the volume by hand, so the label volume
-     * does not overwrite their choice on the next loop. Consumed by the next [onTrackStart].
+     * The clone re-queued by [repeatTrack] after the user changed the volume by hand, so the label volume does not
+     * overwrite their choice on the next loop. Matched by identity in [onTrackStart] rather than being a bare flag:
+     * a concurrent [stop] can drain the queue before the clone ever starts, and a flag would then leak onto whatever
+     * the user played next.
      */
     @Volatile
-    private var suppressLabelVolumeOnce: Boolean = false
+    private var suppressLabelVolumeFor: AudioTrack? = null
 
     private val playLock = Any()
 
@@ -168,6 +170,9 @@ class Player(
     @Volatile
     var isFadeInArmed: Boolean = false
 
+    // Known limitations, kept as-is because the current titles do not trip them: the leading .* is greedy, so the
+    // LAST "v:" in the title wins, and the closing "]" is optional, so the match is not actually required to sit
+    // inside the label brackets. A title like "[Label] Live v:12 Remix" therefore matches.
     private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*[vV]:(\\d{1,3}).*]?.*$")
 
     /**
@@ -292,15 +297,17 @@ class Player(
         //
         // A fade-in being armed means the client is driving the volume itself, and the suppress flag means the user
         // set the volume by hand during the previous pass of a repeating track; either way, leave the volume alone.
+        val suppressed = suppressLabelVolumeFor === track
+        suppressLabelVolumeFor = null
+
         pendingLabelVolume =
-            if (isFadeInArmed || suppressLabelVolumeOnce) {
+            if (isFadeInArmed || suppressed) {
                 null
             } else {
                 parseQueueLabelVolume(track)
             }
 
         isFadeInArmed = false
-        suppressLabelVolumeOnce = false
         publishState()
     }
 
@@ -361,13 +368,14 @@ class Player(
     ) {
         if (endReason.mayStartNext) {
             if (repeatTrack) {
+                val clone = track.makeClone()
                 // trackVolumeOverride is set when the label volume is applied and cleared by the volume setter, so a
                 // null here means the user changed the volume by hand during this pass. Keep their value on the next
                 // loop instead of snapping back to the label.
                 if (trackVolumeOverride == null) {
-                    suppressLabelVolumeOnce = true
+                    suppressLabelVolumeFor = clone
                 }
-                queue.addFirst(track.makeClone())
+                queue.addFirst(clone)
             } else if (queueLooping) {
                 queue.add(track.makeClone())
             }

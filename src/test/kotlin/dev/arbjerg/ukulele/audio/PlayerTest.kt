@@ -394,7 +394,30 @@ class PlayerTest {
     }
 
     @Test
-    fun `the label-volume suppression only lasts a single track`() {
+    fun `label-volume suppression does not leak onto an unrelated track`() {
+        player.repeatTrack = true
+        val labeled = track("[Some Label, v:42] Song")
+        val clone = track("[Some Label, v:42] Song")
+        `when`(labeled.makeClone()).thenReturn(clone)
+
+        player.onTrackStart(audioPlayer, labeled)
+        player.onTrackReplayGainResolved(audioPlayer, labeled, null)
+        player.volume = 600
+        player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
+
+        // The clone never gets to start - a concurrent stop() drains the queue first, which the early return in
+        // onTrackEnd allows. A player-scoped flag would still be set at this point.
+        player.stop()
+
+        val unrelated = track("[Other Label, v:30] Different Song")
+        player.onTrackStart(audioPlayer, unrelated)
+        player.onTrackReplayGainResolved(audioPlayer, unrelated, null)
+
+        verify(audioPlayer, times(1)).volume = 30
+    }
+
+    @Test
+    fun `a manual volume keeps the label suppressed for every later loop, not just one`() {
         player.repeatTrack = true
         val labeled = track("[Some Label, v:42] Song")
         val clone = track("[Some Label, v:42] Song")
@@ -407,16 +430,17 @@ class PlayerTest {
         player.volume = 600
         player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
 
-        // First loop is suppressed...
         player.onTrackStart(audioPlayer, clone)
         player.onTrackReplayGainResolved(audioPlayer, clone, null)
         player.onTrackEnd(audioPlayer, clone, AudioTrackEndReason.FINISHED)
 
-        // ...but the one after it is not, since the user did not touch the volume again.
         player.onTrackStart(audioPlayer, second)
         player.onTrackReplayGainResolved(audioPlayer, second, null)
 
+        // Each loop re-arms the suppression because the label was never re-applied, so the user's 60% rides through
+        // every repeat rather than being clobbered after one lap.
         verify(audioPlayer, times(1)).volume = 42
+        assertEquals(600, player.volume)
     }
 
     @Test

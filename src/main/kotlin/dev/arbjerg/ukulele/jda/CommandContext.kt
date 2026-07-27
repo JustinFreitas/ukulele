@@ -27,6 +27,7 @@ abstract class CommandContext(
     val command: Command,
 ) {
     val prefix: String = "/"
+
     /** Trigger string (e.g. /play) */
     val trigger: String get() = "/${command.name}"
 
