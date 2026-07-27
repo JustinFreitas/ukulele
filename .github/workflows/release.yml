@@ -1,0 +1,49 @@
+# Attaches the runnable fat jar to a published GitHub Release.
+#
+# The Docker image is not built here: build.yml already runs on every push, including tag
+# pushes, and tags the image with github.ref_name - so the tag behind a release has already
+# produced ghcr.io/justinfreitas/ukulele:<tag> by the time this runs.
+
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout the released tag
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build the fat jar
+        run: ./gradlew bootJar
+
+      - name: Name the artifact after the release
+        run: cp build/libs/ukulele.jar "ukulele-${{ github.event.release.tag_name }}.jar"
+
+      - name: Attach the jar to the release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ukulele-${{ github.event.release.tag_name }}.jar
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
