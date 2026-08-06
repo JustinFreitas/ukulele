@@ -6,7 +6,7 @@ Ukulele is a lightweight, simple-to-host Discord music bot inspired by FredBoat.
 The bot is self-contained and requires **Java 25** to run.
 
 > [!NOTE]
-> The modernized stack (Java 25, Spring Boot 4, Kotlin 2.3, REST/WebSocket API) lives on the **[`modernize-java25`](../../tree/modernize-java25)** branch. This is a personal fork, so that branch is the active line of development rather than `master`.
+> The modernized stack (Java 25, Spring Boot 4, Kotlin 2.3, REST/WebSocket API) is the primary line of development on the **master** branch.
 
 > [!IMPORTANT]
 > This project utilizes a **custom Lavaplayer fork** ([`JustinFreitas/lavaplayer`](https://github.com/JustinFreitas/lavaplayer), `v2.2.6_13`) which unlocks advanced features like **ReplayGain (Volume Normalization)**. This is **opt-in** — see [Volume Normalization](#-volume-normalization-replaygain) to enable it.
@@ -127,17 +127,17 @@ mkdir db && chown -R 999 db/
 cp ukulele.example.yml ukulele.yml   # then edit ukulele.yml and add your bot token
 
 # 2. Pull and run the prebuilt image
-docker pull ghcr.io/justinfreitas/ukulele:modernize-java25
+docker pull ghcr.io/justinfreitas/ukulele:master
 docker run -d --restart always \
   -v "$(pwd)/ukulele.yml:/opt/ukulele/ukulele.yml" \
   -v "$(pwd)/db:/opt/ukulele/db" \
   -e CONFIG_DATABASE=./db/database \
   -p 8080:8080 \
-  ghcr.io/justinfreitas/ukulele:modernize-java25
+  ghcr.io/justinfreitas/ukulele:master
 ```
 
 > [!TIP]
-> To use the prebuilt image with `docker-compose` instead of building locally, swap `build: .` for `image: ghcr.io/justinfreitas/ukulele:modernize-java25` in `docker-compose.yml`.
+> To use the prebuilt image with `docker-compose` instead of building locally, swap `build: .` for `image: ghcr.io/justinfreitas/ukulele:master` in `docker-compose.yml`.
 
 **Option B — Build from source.** The included `docker-compose.yml` builds the image locally from the `Dockerfile`:
 
