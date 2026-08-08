@@ -13,14 +13,58 @@ jobs:
         with:
           token: ${{ secrets.PIPELINE_PAT }}
 
-      - name: Update gradle/libs.versions.toml
+      - name: Update gradle/libs.versions.toml safely
+        env:
+          NEW_YT: ${{ github.event.client_payload.youtube_version }}
+          NEW_LAVA: ${{ github.event.client_payload.lavaplayer_version }}
         run: |
-          YOUTUBE_VERSION="${{ github.event.client_payload.youtube_version }}"
-          LAVAPLAYER_VERSION="${{ github.event.client_payload.lavaplayer_version }}"
-          sed -i "s/youtubeSource = \".*\"/youtubeSource = \"$YOUTUBE_VERSION\"/g" gradle/libs.versions.toml
-          sed -i "s/lavaplayer = \".*\"/lavaplayer = \"$LAVAPLAYER_VERSION\"/g" gradle/libs.versions.toml
+          python3 -c '
+          import os, re
+
+          def to_tuple(v):
+              return tuple(map(int, re.findall(r"\d+", v))) if v else ()
+
+          filepath = "gradle/libs.versions.toml"
+          with open(filepath, "r") as f:
+              content = f.read()
+
+          new_yt = os.environ.get("NEW_YT", "").strip()
+          new_lava = os.environ.get("NEW_LAVA", "").strip()
+
+          yt_match = re.search(r"youtubeSource\s*=\s*\"([^\"]+)\"", content)
+          lava_match = re.search(r"lavaplayer\s*=\s*\"([^\"]+)\"", content)
+
+          curr_yt = yt_match.group(1) if yt_match else ""
+          curr_lava = lava_match.group(1) if lava_match else ""
+
+          updated = False
+
+          if new_yt and to_tuple(new_yt) > to_tuple(curr_yt):
+              print(f"Bumping youtubeSource: {curr_yt} -> {new_yt}")
+              content = re.sub(r"youtubeSource\s*=\s*\"[^\"]+\"", f"youtubeSource = \"{new_yt}\"", content)
+              updated = True
+          else:
+              print(f"Skipping youtubeSource update (current: \"{curr_yt}\", incoming: \"{new_yt}\")")
+
+          if new_lava and to_tuple(new_lava) > to_tuple(curr_lava):
+              print(f"Bumping lavaplayer: {curr_lava} -> {new_lava}")
+              content = re.sub(r"lavaplayer\s*=\s*\"[^\"]+\"", f"lavaplayer = \"{new_lava}\"", content)
+              updated = True
+          else:
+              print(f"Skipping lavaplayer update (current: \"{curr_lava}\", incoming: \"{new_lava}\")")
+
+          if updated:
+              with open(filepath, "w") as f:
+                  f.write(content)
+              with open(os.environ["GITHUB_ENV"], "a") as f:
+                  f.write("UPDATED=true\n")
+          else:
+              with open(os.environ["GITHUB_ENV"], "a") as f:
+                  f.write("UPDATED=false\n")
+          '
 
       - name: Setup Java
+        if: env.UPDATED == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: zulu
@@ -28,12 +72,14 @@ jobs:
           cache: gradle
 
       - name: Setup Gradle
+        if: env.UPDATED == 'true'
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
+      - name: Build and Test
+        if: env.UPDATED == 'true'
         run: |
           for i in {1..3}; do
-            ./gradlew build --no-daemon && break || {
+            ./gradlew test bootJar --no-daemon && break || {
               if [ $i -lt 3 ]; then
                 echo "Build failed. Waiting 60s before retry..."
                 sleep 60
@@ -44,8 +90,9 @@ jobs:
           done
 
       - name: Commit and Push
+        if: env.UPDATED == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -am "build: bump lavaplayer to ${{ github.event.client_payload.lavaplayer_version }} and youtube-source to ${{ github.event.client_payload.youtube_version }}"
+          git commit -am "build(deps): auto-bump dependencies (lavaplayer / youtube-source)"
           git push
