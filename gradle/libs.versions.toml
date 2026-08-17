@@ -26,7 +26,7 @@ caffeine = "3.2.4"
 kotlinxCoroutines = "1.11.0"
 reactorKotlinExtensions = "1.3.1"
 junit = "6.1.3"
-byteBuddy = "1.18.11"
+byteBuddy = "1.18.12"
 
 [libraries]
 # Platforms / BOMs
