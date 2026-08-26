@@ -25,4 +25,7 @@ class BotProps(
     var corsOrigins: String = "*",
     /** When true, the /ws STOMP endpoint requires the apiToken on CONNECT (same token as /api). */
     var requireWebsocketAuth: Boolean = true,
+    var youtubeRemoteCipherUrl: String? = null,
+    var youtubeRemoteCipherPassword: String? = null,
+    var youtubeRemoteCipherUserAgent: String? = null,
 )

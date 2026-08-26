@@ -20,6 +20,11 @@ config:
   ownerId: "" # Discord user ID of the bot owner. Required for the /exit command and the "owner" API channel target.
   corsOrigins: "*" # Comma-separated allowed CORS / WebSocket origins for the remote-control API. "*" allows any.
   requireWebsocketAuth: true # When true, the /ws STOMP endpoint requires the apiToken on CONNECT.
+  # Optional yt-cipher server, helps to pass some anti-bot challenges.
+  # See https://github.com/kikkia/yt-cipher for details.
+  youtubeRemoteCipherUrl: null
+  youtubeRemoteCipherPassword: null
+  youtubeRemoteCipherUserAgent: "ukulele"
 
 
 server:
