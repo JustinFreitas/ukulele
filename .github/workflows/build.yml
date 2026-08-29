@@ -53,12 +53,10 @@ jobs:
         mkdir -p ci-test/db
         chmod -R 777 ci-test
         cat << 'EOF' > ci-test/ukulele.yml
-        bot:
-          token: "ci-smoke-test-token"
         config:
+          token: "dummy-token-for-ci-smoke-test"
           apiToken: "ci-test-token"
-        database:
-          path: "./db/database"
+          database: "./db/database"
         EOF
 
         # 2. Start container in background
