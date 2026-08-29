@@ -3,7 +3,9 @@
 
 name: Gradle Build
 
-on: [push]
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -41,3 +43,44 @@ jobs:
         tags: ghcr.io/${{ env.REPO_NAME }}:${{ github.ref_name }}
         push: true
         context: .
+    - name: Smoke test Docker container
+      if: github.repository == 'JustinFreitas/ukulele'
+      run: |
+        echo "Testing Docker image: ghcr.io/${{ env.REPO_NAME }}:${{ github.ref_name }}"
+        docker pull ghcr.io/${{ env.REPO_NAME }}:${{ github.ref_name }}
+
+        # 1. Create a minimal test configuration and database directory
+        mkdir -p ci-test/db
+        chmod -R 777 ci-test
+        cat << 'EOF' > ci-test/ukulele.yml
+        bot:
+          token: "ci-smoke-test-token"
+        config:
+          apiToken: "ci-test-token"
+        database:
+          path: "./db/database"
+        EOF
+
+        # 2. Start container in background
+        docker run -d --name ukulele-smoke-test \
+          -v "$(pwd)/ci-test/ukulele.yml:/opt/ukulele/ukulele.yml" \
+          -v "$(pwd)/ci-test/db:/opt/ukulele/db" \
+          -e CONFIG_DATABASE=./db/database \
+          -p 8080:8080 \
+          ghcr.io/${{ env.REPO_NAME }}:${{ github.ref_name }}
+
+        # 3. Allow time for Spring Boot and JVM startup
+        echo "Waiting for container to boot..."
+        sleep 12
+
+        # 4. Display container logs
+        echo "=== Container Logs ==="
+        docker logs ukulele-smoke-test
+
+        # 5. Verify the container process status
+        docker ps -a --filter "name=ukulele-smoke-test"
+
+        # 6. Teardown
+        docker stop ukulele-smoke-test || true
+        docker rm -f ukulele-smoke-test || true
+        rm -rf ci-test
