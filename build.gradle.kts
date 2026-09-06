@@ -29,7 +29,7 @@ kotlin {
 }
 
 group = "dev.arbjerg"
-version = "2.26.0"
+version = "2.26.1"
 
 repositories {
     mavenLocal()
