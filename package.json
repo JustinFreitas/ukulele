@@ -1,6 +1,6 @@
 {
   "name": "ukulele",
-  "version": "2.26.2",
+  "version": "2.26.3",
   "private": true,
   "description": "Discord music bot (Java/Kotlin, Spring Boot). package.json exists only so PM2 shows a version in `pm2 list`. Keep \"version\" in step with `version` in build.gradle.kts when cutting a release."
 }
