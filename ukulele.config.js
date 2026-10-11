@@ -11,7 +11,8 @@ module.exports = {
     interpreter: "C:/Program Files/Zulu/zulu-25/bin/java.exe",
     // --enable-native-access=ALL-UNNAMED silences the Java 25 restricted-method
     // warning from lavaplayer's native loader (matches bootRun's jvmArgs).
-    interpreter_args: "--enable-native-access=ALL-UNNAMED -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m -Djava.io.tmpdir=C:/Users/justi/AppData/Local/Temp -jar", // -> java --enable-native-access=ALL-UNNAMED -jar build\libs\ukulele.jar
+    // ZGC provides sub-millisecond GC pauses to eliminate Lavaplayer audio buffer underruns.
+    interpreter_args: "--enable-native-access=ALL-UNNAMED -XX:+UseZGC -Xms64m -Xmx2g -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=64m -Djava.io.tmpdir=C:/Users/justi/AppData/Local/Temp -jar", // -> java --enable-native-access=ALL-UNNAMED -jar build\libs\ukulele.jar
     autorestart: true,          // pm2 owns the JVM PID, so crash-restart works
     watch: false,
     env: {
