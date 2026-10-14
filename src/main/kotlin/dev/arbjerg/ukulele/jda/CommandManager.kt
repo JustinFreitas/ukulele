@@ -5,8 +5,7 @@ import dev.arbjerg.ukulele.data.GuildPropertiesService
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.channel.ChannelType
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -52,13 +51,13 @@ class CommandManager(
         commandScope.launch {
             val guildProperties = guildProperties.getAwait(guild.idLong)
 
-            if (event.channelType != ChannelType.TEXT) {
-                event.hook.sendMessage("This command can only be used in a text channel.").queue()
-                return@launch
-            }
+            val messageChannel =
+                event.channel as? GuildMessageChannel ?: run {
+                    event.hook.sendMessage("This command can only be used in a guild text or voice channel.").queue()
+                    return@launch
+                }
 
-            val channel = event.channel.asTextChannel()
-            val ctx = SlashCommandContext(contextBeans, guildProperties, guild, channel, member, event, command)
+            val ctx = SlashCommandContext(contextBeans, guildProperties, guild, messageChannel, member, event, command)
 
             log.info("Slash invocation: /${event.name} ${event.getOption("args")?.asString ?: ""}")
             command.invoke0(ctx)

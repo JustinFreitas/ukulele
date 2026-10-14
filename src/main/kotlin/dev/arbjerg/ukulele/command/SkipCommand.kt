@@ -44,8 +44,8 @@ class SkipCommand : Command("skip", "s") {
         player.showQueueOnSkip = !player.showQueueOnSkip
         val showQueueOnSkipMessage =
             when (player.showQueueOnSkip) {
-                true -> "Show Queue On Skip is on.\r"
-                false -> "Show Queue On Skip is off.\r"
+                true -> "Show Queue On Skip is on."
+                false -> "Show Queue On Skip is off."
             }
 
         reply(showQueueOnSkipMessage)

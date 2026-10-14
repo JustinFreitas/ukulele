@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -22,7 +22,7 @@ class RecordingCommandContext(
     beans: Beans,
     guildProperties: GuildProperties,
     guild: Guild,
-    channel: TextChannel,
+    channel: GuildMessageChannel,
     invoker: Member,
     command: Command,
     override val argumentText: String = "",
@@ -62,7 +62,7 @@ fun fakeContext(
         beans,
         guildProperties,
         guild,
-        mock(TextChannel::class.java),
+        mock(GuildMessageChannel::class.java),
         mock(Member::class.java),
         command,
         argumentText,

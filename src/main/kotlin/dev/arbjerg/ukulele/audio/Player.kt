@@ -16,7 +16,7 @@ import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildProperties
 import dev.arbjerg.ukulele.data.GuildPropertiesService
 import net.dv8tion.jda.api.audio.AudioSendHandler
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -85,7 +85,9 @@ class Player(
             beans.guildProperties
                 .transform(guildId) {
                     it.volume = value
-                }.subscribe()
+                }.subscribe(null) { ex ->
+                    log.error("Failed to persist volume for guild $guildId", ex)
+                }
             publishState()
         }
 
@@ -165,7 +167,7 @@ class Player(
     var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
     @Volatile
-    var lastChannel: TextChannel? = null
+    var lastChannel: GuildMessageChannel? = null
 
     @Volatile
     var isFadeInArmed: Boolean = false

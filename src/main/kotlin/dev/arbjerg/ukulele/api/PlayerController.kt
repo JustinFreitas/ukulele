@@ -105,7 +105,13 @@ class PlayerController(
         }
     }
 
-    private val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + SupervisorJob())
+    private val scope =
+        kotlinx.coroutines.CoroutineScope(
+            kotlinx.coroutines.Dispatchers.IO + SupervisorJob() +
+                kotlinx.coroutines.CoroutineExceptionHandler { _, t ->
+                    log.error("Unhandled error in PlayerController scope", t)
+                },
+        )
 
     @PostMapping("/player/{guildId}/play")
     fun play(

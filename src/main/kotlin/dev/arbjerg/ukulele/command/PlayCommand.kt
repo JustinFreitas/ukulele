@@ -206,7 +206,7 @@ class PlayCommand(
         }
 
         if (ourVc != theirVc && theirVc != null) {
-            val canTalk = selfMember.hasPermission(Permission.VOICE_CONNECT, Permission.VOICE_SPEAK)
+            val canTalk = selfMember.hasPermission(theirVc, Permission.VOICE_CONNECT, Permission.VOICE_SPEAK)
             if (!canTalk) {
                 reply("I need permission to connect and speak in ${theirVc.name}")
                 return false

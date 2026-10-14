@@ -7,7 +7,7 @@ import dev.arbjerg.ukulele.features.HelpContext
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import net.dv8tion.jda.api.utils.messages.MessageEditData
@@ -22,7 +22,7 @@ abstract class CommandContext(
     val beans: Beans,
     val guildProperties: GuildProperties,
     val guild: Guild,
-    val channel: TextChannel,
+    val channel: GuildMessageChannel,
     val invoker: Member,
     val command: Command,
 ) {
@@ -77,7 +77,7 @@ class SlashCommandContext(
     beans: Beans,
     guildProperties: GuildProperties,
     guild: Guild,
-    channel: TextChannel,
+    channel: GuildMessageChannel,
     invoker: Member,
     val event: SlashCommandInteractionEvent,
     command: Command,

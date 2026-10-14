@@ -29,7 +29,7 @@ kotlin {
 }
 
 group = "dev.arbjerg"
-version = "2.26.10"
+version = "2.26.11"
 
 repositories {
     mavenLocal()
@@ -124,6 +124,8 @@ dependencies {
     implementation(libs.jdave.api)
     implementation(libs.jdave.native.win)
     implementation(libs.jdave.native.linux)
+    implementation(libs.jdave.native.linux.aarch64)
+    implementation(libs.jdave.native.darwin)
     // https://github.com/lavalink-devs/youtube-source
     // Justin's HttpClient-5 fork of youtube-source, rebuilt against the HC5 lavaplayer fork.
     // The upstream dev.lavalink.youtube:*:1.18.1 jars are compiled against HttpClient 4 and fail at

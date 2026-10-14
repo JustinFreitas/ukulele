@@ -12,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Service
 class EventHandler(
@@ -19,8 +20,12 @@ class EventHandler(
     private val playerRegistry: PlayerRegistry,
 ) : ListenerAdapter() {
     private val log: Logger = LoggerFactory.getLogger(EventHandler::class.java)
+    private val commandsRegistered = AtomicBoolean(false)
 
     override fun onReady(event: ReadyEvent) {
+        log.info("Shard ${event.jda.shardInfo.shardId} is ready")
+        if (!commandsRegistered.compareAndSet(false, true)) return
+
         // Register slash commands globally (propagation can take up to ~1h on first publish).
         val commands = commandManager.getCommands().map { it.buildSlashData() }
         event.jda
