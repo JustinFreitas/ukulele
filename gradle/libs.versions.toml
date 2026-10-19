@@ -2,7 +2,7 @@
 kotlin = "2.4.21"
 springBoot = "4.1.1"
 springFramework = "7.0.7"
-jackson = "3.2.3"
+jackson = "3.2.4"
 jacksonAnnotations = "2.22"
 netty = "4.2.19.Final"
 jdave = "0.1.8"
