@@ -172,10 +172,7 @@ class Player(
     @Volatile
     var isFadeInArmed: Boolean = false
 
-    // Known limitations, kept as-is because the current titles do not trip them: the leading .* is greedy, so the
-    // LAST "v:" in the title wins, and the closing "]" is optional, so the match is not actually required to sit
-    // inside the label brackets. A title like "[Label] Live v:12 Remix" therefore matches.
-    private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[.*[vV]:(\\d{1,3}).*]?.*$")
+    private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[[^\\]]*[vV]:(\\d{1,3})[^\\]]*\\].*$")
 
     /**
      * @return true if playing started, false if not.
@@ -381,6 +378,10 @@ class Player(
             } else if (queueLooping) {
                 queue.add(track.makeClone())
             }
+        }
+
+        if (!endReason.mayStartNext && endReason != AudioTrackEndReason.STOPPED) {
+            return
         }
 
         synchronized(playLock) {

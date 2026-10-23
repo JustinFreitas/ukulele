@@ -18,12 +18,14 @@ class SecurityService {
     private val readRateLimitCache =
         Caffeine
             .newBuilder()
+            .maximumSize(10_000)
             .expireAfterWrite(15, TimeUnit.MINUTES)
             .build<String, AtomicInteger>()
 
     private val writeRateLimitCache =
         Caffeine
             .newBuilder()
+            .maximumSize(10_000)
             .expireAfterWrite(15, TimeUnit.MINUTES)
             .build<String, AtomicInteger>()
 
@@ -31,12 +33,14 @@ class SecurityService {
     private val failedAttempts =
         Caffeine
             .newBuilder()
+            .maximumSize(10_000)
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build<String, Int>()
 
     private val bannedIps =
         Caffeine
             .newBuilder()
+            .maximumSize(10_000)
             .expireAfterWrite(BAN_DURATION_MS, TimeUnit.MILLISECONDS)
             .build<String, Boolean>()
 

@@ -47,7 +47,7 @@ class PlayerController(
     suspend fun getPlayer(
         @PathVariable guildId: Long,
     ): PlayerStatusDto {
-        val guild = shardManager.getGuildById(guildId) ?: throw RuntimeException("Guild not found")
+        val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)
 
@@ -76,7 +76,7 @@ class PlayerController(
     suspend fun getQueue(
         @PathVariable guildId: Long,
     ): List<TrackDto> {
-        val guild = shardManager.getGuildById(guildId) ?: throw RuntimeException("Guild not found")
+        val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)
         return player.upcomingTracks.map { it.toDto() }
@@ -86,7 +86,7 @@ class PlayerController(
     fun getChannels(
         @PathVariable guildId: Long,
     ): List<VoiceChannelDto> {
-        val guild = shardManager.getGuildById(guildId) ?: throw RuntimeException("Guild not found")
+        val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
         return guild.voiceChannels.map { VoiceChannelDto(it.id, it.name) }
     }
 
@@ -194,38 +194,53 @@ class PlayerController(
             source = source.trim().removePrefix("<").removeSuffix(">")
 
             if (source.isNotEmpty()) {
-                suspendCancellableCoroutine<Unit> { cont ->
-                    apm.loadItemOrdered(
-                        player,
-                        source,
-                        object : AudioLoadResultHandler {
-                            override fun trackLoaded(track: AudioTrack) {
-                                accepted.add(labelled(track, queueLabel))
-                                cont.resume(Unit)
-                            }
+                val loaded =
+                    kotlinx.coroutines.withTimeoutOrNull(45_000L) {
+                        suspendCancellableCoroutine<Unit> { cont ->
+                            apm.loadItemOrdered(
+                                player,
+                                source,
+                                object : AudioLoadResultHandler {
+                                    override fun trackLoaded(track: AudioTrack) {
+                                        if (cont.isActive) {
+                                            accepted.add(labelled(track, queueLabel))
+                                            cont.resume(Unit)
+                                        }
+                                    }
 
-                            override fun playlistLoaded(playlist: AudioPlaylist) {
-                                if (playlist.isSearchResult) {
-                                    playlist.tracks.firstOrNull()?.let { accepted.add(labelled(it, queueLabel)) }
-                                } else {
-                                    accepted.addAll(playlist.tracks)
-                                }
-                                cont.resume(Unit)
-                            }
+                                    override fun playlistLoaded(playlist: AudioPlaylist) {
+                                        if (cont.isActive) {
+                                            if (playlist.isSearchResult) {
+                                                playlist.tracks.firstOrNull()?.let { accepted.add(labelled(it, queueLabel)) }
+                                            } else {
+                                                accepted.addAll(playlist.tracks)
+                                            }
+                                            cont.resume(Unit)
+                                        }
+                                    }
 
-                            override fun noMatches() {
-                                log.warn("No matches found for source: {}", source)
-                                errors.add("Nothing found for '$source'")
-                                cont.resume(Unit)
-                            }
+                                    override fun noMatches() {
+                                        if (cont.isActive) {
+                                            log.warn("No matches found for source: {}", source)
+                                            errors.add("Nothing found for '$source'")
+                                            cont.resume(Unit)
+                                        }
+                                    }
 
-                            override fun loadFailed(exception: FriendlyException) {
-                                log.error("Load failed for source: {}", source, exception)
-                                errors.add("Failed to load '$source': ${exception.message}")
-                                cont.resume(Unit)
-                            }
-                        },
-                    )
+                                    override fun loadFailed(exception: FriendlyException) {
+                                        if (cont.isActive) {
+                                            log.error("Load failed for source: {}", source, exception)
+                                            errors.add("Failed to load '$source': ${exception.message}")
+                                            cont.resume(Unit)
+                                        }
+                                    }
+                                },
+                            )
+                        }
+                    }
+                if (loaded == null) {
+                    log.warn("Timed out loading source: {}", source)
+                    errors.add("Timed out loading '$source'")
                 }
             }
         }
@@ -277,7 +292,7 @@ class PlayerController(
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        val volume = body.volume
+        val volume = body.volume.coerceIn(0, 1500)
         playerRegistry.get(guild, properties).volume = volume
     }
 
@@ -338,6 +353,9 @@ class PlayerController(
         @PathVariable guildId: Long,
         @RequestBody body: SayRequest,
     ) {
+        if (body.text.isBlank() || body.text.length > 2000) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Text must be between 1 and 2000 characters")
+        }
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)

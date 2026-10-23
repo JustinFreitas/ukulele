@@ -470,11 +470,17 @@ class PlayerTest {
     fun `onTrackEnd does nothing when the end reason does not allow starting the next track`() {
         player.repeatTrack = true
         val ending = track("Ending")
+        val queued = track("Queued")
+        `when`(audioPlayer.playingTrack).thenReturn(ending)
+        player.add(queued)
+        org.mockito.Mockito.clearInvocations(audioPlayer)
 
         player.onTrackEnd(audioPlayer, ending, AudioTrackEndReason.REPLACED)
+        player.onTrackEnd(audioPlayer, ending, AudioTrackEndReason.CLEANUP)
 
         verify(ending, never()).makeClone()
         verify(audioPlayer, never()).playTrack(any())
+        assertEquals(1, player.upcomingTracks.size)
     }
 
     @Test

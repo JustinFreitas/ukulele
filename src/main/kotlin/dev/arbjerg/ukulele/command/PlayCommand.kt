@@ -100,33 +100,49 @@ class PlayCommand(
     private suspend fun CommandContext.awaitLoad(
         source: String,
         onResult: (Any) -> Unit,
-    ) = suspendCancellableCoroutine { cont ->
-        apm.loadItemOrdered(
-            this,
-            source,
-            object : AudioLoadResultHandler {
-                override fun trackLoaded(track: AudioTrack) {
-                    onResult(track)
-                    cont.resume(Unit)
-                }
+    ) {
+        val loaded =
+            kotlinx.coroutines.withTimeoutOrNull(45_000L) {
+                suspendCancellableCoroutine { cont ->
+                    apm.loadItemOrdered(
+                        player,
+                        source,
+                        object : AudioLoadResultHandler {
+                            override fun trackLoaded(track: AudioTrack) {
+                                if (cont.isActive) {
+                                    onResult(track)
+                                    cont.resume(Unit)
+                                }
+                            }
 
-                override fun playlistLoaded(playlist: AudioPlaylist) {
-                    onResult(playlist)
-                    cont.resume(Unit)
-                }
+                            override fun playlistLoaded(playlist: AudioPlaylist) {
+                                if (cont.isActive) {
+                                    onResult(playlist)
+                                    cont.resume(Unit)
+                                }
+                            }
 
-                override fun noMatches() {
-                    onResult(LoadOutcome.NoMatch)
-                    cont.resume(Unit)
-                }
+                            override fun noMatches() {
+                                if (cont.isActive) {
+                                    onResult(LoadOutcome.NoMatch)
+                                    cont.resume(Unit)
+                                }
+                            }
 
-                override fun loadFailed(exception: FriendlyException) {
-                    command.log.error("Handled exception occurred", exception)
-                    onResult(LoadOutcome.Failed("An exception occurred!\n`${exception.message}`"))
-                    cont.resume(Unit)
+                            override fun loadFailed(exception: FriendlyException) {
+                                if (cont.isActive) {
+                                    command.log.error("Handled exception occurred", exception)
+                                    onResult(LoadOutcome.Failed("An exception occurred!\n`${exception.message}`"))
+                                    cont.resume(Unit)
+                                }
+                            }
+                        },
+                    )
                 }
-            },
-        )
+            }
+        if (loaded == null) {
+            onResult(LoadOutcome.Failed("Timed out loading `$source`"))
+        }
     }
 
     /** Applies the optional queue label, then either collects the track or counts it as duration-filtered. */
