@@ -54,12 +54,14 @@ class WebSocketConfig(
                         wsHandler: WebSocketHandler,
                         attributes: MutableMap<String, Any>,
                     ): Boolean {
-                        val xForwardedFor = request.headers.getFirst("X-Forwarded-For")
+                        val remoteAddr = request.remoteAddress.address?.hostAddress ?: "unknown"
+                        val isTrustedProxy = remoteAddr == "127.0.0.1" || remoteAddr == "::1" || remoteAddr == "0:0:0:0:0:0:0:1"
+                        val xForwardedFor = if (isTrustedProxy) request.headers.getFirst("X-Forwarded-For") else null
                         val ip =
                             if (!xForwardedFor.isNullOrEmpty()) {
                                 xForwardedFor.split(",").first().trim()
                             } else {
-                                request.remoteAddress.address?.hostAddress ?: "unknown"
+                                remoteAddr
                             }
                         attributes["clientIp"] = ip
 

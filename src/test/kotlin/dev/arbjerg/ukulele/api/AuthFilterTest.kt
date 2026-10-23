@@ -113,14 +113,25 @@ class AuthFilterTest {
     }
 
     @Test
-    fun `first IP in X-Forwarded-For is used for rate limiting and banning`() {
-        val req = request(xForwardedFor = " 3.3.3.3 , 4.4.4.4")
+    fun `first IP in X-Forwarded-For is used when request comes from loopback proxy`() {
+        val req = request(xForwardedFor = " 3.3.3.3 , 4.4.4.4", remoteAddr = "127.0.0.1")
         val res = response()
 
         filter.doFilter(req, res, chain)
 
         verify(securityService).isRateLimited("3.3.3.3", false)
         verify(securityService).isBanned("3.3.3.3")
+    }
+
+    @Test
+    fun `ignores spoofed X-Forwarded-For when request comes from untrusted remoteAddr`() {
+        val req = request(xForwardedFor = "3.3.3.3", remoteAddr = "9.9.9.9")
+        val res = response()
+
+        filter.doFilter(req, res, chain)
+
+        verify(securityService).isRateLimited("9.9.9.9", false)
+        verify(securityService).isBanned("9.9.9.9")
     }
 
     @Test

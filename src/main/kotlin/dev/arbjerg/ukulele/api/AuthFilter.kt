@@ -35,12 +35,14 @@ class AuthFilter(
             return
         }
 
-        val xForwardedFor = req.getHeader("X-Forwarded-For")
+        val remoteAddr = req.remoteAddr ?: "unknown"
+        val isTrustedProxy = remoteAddr == "127.0.0.1" || remoteAddr == "::1" || remoteAddr == "0:0:0:0:0:0:0:1"
+        val xForwardedFor = if (isTrustedProxy) req.getHeader("X-Forwarded-For") else null
         val ip =
             if (!xForwardedFor.isNullOrEmpty()) {
                 xForwardedFor.split(",").first().trim()
             } else {
-                req.remoteAddr ?: "unknown"
+                remoteAddr
             }
         val isWrite = req.method != "GET" && req.method != "OPTIONS"
         val isResetEndpoint = path == "/api/security/reset" && req.method == "POST"
