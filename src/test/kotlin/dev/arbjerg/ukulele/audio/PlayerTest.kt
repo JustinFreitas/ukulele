@@ -53,6 +53,10 @@ class PlayerTest {
         `when`(botProps.showQueueOnSkip).thenReturn(false)
         `when`(botProps.announceTracks).thenReturn(false)
         `when`(botProps.normalization).thenReturn(false)
+        `when`(botProps.trackFade).thenReturn(false)
+        `when`(botProps.trackFadeSticky).thenReturn(true)
+        `when`(botProps.trackFadeDurationMs).thenReturn(1500L)
+        `when`(botProps.frameBufferDurationMs).thenReturn(300)
 
         publisher = mock(PlayerEventPublisher::class.java)
         guildPropertiesService = mock(GuildPropertiesService::class.java)
@@ -493,5 +497,48 @@ class PlayerTest {
 
         verify(audioPlayer, times(1)).destroy()
         assertTrue(player.upcomingTracks.isEmpty())
+    }
+
+    @Test
+    fun `fadeOut and fadeIn toggle isFadedOut without modifying master volume`() {
+        player.volume = 600
+        assertFalse(player.isFadedOut)
+
+        player.fadeOut()
+        assertTrue(player.isFadedOut)
+        assertEquals(600, player.volume)
+
+        player.fadeIn()
+        assertFalse(player.isFadedOut)
+        assertEquals(600, player.volume)
+    }
+
+    @Test
+    fun `setting positive volume automatically clears isFadedOut`() {
+        player.fadeOut()
+        assertTrue(player.isFadedOut)
+
+        player.volume = 400
+        assertFalse(player.isFadedOut)
+    }
+
+    @Test
+    fun `one-shot trackFade disarms after onTrackStart when trackFadeSticky is false`() {
+        `when`(botProps.trackFadeSticky).thenReturn(false)
+        player.trackFade = true
+
+        player.onTrackStart(audioPlayer, track("Song"))
+
+        assertFalse(player.trackFade)
+    }
+
+    @Test
+    fun `sticky trackFade stays armed after onTrackStart when trackFadeSticky is true`() {
+        `when`(botProps.trackFadeSticky).thenReturn(true)
+        player.trackFade = true
+
+        player.onTrackStart(audioPlayer, track("Song"))
+
+        assertTrue(player.trackFade)
     }
 }

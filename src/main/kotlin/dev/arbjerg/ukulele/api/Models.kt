@@ -24,6 +24,9 @@ data class PlayerStatusDto(
     val isReplayGainEnabled: Boolean,
     val queueSize: Int,
     val channelId: String?,
+    val trackFade: Boolean = false,
+    @get:com.fasterxml.jackson.annotation.JsonProperty("isFadedOut")
+    val isFadedOut: Boolean = false,
 )
 
 data class TrackDto(
@@ -95,4 +98,8 @@ data class RemoveRequest(
 data class ReorderRequest(
     val fromIndex: Int,
     val toIndex: Int,
+)
+
+data class FadeRequest(
+    val fade: Boolean,
 )

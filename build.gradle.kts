@@ -29,7 +29,7 @@ kotlin {
 }
 
 group = "dev.arbjerg"
-version = "2.26.17"
+version = "2.27.0"
 
 repositories {
     mavenLocal()
@@ -54,28 +54,34 @@ val youtubeSourceVersion = libs.versions.youtubeSource.get()
 // Casing matters: the published groupId is com.github.JustinFreitas.lavaplayer, and on a case-sensitive
 // filesystem a lower-cased probe path would never match, silently disabling the override.
 val forkRepo = file("${System.getProperty("user.home")}/.m2/repository/com/github/JustinFreitas/lavaplayer")
-val hasLocalDeps =
+val hasLocalLavaplayer =
     forkRepo.resolve("lavaplayer/$lavaplayerVersion").exists() ||
         forkRepo.resolve(lavaplayerVersion).exists()
+val ytRepo = file("${System.getProperty("user.home")}/.m2/repository/dev/lavalink/youtube")
+val hasLocalYoutube = ytRepo.resolve("v2/$youtubeSourceVersion").exists()
 
-if (hasLocalDeps) {
+if (hasLocalLavaplayer || hasLocalYoutube) {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
-            substitute(
-                module("com.github.JustinFreitas.lavaplayer:lavaplayer"),
-            ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer:$lavaplayerVersion"))
-            substitute(
-                module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm"),
-            ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm:$lavaplayerVersion"))
-            substitute(
-                module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator"),
-            ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator:$lavaplayerVersion"))
-            substitute(
-                module("com.github.JustinFreitas.youtube-source:v2"),
-            ).using(module("dev.lavalink.youtube:v2:$youtubeSourceVersion"))
-            substitute(
-                module("com.github.JustinFreitas.youtube-source:common"),
-            ).using(module("dev.lavalink.youtube:common:$youtubeSourceVersion"))
+            if (hasLocalLavaplayer) {
+                substitute(
+                    module("com.github.JustinFreitas.lavaplayer:lavaplayer"),
+                ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer:$lavaplayerVersion"))
+                substitute(
+                    module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm"),
+                ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-format-xm:$lavaplayerVersion"))
+                substitute(
+                    module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator"),
+                ).using(module("com.github.JustinFreitas.lavaplayer:lavaplayer-ext-youtube-rotator:$lavaplayerVersion"))
+            }
+            if (hasLocalYoutube) {
+                substitute(
+                    module("com.github.JustinFreitas.youtube-source:v2"),
+                ).using(module("dev.lavalink.youtube:v2:$youtubeSourceVersion"))
+                substitute(
+                    module("com.github.JustinFreitas.youtube-source:common"),
+                ).using(module("dev.lavalink.youtube:common:$youtubeSourceVersion"))
+            }
         }
     }
 }

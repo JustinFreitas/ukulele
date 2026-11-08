@@ -65,6 +65,8 @@ class PlayerController(
                 isReplayGainEnabled = botProps.normalization,
                 queueSize = player.upcomingTracks.size,
                 channelId = guild.audioManager.connectedChannel?.id,
+                trackFade = player.trackFade,
+                isFadedOut = player.isFadedOut,
             )
         if (dto.currentTrack != null) {
             // Logging removed
@@ -335,6 +337,34 @@ class PlayerController(
         val properties = guildPropertiesService.getAwait(guildId)
         val isLoop = body.loop
         playerRegistry.get(guild, properties).queueLooping = isLoop
+    }
+
+    @PostMapping("/player/{guildId}/fade")
+    suspend fun fade(
+        @PathVariable guildId: Long,
+        @RequestBody body: FadeRequest,
+    ) {
+        val guild = shardManager.getGuildById(guildId) ?: return
+        val properties = guildPropertiesService.getAwait(guildId)
+        playerRegistry.get(guild, properties).trackFade = body.fade
+    }
+
+    @PostMapping("/player/{guildId}/fade-out")
+    suspend fun fadeOut(
+        @PathVariable guildId: Long,
+    ) {
+        val guild = shardManager.getGuildById(guildId) ?: return
+        val properties = guildPropertiesService.getAwait(guildId)
+        playerRegistry.get(guild, properties).fadeOut()
+    }
+
+    @PostMapping("/player/{guildId}/fade-in")
+    suspend fun fadeIn(
+        @PathVariable guildId: Long,
+    ) {
+        val guild = shardManager.getGuildById(guildId) ?: return
+        val properties = guildPropertiesService.getAwait(guildId)
+        playerRegistry.get(guild, properties).fadeIn()
     }
 
     @PostMapping("/player/{guildId}/seek")

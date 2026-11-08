@@ -160,5 +160,14 @@ class PlayerControllerTest {
             controller.stop(guildId)
             verify(player).stop()
             verify(audioManager).closeAudioConnection()
+
+            controller.fade(guildId, FadeRequest(true))
+            verify(player).trackFade = true
+
+            controller.fadeOut(guildId)
+            verify(player).fadeOut()
+
+            controller.fadeIn(guildId)
+            verify(player).fadeIn()
         }
 }

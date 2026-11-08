@@ -22,6 +22,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.nio.Buffer
 import java.nio.ByteBuffer
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -45,10 +49,40 @@ class Player(
 
     private val guildId = guildProperties.guildId
     private val queue = TrackQueue()
+
+    @Volatile
+    private var activeFadeConfig: TrackFadeConfig? = null
+
+    @Volatile
+    internal var activeFadeFilter: TrackFadeFilter? = null
+
+    @Volatile
+    private var naturalRepeatTrack: AudioTrack? = null
+
+    private val skipFadeScheduler =
+        Executors.newSingleThreadScheduledExecutor { runnable ->
+            Thread(runnable, "ukulele-fade-$guildId").apply { isDaemon = true }
+        }
+    private val pendingSkipStop = AtomicReference<ScheduledFuture<*>?>(null)
+
+    internal val fadeFilterFactory =
+        TrackFadeFilterFactory(
+            configProvider = { activeFadeConfig },
+            shouldAutoFadeOutAtEof = { trackFade && !repeatTrack },
+            onFilterCreated = { filter ->
+                activeFadeFilter = filter
+                if (isFadedOut) {
+                    filter.targetGain = 0.0f
+                }
+            },
+        )
+
     private val player =
         beans.apm.createPlayer().apply {
             addListener(this@Player)
             volume = scaleVolume(guildProperties.volume)
+            setFrameBufferDuration(beans.botProps.frameBufferDurationMs.takeIf { it > 0 } ?: 300)
+            setFilterFactory(fadeFilterFactory)
         }
     private val buffer = ByteBuffer.allocate(4096)
     private val frame: MutableAudioFrame = MutableAudioFrame().apply { setBuffer(buffer) }
@@ -81,6 +115,10 @@ class Player(
         set(value) {
             field = value
             trackVolumeOverride = null
+            if (value > 0 && isFadedOut) {
+                isFadedOut = false
+                activeFadeFilter?.targetGain = 1.0f
+            }
             player.volume = scaleVolume(value)
             beans.guildProperties
                 .transform(guildId) {
@@ -111,6 +149,8 @@ class Player(
                         ?.audioManager
                         ?.connectedChannel
                         ?.id,
+                trackFade = trackFade,
+                isFadedOut = isFadedOut,
             )
         beans.publisher.publishUpdate(guildId.toString(), dto)
     }
@@ -164,6 +204,17 @@ class Player(
         }
 
     @Volatile
+    var trackFade: Boolean = beans.botProps.trackFade
+        set(value) {
+            field = value
+            publishState()
+        }
+
+    @Volatile
+    var isFadedOut: Boolean = false
+        private set
+
+    @Volatile
     var showQueueOnSkip: Boolean = beans.botProps.showQueueOnSkip
 
     @Volatile
@@ -173,6 +224,29 @@ class Player(
     var isFadeInArmed: Boolean = false
 
     private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[[^\\]]*[vV]:(\\d{1,3})[^\\]]*\\].*$")
+
+    private val fadeDurationMs: Long
+        get() = beans.botProps.trackFadeDurationMs.takeIf { it > 0L } ?: 1500L
+
+    private fun cancelPendingSkipStop(): Boolean {
+        val existing = pendingSkipStop.getAndSet(null) ?: return false
+        existing.cancel(false)
+        return true
+    }
+
+    fun fadeOut() {
+        cancelPendingSkipStop()
+        isFadedOut = true
+        activeFadeFilter?.targetGain = 0.0f
+        publishState()
+    }
+
+    fun fadeIn() {
+        cancelPendingSkipStop()
+        isFadedOut = false
+        activeFadeFilter?.targetGain = 1.0f
+        publishState()
+    }
 
     /**
      * @return true if playing started, false if not.
@@ -211,14 +285,37 @@ class Player(
                 newRange.first - 1 until newRange.last
             }
         if (newRange.last >= 0) skipped.addAll(queue.removeRange(newRange))
-        if (skipped.isNotEmpty() && skipped.first() == player.playingTrack) {
-            // Stopping the currently playing track will handle its removal from the queue.
-            player.stopTrack()
-        }
         if (queueLooping) {
             // With looping enabled, add a clone of each skipped AudioTrack to the end of the queue.
             skipped.forEach {
                 queue.add(it.makeClone())
+            }
+        }
+        if (skipped.isNotEmpty() && skipped.first() == player.playingTrack) {
+            val wasWaitingForSkipFade = cancelPendingSkipStop()
+            val filter = activeFadeFilter
+            if (!wasWaitingForSkipFade && trackFade && !isFadedOut && !player.isPaused && filter != null) {
+                val expectedTrack = player.playingTrack
+                filter.targetGain = 0.0f
+                val futureRef = AtomicReference<ScheduledFuture<*>?>(null)
+                val scheduled =
+                    skipFadeScheduler.schedule(
+                        {
+                            pendingSkipStop.compareAndSet(futureRef.get(), null)
+                            if (player.playingTrack === expectedTrack) {
+                                isFadedOut = true
+                                player.stopTrack()
+                            }
+                        },
+                        fadeDurationMs,
+                        TimeUnit.MILLISECONDS,
+                    )
+                futureRef.set(scheduled)
+                pendingSkipStop.set(scheduled)
+                publishState()
+            } else {
+                // Stopping the currently playing track will handle its removal from the queue.
+                player.stopTrack()
             }
         }
 
@@ -226,6 +323,7 @@ class Player(
     }
 
     fun pause() {
+        cancelPendingSkipStop()
         player.isPaused = true
         publishState()
     }
@@ -240,6 +338,9 @@ class Player(
     }
 
     fun stop() {
+        cancelPendingSkipStop()
+        isFadedOut = false
+        activeFadeFilter = null
         queue.clear()
         player.stopTrack()
         publishState()
@@ -281,6 +382,7 @@ class Player(
         player: AudioPlayer,
         track: AudioTrack,
     ) {
+        cancelPendingSkipStop()
         if (beans.botProps.announceTracks) {
             lastChannel?.sendMessageEmbeds(beans.nowPlayingCommand.buildEmbed(track))?.queue()
         }
@@ -289,6 +391,29 @@ class Player(
 
         // Reset the volume to the current guild volume config
         player.volume = scaleVolume(this.volume)
+
+        val isNaturalRepeat = naturalRepeatTrack === track
+        naturalRepeatTrack = null
+
+        val stayFadedOutOnRepeat = isNaturalRepeat && isFadedOut
+        val wasFadedOut = isFadedOut && !isNaturalRepeat
+        if (!stayFadedOutOnRepeat) {
+            isFadedOut = false
+        }
+
+        val shouldStreamFadeIn = (trackFade || isFadeInArmed || wasFadedOut) && !isNaturalRepeat
+        activeFadeFilter = null
+        activeFadeConfig =
+            TrackFadeConfig(
+                track = track,
+                initialGain = if (shouldStreamFadeIn || stayFadedOutOnRepeat) 0.0f else 1.0f,
+                initialTargetGain = if (stayFadedOutOnRepeat) 0.0f else 1.0f,
+                fadeDurationMs = fadeDurationMs,
+            )
+
+        if (trackFade && !isNaturalRepeat && !beans.botProps.trackFadeSticky) {
+            trackFade = false
+        }
 
         // Whether the label volume applies depends on the track's ReplayGain, which is not known yet: lavaplayer
         // dispatches the start event before handing the track to its executor, so nothing has decoded. Park the
@@ -365,9 +490,11 @@ class Player(
         track: AudioTrack,
         endReason: AudioTrackEndReason,
     ) {
+        cancelPendingSkipStop()
         if (endReason.mayStartNext) {
             if (repeatTrack) {
                 val clone = track.makeClone()
+                naturalRepeatTrack = clone
                 // trackVolumeOverride is set when the label volume is applied and cleared by the volume setter, so a
                 // null here means the user changed the volume by hand during this pass. Keep their value on the next
                 // loop instead of snapping back to the label.
@@ -387,6 +514,8 @@ class Player(
         synchronized(playLock) {
             val new =
                 queue.take() ?: run {
+                    isFadedOut = false
+                    activeFadeFilter = null
                     publishState()
                     return
                 }
@@ -411,6 +540,10 @@ class Player(
     }
 
     fun destroy() {
+        cancelPendingSkipStop()
+        skipFadeScheduler.shutdownNow()
+        isFadedOut = false
+        activeFadeFilter = null
         queue.clear()
         player.destroy()
         beans.shardManager

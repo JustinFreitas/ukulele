@@ -28,4 +28,8 @@ class BotProps(
     var youtubeRemoteCipherUrl: String? = null,
     var youtubeRemoteCipherPassword: String? = null,
     var youtubeRemoteCipherUserAgent: String? = null,
+    var trackFade: Boolean = false,
+    var trackFadeSticky: Boolean = true,
+    var trackFadeDurationMs: Long = 1500,
+    var frameBufferDurationMs: Int = 300,
 )
