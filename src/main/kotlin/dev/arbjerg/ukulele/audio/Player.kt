@@ -65,6 +65,14 @@ class Player(
         }
     private val pendingSkipStop = AtomicReference<ScheduledFuture<*>?>(null)
 
+    private data class PendingSeek(
+        val track: AudioTrack,
+        val position: Long,
+        val future: ScheduledFuture<*>,
+    )
+
+    private val pendingSeek = AtomicReference<PendingSeek?>(null)
+
     internal val fadeFilterFactory =
         TrackFadeFilterFactory(
             configProvider = { activeFadeConfig },
@@ -106,6 +114,15 @@ class Player(
     @Volatile
     private var suppressLabelVolumeFor: AudioTrack? = null
 
+    @Volatile
+    private var activeTrackStartOffsetMs: Long = 0L
+
+    @Volatile
+    private var userSeekedBeforeStartOffset: Boolean = false
+
+    @Volatile
+    private var suppressStartOffsetFor: AudioTrack? = null
+
     private val playLock = Any()
 
     // Virtual volume (0-1000); scaled into the real min..max range by scaleVolume
@@ -129,7 +146,10 @@ class Player(
             publishState()
         }
 
+    fun effectivePosition(track: AudioTrack): Long = pendingSeek.get()?.takeIf { it.track === track }?.position ?: track.position
+
     private fun publishState() {
+        val current = currentTrack
         val dto =
             PlayerStatusDto(
                 guildId = guildId.toString(),
@@ -137,7 +157,7 @@ class Player(
                 volume = volume,
                 repeatTrack = repeatTrack,
                 queueLooping = queueLooping,
-                currentTrack = currentTrack?.toDto(),
+                currentTrack = current?.toDto(effectivePosition(current)),
                 remainingDuration = remainingDuration,
                 minVolume = beans.botProps.minVolume,
                 maxVolume = beans.botProps.maxVolume,
@@ -179,10 +199,13 @@ class Player(
     }
 
     val remainingDuration: Long get() {
-        var duration = 0L
-        if (player.playingTrack != null && !player.playingTrack.info.isStream) {
-            player.playingTrack?.let { duration = it.info.length - it.position }
-        }
+        val playing = player.playingTrack
+        val duration =
+            if (playing != null && !playing.info.isStream) {
+                (playing.info.length - effectivePosition(playing)).coerceAtLeast(0L)
+            } else {
+                0L
+            }
         return duration + queue.duration
     }
 
@@ -207,6 +230,16 @@ class Player(
     var trackFade: Boolean = beans.botProps.trackFade
         set(value) {
             field = value
+            if (!value) {
+                if (cancelPendingSkipStop()) {
+                    player.stopTrack()
+                }
+                val pending = cancelPendingSeek()
+                if (pending != null && player.playingTrack === pending.track) {
+                    pending.track.position = pending.position
+                    activeFadeFilter?.targetGain = if (isFadedOut) 0.0f else 1.0f
+                }
+            }
             publishState()
         }
 
@@ -234,8 +267,18 @@ class Player(
         return true
     }
 
+    private fun cancelPendingSeek(): PendingSeek? {
+        val existing = pendingSeek.getAndSet(null) ?: return null
+        existing.future.cancel(false)
+        return existing
+    }
+
     fun fadeOut() {
         cancelPendingSkipStop()
+        val pending = cancelPendingSeek()
+        if (pending != null && player.playingTrack === pending.track) {
+            pending.track.position = pending.position
+        }
         isFadedOut = true
         activeFadeFilter?.targetGain = 0.0f
         publishState()
@@ -243,6 +286,11 @@ class Player(
 
     fun fadeIn() {
         cancelPendingSkipStop()
+        val pending = cancelPendingSeek()
+        if (pending != null && player.playingTrack === pending.track) {
+            activeFadeFilter?.prepareFadeInOnSeek()
+            pending.track.position = pending.position
+        }
         isFadedOut = false
         activeFadeFilter?.targetGain = 1.0f
         publishState()
@@ -293,8 +341,9 @@ class Player(
         }
         if (skipped.isNotEmpty() && skipped.first() == player.playingTrack) {
             val wasWaitingForSkipFade = cancelPendingSkipStop()
+            val wasWaitingForSeekFade = cancelPendingSeek() != null
             val filter = activeFadeFilter
-            if (!wasWaitingForSkipFade && trackFade && !isFadedOut && !player.isPaused && filter != null) {
+            if (!wasWaitingForSkipFade && !wasWaitingForSeekFade && trackFade && !isFadedOut && !player.isPaused && filter != null) {
                 val expectedTrack = player.playingTrack
                 filter.targetGain = 0.0f
                 val futureRef = AtomicReference<ScheduledFuture<*>?>(null)
@@ -324,6 +373,11 @@ class Player(
 
     fun pause() {
         cancelPendingSkipStop()
+        val pending = cancelPendingSeek()
+        if (pending != null && player.playingTrack === pending.track) {
+            pending.track.position = pending.position
+            activeFadeFilter?.targetGain = if (isFadedOut) 0.0f else 1.0f
+        }
         player.isPaused = true
         publishState()
     }
@@ -339,6 +393,7 @@ class Player(
 
     fun stop() {
         cancelPendingSkipStop()
+        cancelPendingSeek()
         isFadedOut = false
         activeFadeFilter = null
         queue.clear()
@@ -375,7 +430,61 @@ class Player(
     }
 
     fun seek(position: Long) {
-        player.playingTrack?.position = position
+        val playing = player.playingTrack ?: return
+        if (pendingSkipStop.get() != null) return
+
+        val clampedPos = position.coerceAtLeast(0L)
+        if (activeTrackStartOffsetMs > 0L) {
+            userSeekedBeforeStartOffset = clampedPos < activeTrackStartOffsetMs
+        }
+
+        val wasWaitingForSeekFade = cancelPendingSeek() != null
+        val filter = activeFadeFilter
+        val remainingMs =
+            if (!playing.info.isStream && playing.duration > 0L) {
+                playing.duration - playing.position
+            } else {
+                Long.MAX_VALUE
+            }
+
+        if (!wasWaitingForSeekFade && trackFade && !isFadedOut && !player.isPaused && filter != null &&
+            remainingMs > fadeDurationMs + 500L
+        ) {
+            filter.targetGain = 0.0f
+            val pendingRef = AtomicReference<PendingSeek?>(null)
+            val scheduled =
+                skipFadeScheduler.schedule(
+                    {
+                        val currentPending = pendingRef.get()
+                        if (currentPending != null) {
+                            pendingSeek.compareAndSet(currentPending, null)
+                        }
+                        if (player.playingTrack === playing) {
+                            activeFadeFilter?.prepareFadeInOnSeek()
+                            if (trackFade && !beans.botProps.trackFadeSticky) {
+                                trackFade = false
+                            }
+                            playing.position = clampedPos
+                            publishState()
+                        }
+                    },
+                    fadeDurationMs,
+                    TimeUnit.MILLISECONDS,
+                )
+            val entry = PendingSeek(playing, clampedPos, scheduled)
+            pendingRef.set(entry)
+            pendingSeek.set(entry)
+            publishState()
+        } else {
+            if (trackFade && !isFadedOut) {
+                filter?.prepareFadeInOnSeek()
+                if (!beans.botProps.trackFadeSticky) {
+                    trackFade = false
+                }
+            }
+            playing.position = clampedPos
+            publishState()
+        }
     }
 
     override fun onTrackStart(
@@ -383,6 +492,7 @@ class Player(
         track: AudioTrack,
     ) {
         cancelPendingSkipStop()
+        cancelPendingSeek()
         if (beans.botProps.announceTracks) {
             lastChannel?.sendMessageEmbeds(beans.nowPlayingCommand.buildEmbed(track))?.queue()
         }
@@ -394,6 +504,22 @@ class Player(
 
         val isNaturalRepeat = naturalRepeatTrack === track
         naturalRepeatTrack = null
+
+        val suppressStartOffset = suppressStartOffsetFor === track
+        suppressStartOffsetFor = null
+        userSeekedBeforeStartOffset = suppressStartOffset
+
+        val resolvedStartOffsetMs =
+            track.getUserData(TrackStartOffset::class.java)?.offsetMs
+                ?: TrackTimeParser.parseLabelOffsetMs(track.info.title)
+                ?: 0L
+        activeTrackStartOffsetMs = resolvedStartOffsetMs
+        if (resolvedStartOffsetMs > 0L) {
+            track.userData = TrackStartOffset(resolvedStartOffsetMs)
+            if (!suppressStartOffset && track.isSeekable && (track.duration <= 0L || resolvedStartOffsetMs < track.duration)) {
+                track.position = resolvedStartOffsetMs
+            }
+        }
 
         val stayFadedOutOnRepeat = isNaturalRepeat && isFadedOut
         val wasFadedOut = isFadedOut && !isNaturalRepeat
@@ -491,6 +617,7 @@ class Player(
         endReason: AudioTrackEndReason,
     ) {
         cancelPendingSkipStop()
+        cancelPendingSeek()
         if (endReason.mayStartNext) {
             if (repeatTrack) {
                 val clone = track.makeClone()
@@ -500,6 +627,9 @@ class Player(
                 // loop instead of snapping back to the label.
                 if (trackVolumeOverride == null) {
                     suppressLabelVolumeFor = clone
+                }
+                if (userSeekedBeforeStartOffset) {
+                    suppressStartOffsetFor = clone
                 }
                 queue.addFirst(clone)
             } else if (queueLooping) {
@@ -541,6 +671,7 @@ class Player(
 
     fun destroy() {
         cancelPendingSkipStop()
+        cancelPendingSeek()
         skipFadeScheduler.shutdownNow()
         isFadedOut = false
         activeFadeFilter = null

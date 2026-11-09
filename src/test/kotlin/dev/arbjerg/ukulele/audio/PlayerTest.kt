@@ -541,4 +541,39 @@ class PlayerTest {
 
         assertTrue(player.trackFade)
     }
+
+    @Test
+    fun `onTrackStart applies label start offset and preserves it across repeats unless user seeks earlier`() {
+        player.repeatTrack = true
+        val labeled = track("[Boss Intro, v:50, t:1:30] Boss Theme")
+        val clone1 = track("[Boss Intro, v:50, t:1:30] Boss Theme")
+        val clone2 = track("[Boss Intro, v:50, t:1:30] Boss Theme")
+        `when`(labeled.isSeekable).thenReturn(true)
+        `when`(clone1.isSeekable).thenReturn(true)
+        `when`(clone2.isSeekable).thenReturn(true)
+        `when`(labeled.duration).thenReturn(300_000L)
+        `when`(clone1.duration).thenReturn(300_000L)
+        `when`(clone2.duration).thenReturn(300_000L)
+        `when`(labeled.makeClone()).thenReturn(clone1)
+        `when`(clone1.makeClone()).thenReturn(clone2)
+
+        // Pass 1 starts at 90_000ms
+        `when`(audioPlayer.playingTrack).thenReturn(labeled)
+        player.onTrackStart(audioPlayer, labeled)
+        verify(labeled, times(1)).position = 90_000L
+
+        // End of Pass 1 without manual seek -> Pass 2 also starts at 90_000ms
+        player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
+        `when`(audioPlayer.playingTrack).thenReturn(clone1)
+        player.onTrackStart(audioPlayer, clone1)
+        verify(clone1, times(1)).position = 90_000L
+
+        // User manually seeks earlier (to 10_000ms) during Pass 2 -> Pass 3 suppresses the 90_000ms offset
+        player.seek(10_000L)
+        verify(clone1, times(1)).position = 10_000L
+        player.onTrackEnd(audioPlayer, clone1, AudioTrackEndReason.FINISHED)
+        `when`(audioPlayer.playingTrack).thenReturn(clone2)
+        player.onTrackStart(audioPlayer, clone2)
+        verify(clone2, never()).position = 90_000L
+    }
 }

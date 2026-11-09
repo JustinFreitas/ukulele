@@ -41,13 +41,13 @@ data class TrackDto(
     val replayGainDb: Float?,
 )
 
-fun AudioTrack.toDto() =
+fun AudioTrack.toDto(positionOverride: Long? = null) =
     TrackDto(
         title = info.title,
         author = info.author,
         uri = info.uri,
         duration = duration,
-        position = position,
+        position = positionOverride ?: position,
         isReplayGain = isReplayGainApplied(),
         replayGainDb = replayGainDb,
     )

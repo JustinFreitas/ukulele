@@ -6,6 +6,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.audio.PlayerRegistry
+import dev.arbjerg.ukulele.audio.TrackStartOffset
+import dev.arbjerg.ukulele.audio.TrackTimeParser
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.features.HelpContext
 import dev.arbjerg.ukulele.jda.Command
@@ -47,7 +49,7 @@ class PlayCommand(
             if (!(matcher.find() && matcher.groupCount() == 2)) continue
 
             val queueLabel = if (matcher.group(1) != null) matcher.group(1).trim() else ""
-            val source =
+            val rawSource =
                 if (matcher.group(2) != null) {
                     matcher
                         .group(2)
@@ -57,19 +59,21 @@ class PlayCommand(
                 } else {
                     ""
                 }
+            val (source, urlOffsetMs) = TrackTimeParser.extractSourceAndOffset(rawSource)
+            val startOffsetMs = TrackTimeParser.parseLabelOffsetMs(queueLabel) ?: urlOffsetMs
             if (source.isEmpty()) continue
 
             awaitLoad(source) { item ->
                 when (item) {
                     is AudioTrack -> {
-                        collect(item, queueLabel, accepted) { filteredCount++ }
+                        collect(item, queueLabel, startOffsetMs, accepted) { filteredCount++ }
                     }
 
                     is AudioPlaylist -> {
                         if (item.isSearchResult) {
-                            item.tracks.firstOrNull()?.let { collect(it, queueLabel, accepted) { filteredCount++ } }
+                            item.tracks.firstOrNull()?.let { collect(it, queueLabel, startOffsetMs, accepted) { filteredCount++ } }
                         } else {
-                            item.tracks.forEach { collect(it, queueLabel, accepted) { filteredCount++ } }
+                            item.tracks.forEach { collect(it, queueLabel, null, accepted) { filteredCount++ } }
                         }
                     }
 
@@ -149,6 +153,7 @@ class PlayCommand(
     private fun collect(
         track: AudioTrack,
         queueLabel: String,
+        startOffsetMs: Long?,
         accepted: MutableList<AudioTrack>,
         onFiltered: () -> Unit,
     ) {
@@ -158,6 +163,9 @@ class PlayCommand(
         }
         if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
             track.info.title = "$queueLabel - ${track.info.title}"
+        }
+        if (startOffsetMs != null && startOffsetMs > 0L) {
+            track.userData = TrackStartOffset(startOffsetMs)
         }
         accepted.add(track)
     }

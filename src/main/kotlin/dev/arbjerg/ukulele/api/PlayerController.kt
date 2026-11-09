@@ -6,6 +6,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.audio.PlayerRegistry
+import dev.arbjerg.ukulele.audio.TrackStartOffset
+import dev.arbjerg.ukulele.audio.TrackTimeParser
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildPropertiesService
 import kotlinx.coroutines.SupervisorJob
@@ -51,6 +53,7 @@ class PlayerController(
         val properties = guildPropertiesService.getAwait(guildId)
         val player = playerRegistry.get(guild, properties)
 
+        val current = player.currentTrack
         val dto =
             PlayerStatusDto(
                 guildId = guildId.toString(),
@@ -58,7 +61,7 @@ class PlayerController(
                 volume = player.volume,
                 repeatTrack = player.repeatTrack,
                 queueLooping = player.queueLooping,
-                currentTrack = player.currentTrack?.toDto(),
+                currentTrack = current?.toDto(player.effectivePosition(current)),
                 remainingDuration = player.remainingDuration,
                 minVolume = botProps.minVolume,
                 maxVolume = botProps.maxVolume,
@@ -175,9 +178,13 @@ class PlayerController(
         fun labelled(
             track: AudioTrack,
             queueLabel: String,
+            startOffsetMs: Long?,
         ): AudioTrack {
             if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
                 track.info.title = "$queueLabel - ${track.info.title}"
+            }
+            if (startOffsetMs != null && startOffsetMs > 0L) {
+                track.userData = TrackStartOffset(startOffsetMs)
             }
             return track
         }
@@ -193,7 +200,10 @@ class PlayerController(
                 log.warn("Pattern match failed for identifier: '{}', attempting to load as raw URL", identifier)
             }
 
-            source = source.trim().removePrefix("<").removeSuffix(">")
+            val rawSource = source.trim().removePrefix("<").removeSuffix(">")
+            val (cleanSource, urlOffsetMs) = TrackTimeParser.extractSourceAndOffset(rawSource)
+            val startOffsetMs = TrackTimeParser.parseLabelOffsetMs(queueLabel) ?: urlOffsetMs
+            source = cleanSource
 
             if (source.isNotEmpty()) {
                 val loaded =
@@ -205,7 +215,7 @@ class PlayerController(
                                 object : AudioLoadResultHandler {
                                     override fun trackLoaded(track: AudioTrack) {
                                         if (cont.isActive) {
-                                            accepted.add(labelled(track, queueLabel))
+                                            accepted.add(labelled(track, queueLabel, startOffsetMs))
                                             cont.resume(Unit)
                                         }
                                     }
@@ -213,9 +223,13 @@ class PlayerController(
                                     override fun playlistLoaded(playlist: AudioPlaylist) {
                                         if (cont.isActive) {
                                             if (playlist.isSearchResult) {
-                                                playlist.tracks.firstOrNull()?.let { accepted.add(labelled(it, queueLabel)) }
+                                                playlist.tracks.firstOrNull()?.let {
+                                                    accepted.add(labelled(it, queueLabel, startOffsetMs))
+                                                }
                                             } else {
-                                                accepted.addAll(playlist.tracks)
+                                                playlist.tracks.forEach {
+                                                    accepted.add(labelled(it, queueLabel, null))
+                                                }
                                             }
                                             cont.resume(Unit)
                                         }

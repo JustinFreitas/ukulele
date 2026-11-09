@@ -13,6 +13,7 @@ data class TrackFadeConfig(
     val initialGain: Float,
     val initialTargetGain: Float = 1.0f,
     val fadeDurationMs: Long,
+    @Volatile var filterCreated: Boolean = false,
 )
 
 class TrackFadeFilterFactory(
@@ -29,8 +30,10 @@ class TrackFadeFilterFactory(
         val effectiveTrack = track ?: config.track
         val isStream = effectiveTrack?.info?.isStream ?: true
         val durationMs = effectiveTrack?.duration ?: 0L
-        val midTrackRebuild = (effectiveTrack?.position ?: 0L) > config.fadeDurationMs
+        val midTrackRebuild = config.filterCreated
+        config.filterCreated = true
         val initialGain = if (midTrackRebuild) config.initialTargetGain else config.initialGain
+        val initialPositionMs = effectiveTrack?.position ?: 0L
 
         val filter =
             TrackFadeFilter(
@@ -41,6 +44,7 @@ class TrackFadeFilterFactory(
                 fadeDurationMs = config.fadeDurationMs,
                 trackDurationMs = durationMs,
                 isStream = isStream,
+                initialPositionMs = initialPositionMs,
                 shouldAutoFadeOutAtEof = shouldAutoFadeOutAtEof,
             )
         onFilterCreated(filter)
@@ -56,6 +60,7 @@ class TrackFadeFilter(
     fadeDurationMs: Long,
     trackDurationMs: Long,
     isStream: Boolean,
+    initialPositionMs: Long = 0L,
     private val shouldAutoFadeOutAtEof: () -> Boolean,
 ) : FloatPcmAudioFilter {
     private val fadeSamples = (fadeDurationMs.coerceAtLeast(1L) * sampleRate) / 1000L
@@ -73,9 +78,16 @@ class TrackFadeFilter(
     @Volatile
     var targetGain: Float = initialTargetGain.coerceIn(0.0f, 1.0f)
 
-    private var sampleCursor: Long = 0L
+    @Volatile
+    private var fadeInOnNextSeek: Boolean = false
+
+    private var sampleCursor: Long = (initialPositionMs.coerceAtLeast(0L) * sampleRate) / 1000L
     private var eofLatched: Boolean = false
     private var eofFadingOut: Boolean = false
+
+    fun prepareFadeInOnSeek() {
+        fadeInOnNextSeek = true
+    }
 
     override fun process(
         input: Array<FloatArray>,
@@ -126,9 +138,12 @@ class TrackFadeFilter(
         providedTime: Long,
     ) {
         sampleCursor = (providedTime.coerceAtLeast(0L) * sampleRate) / 1000L
-        if (eofFadeStartSample < 0L || sampleCursor < eofFadeStartSample) {
-            eofLatched = false
-            eofFadingOut = false
+        eofLatched = false
+        eofFadingOut = false
+        if (fadeInOnNextSeek) {
+            fadeInOnNextSeek = false
+            currentGain = 0.0f
+            targetGain = 1.0f
         }
     }
 

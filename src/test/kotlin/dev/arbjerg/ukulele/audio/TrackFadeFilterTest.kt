@@ -212,4 +212,64 @@ class TrackFadeFilterTest {
         assertTrue(capturedFilter != null)
         assertEquals(1.0f, capturedFilter!!.targetGain)
     }
+
+    @Test
+    fun `prepareFadeInOnSeek resets gain to 0_0f and ramps to 1_0f on seekPerformed`() {
+        val downstream = CapturingFilter()
+        val filter =
+            TrackFadeFilter(
+                downstream = downstream,
+                sampleRate = 100,
+                initialGain = 1.0f,
+                initialTargetGain = 1.0f,
+                fadeDurationMs = 100L,
+                trackDurationMs = 10_000L,
+                isStream = false,
+                shouldAutoFadeOutAtEof = { false },
+            )
+
+        // Simulate cross-fade seek fade-out completed (currentGain = 0.0f, targetGain = 0.0f)
+        filter.targetGain = 0.0f
+        filter.process(arrayOf(FloatArray(10) { 1.0f }), 0, 10)
+        assertEquals(0.0f, filter.currentGain, 1e-5f)
+
+        // Prepare fade-in on next seek and perform seek
+        filter.prepareFadeInOnSeek()
+        filter.seekPerformed(3_000L, 3_000L)
+        assertEquals(0.0f, filter.currentGain, 1e-5f)
+        assertEquals(1.0f, filter.targetGain, 1e-5f)
+
+        // Next 10 samples ramp from 0.1f -> 1.0f
+        filter.process(arrayOf(FloatArray(10) { 1.0f }), 0, 10)
+        assertEquals(0.1f, downstream.lastSamples!![0][0], 1e-5f)
+        assertEquals(1.0f, downstream.lastSamples!![0][9], 1e-5f)
+    }
+
+    @Test
+    fun `factory starts with initialGain 0_0f on first build even when track has start offset position`() {
+        val downstream = mock(UniversalPcmAudioFilter::class.java)
+        val track = createTrack(duration = 300_000L, position = 90_000L)
+        val format = StandardAudioDataFormats.DISCORD_OPUS
+        var capturedFilter: TrackFadeFilter? = null
+        val config =
+            TrackFadeConfig(
+                track = track,
+                initialGain = 0.0f,
+                initialTargetGain = 1.0f,
+                fadeDurationMs = 1500L,
+            )
+        val factory =
+            TrackFadeFilterFactory(
+                configProvider = { config },
+                shouldAutoFadeOutAtEof = { true },
+            ) { capturedFilter = it }
+
+        // First buildChain for a track with start offset 90_000L still starts at 0.0f
+        factory.buildChain(track, format, downstream)
+        assertEquals(0.0f, capturedFilter!!.currentGain, 1e-5f)
+
+        // Second buildChain on the same config (mid-track filter rebuild) starts at 1.0f
+        factory.buildChain(track, format, downstream)
+        assertEquals(1.0f, capturedFilter.currentGain, 1e-5f)
+    }
 }
