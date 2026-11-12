@@ -164,8 +164,10 @@ class PlayCommand(
         if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
             track.info.title = "$queueLabel - ${track.info.title}"
         }
-        if (startOffsetMs != null && startOffsetMs > 0L) {
-            track.userData = TrackStartOffset(startOffsetMs)
+        val normalizedOffsetMs = startOffsetMs?.takeIf { it > 0L } ?: 0L
+        val normalizedLabel = queueLabel.takeIf { it.isNotEmpty() }
+        if (normalizedOffsetMs > 0L || normalizedLabel != null) {
+            track.userData = TrackStartOffset(offsetMs = normalizedOffsetMs, queueLabel = normalizedLabel)
         }
         accepted.add(track)
     }

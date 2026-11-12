@@ -142,4 +142,45 @@ class SkipCommandTest {
 
         assertTrue(ctx.replies[0].contains("Invalid range"))
     }
+
+    @Test
+    fun `skip during deferred trackFade reports incoming next track rather than fading-out track`() {
+        val harness = newTestPlayer()
+        `when`(harness.botProps.trackFadeDurationMs).thenReturn(5_000L)
+        val track1 = track("Outgoing Track")
+        val track2 = track("Incoming Track")
+        `when`(harness.audioPlayer.playingTrack).thenReturn(track1)
+        `when`(harness.audioPlayer.isPaused).thenReturn(false)
+        harness.player.add(track2)
+        harness.player.trackFade = true
+        harness.player.activeFadeFilter = mock(dev.arbjerg.ukulele.audio.TrackFadeFilter::class.java)
+
+        val ctx = fakeContext(command, "", harness.player)
+        command.invokeBlocking(ctx)
+
+        // stopTrack() is deferred for fade-out, yet the reply accurately announces Incoming Track
+        verify(harness.audioPlayer, never()).stopTrack()
+        assertTrue(ctx.replies[0].contains("Skipped `Outgoing Track`"))
+        assertTrue(ctx.replies[0].contains("Playing Incoming Track"))
+        harness.player.destroy()
+    }
+
+    @Test
+    fun `skip on last track during deferred trackFade reports empty queue and stopped player`() {
+        val harness = newTestPlayer()
+        `when`(harness.botProps.trackFadeDurationMs).thenReturn(5_000L)
+        val track1 = track("Final Track")
+        `when`(harness.audioPlayer.playingTrack).thenReturn(track1)
+        `when`(harness.audioPlayer.isPaused).thenReturn(false)
+        harness.player.trackFade = true
+        harness.player.activeFadeFilter = mock(dev.arbjerg.ukulele.audio.TrackFadeFilter::class.java)
+
+        val ctx = fakeContext(command, "", harness.player)
+        command.invokeBlocking(ctx)
+
+        verify(harness.audioPlayer, never()).stopTrack()
+        assertTrue(ctx.replies[0].contains("Skipped `Final Track`"))
+        assertTrue(ctx.replies[0].contains("The queue is empty and the player is stopped."))
+        harness.player.destroy()
+    }
 }

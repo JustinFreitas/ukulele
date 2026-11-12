@@ -3,7 +3,8 @@ package dev.arbjerg.ukulele.audio
 import java.util.regex.Pattern
 
 data class TrackStartOffset(
-    val offsetMs: Long,
+    val offsetMs: Long = 0L,
+    val queueLabel: String? = null,
 ) {
     /**
      * YoutubeAudioTrack in youtube-source invokes JsonBrowser.parse(userData.toString()) whenever userData != null.

@@ -65,7 +65,7 @@ class WebSocketConfig(
                             }
                         attributes["clientIp"] = ip
 
-                        if (securityService.isBanned(ip)) {
+                        if (securityService.isRateLimited(ip, false) || securityService.isBanned(ip)) {
                             response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS)
                             return false
                         }
@@ -100,6 +100,9 @@ class WebSocketConfig(
                     val ip = accessor.sessionAttributes?.get("clientIp") as? String ?: "unknown"
 
                     if (StompCommand.CONNECT == accessor.command) {
+                        if (securityService.isRateLimited(ip, false)) {
+                            throw MessagingException("Rate limit exceeded. Please try again later.")
+                        }
                         if (securityService.isBanned(ip)) {
                             throw MessagingException("Your IP is temporarily banned due to excessive unauthorized attempts.")
                         }
@@ -124,6 +127,9 @@ class WebSocketConfig(
                             }
                         }
                     } else if (StompCommand.SUBSCRIBE == accessor.command) {
+                        if (securityService.isRateLimited(ip, false)) {
+                            throw MessagingException("Rate limit exceeded. Please try again later.")
+                        }
                         if (securityService.isBanned(ip)) {
                             throw MessagingException("Your IP is temporarily banned due to excessive unauthorized attempts.")
                         }
@@ -131,7 +137,7 @@ class WebSocketConfig(
                         if (botProps.requireWebsocketAuth) {
                             val authorized = accessor.sessionAttributes?.get("authorized") as? Boolean ?: false
                             if (!authorized) {
-                                securityService.incrementUnauthorized()
+                                securityService.registerFailedAttempt(ip)
                                 throw MessagingException("Unauthorized WebSocket subscription")
                             }
                         }
@@ -139,7 +145,7 @@ class WebSocketConfig(
                         // Validate subscription destination: must be /topic/player/{guildId} and the guild must exist
                         val destination = accessor.destination
                         if (destination == null) {
-                            securityService.incrementUnauthorized()
+                            securityService.registerFailedAttempt(ip)
                             throw MessagingException("Access Denied: Missing subscription destination")
                         }
                         val matchResult = "^/topic/player/(\\d+)$".toRegex().find(destination)
@@ -149,7 +155,7 @@ class WebSocketConfig(
                                 throw MessagingException("Access Denied: Invalid or inaccessible Guild ID")
                             }
                         } else {
-                            securityService.incrementUnauthorized()
+                            securityService.registerFailedAttempt(ip)
                             throw MessagingException("Access Denied: Invalid subscription destination")
                         }
                     }

@@ -183,8 +183,10 @@ class PlayerController(
             if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
                 track.info.title = "$queueLabel - ${track.info.title}"
             }
-            if (startOffsetMs != null && startOffsetMs > 0L) {
-                track.userData = TrackStartOffset(startOffsetMs)
+            val normalizedOffsetMs = startOffsetMs?.takeIf { it > 0L } ?: 0L
+            val normalizedLabel = queueLabel.takeIf { it.isNotEmpty() }
+            if (normalizedOffsetMs > 0L || normalizedLabel != null) {
+                track.userData = TrackStartOffset(offsetMs = normalizedOffsetMs, queueLabel = normalizedLabel)
             }
             return track
         }
@@ -194,7 +196,7 @@ class PlayerController(
             var source = identifier
             var queueLabel = ""
             if (matcher.find() && matcher.groupCount() == 2) {
-                if (matcher.group(1) != null) queueLabel = matcher.group(1)
+                if (matcher.group(1) != null) queueLabel = matcher.group(1).trim()
                 if (matcher.group(2) != null) source = matcher.group(2)
             } else {
                 log.warn("Pattern match failed for identifier: '{}', attempting to load as raw URL", identifier)
@@ -318,8 +320,8 @@ class PlayerController(
     ) {
         val guild = shardManager.getGuildById(guildId) ?: return
         val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).stop()
         guild.audioManager.closeAudioConnection()
+        playerRegistry.get(guild, properties).stop()
     }
 
     @PostMapping("/player/{guildId}/shuffle")
@@ -420,6 +422,7 @@ class PlayerController(
         if (channel != null) {
             guild.audioManager.openAudioConnection(channel)
             guild.audioManager.sendingHandler = player
+            player.triggerStateUpdate()
         }
     }
 

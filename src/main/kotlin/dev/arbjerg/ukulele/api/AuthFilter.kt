@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import java.net.URI
 
 @Component
 class AuthFilter(
@@ -22,7 +23,7 @@ class AuthFilter(
     ) {
         val req = request as HttpServletRequest
         val res = response as HttpServletResponse
-        val path = req.requestURI
+        val path = normalizePath(req)
 
         if (!path.startsWith("/api")) {
             chain.doFilter(request, response)
@@ -47,8 +48,8 @@ class AuthFilter(
         val isWrite = req.method != "GET" && req.method != "OPTIONS"
         val isResetEndpoint = path == "/api/security/reset" && req.method == "POST"
 
-        // Rate limiting check
-        if (securityService.isRateLimited(ip, isWrite)) {
+        // Rate limiting check (reset endpoint bypasses rate-limit/ban so an admin with a valid token can self-recover)
+        if (!isResetEndpoint && securityService.isRateLimited(ip, isWrite)) {
             res.status = HttpStatus.TOO_MANY_REQUESTS.value()
             res.writer.write("Rate limit exceeded. Please try again later.")
             return
@@ -80,5 +81,26 @@ class AuthFilter(
         }
 
         chain.doFilter(request, response)
+    }
+
+    private fun normalizePath(req: HttpServletRequest): String {
+        val raw =
+            req.servletPath?.takeIf { it.isNotEmpty() }
+                ?: req.requestURI?.removePrefix(req.contextPath.orEmpty())
+                ?: ""
+        val withoutParams =
+            raw
+                .split("/")
+                .joinToString("/") { it.substringBefore(";") }
+                .replace(MULTI_SLASH_REGEX, "/")
+        val safePath = if (withoutParams.startsWith("/")) withoutParams else "/$withoutParams"
+        val normalized =
+            runCatching { URI("http", "localhost", safePath, null).normalize().path ?: safePath }
+                .getOrDefault(safePath)
+        return if (normalized.length > 1) normalized.trimEnd('/') else normalized
+    }
+
+    companion object {
+        private val MULTI_SLASH_REGEX = Regex("/+")
     }
 }

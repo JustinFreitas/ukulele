@@ -147,7 +147,20 @@ class PlayerTest {
 
     private fun track(title: String): AudioTrack {
         val t = mock(AudioTrack::class.java)
+        val userDataRef =
+            java.util.concurrent.atomic
+                .AtomicReference<Any?>(null)
         `when`(t.info).thenReturn(AudioTrackInfo(title, "Author", 1000L, "id-$title", false, "uri-$title"))
+        `when`(t.userData).thenAnswer { userDataRef.get() }
+        org.mockito.Mockito
+            .doAnswer { inv ->
+                userDataRef.set(inv.getArgument(0))
+                null
+            }.`when`(t)
+            .userData = any()
+        `when`(t.getUserData(TrackStartOffset::class.java)).thenAnswer {
+            userDataRef.get() as? TrackStartOffset
+        }
         return t
     }
 
@@ -259,6 +272,7 @@ class PlayerTest {
     @Test
     fun `onTrackStart defers the queue-label volume until ReplayGain is known`() {
         val labeledTrack = track("[Some Label, v:42] Song")
+        `when`(audioPlayer.playingTrack).thenReturn(labeledTrack)
 
         player.onTrackStart(audioPlayer, labeledTrack)
 
@@ -276,6 +290,7 @@ class PlayerTest {
         // The bug this covers is invisible at maxVolume=100, where the scaled and raw values coincide.
         `when`(botProps.maxVolume).thenReturn(20)
         val labeledTrack = track("[Some Label, v:40] Song")
+        `when`(audioPlayer.playingTrack).thenReturn(labeledTrack)
 
         player.onTrackStart(audioPlayer, labeledTrack)
         player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
@@ -289,6 +304,7 @@ class PlayerTest {
     fun `queue-label volume is skipped when the track carries ReplayGain`() {
         `when`(botProps.normalization).thenReturn(true)
         val labeledTrack = track("[Some Label, v:42] Song")
+        `when`(audioPlayer.playingTrack).thenReturn(labeledTrack)
 
         player.onTrackStart(audioPlayer, labeledTrack)
         player.onTrackReplayGainResolved(audioPlayer, labeledTrack, -2.52f)
@@ -301,6 +317,7 @@ class PlayerTest {
     fun `queue-label volume still applies when normalization is on but the track has no ReplayGain`() {
         `when`(botProps.normalization).thenReturn(true)
         val labeledTrack = track("[Some Label, v:42] Song")
+        `when`(audioPlayer.playingTrack).thenReturn(labeledTrack)
 
         player.onTrackStart(audioPlayer, labeledTrack)
         player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
@@ -311,6 +328,7 @@ class PlayerTest {
     @Test
     fun `queue-label volume is applied on a track with no label only as a no-op`() {
         val plainTrack = track("Song with no label")
+        `when`(audioPlayer.playingTrack).thenReturn(plainTrack)
 
         player.onTrackStart(audioPlayer, plainTrack)
         player.onTrackReplayGainResolved(audioPlayer, plainTrack, null)
@@ -322,6 +340,7 @@ class PlayerTest {
     fun `onTrackStart skips label-volume parsing while a fade-in is armed`() {
         player.isFadeInArmed = true
         val labeledTrack = track("[Some Label, v:42] Song")
+        `when`(audioPlayer.playingTrack).thenReturn(labeledTrack)
 
         player.onTrackStart(audioPlayer, labeledTrack)
         player.onTrackReplayGainResolved(audioPlayer, labeledTrack, null)
@@ -348,6 +367,7 @@ class PlayerTest {
         val labeled = track("[Some Label, v:42] Song")
         val clone = track("[Some Label, v:42] Song")
         `when`(labeled.makeClone()).thenReturn(clone)
+        `when`(audioPlayer.playingTrack).thenReturn(labeled)
 
         player.onTrackStart(audioPlayer, labeled)
         player.onTrackReplayGainResolved(audioPlayer, labeled, null)
@@ -364,11 +384,13 @@ class PlayerTest {
         val labeled = track("[Some Label, v:42] Song")
         val clone = track("[Some Label, v:42] Song")
         `when`(labeled.makeClone()).thenReturn(clone)
+        `when`(audioPlayer.playingTrack).thenReturn(labeled)
 
         player.onTrackStart(audioPlayer, labeled)
         player.onTrackReplayGainResolved(audioPlayer, labeled, null)
         player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
 
+        `when`(audioPlayer.playingTrack).thenReturn(clone)
         player.onTrackStart(audioPlayer, clone)
         player.onTrackReplayGainResolved(audioPlayer, clone, null)
 
@@ -381,6 +403,7 @@ class PlayerTest {
         val labeled = track("[Some Label, v:42] Song")
         val clone = track("[Some Label, v:42] Song")
         `when`(labeled.makeClone()).thenReturn(clone)
+        `when`(audioPlayer.playingTrack).thenReturn(labeled)
 
         player.onTrackStart(audioPlayer, labeled)
         player.onTrackReplayGainResolved(audioPlayer, labeled, null)
@@ -389,6 +412,7 @@ class PlayerTest {
         player.volume = 600
         player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
 
+        `when`(audioPlayer.playingTrack).thenReturn(clone)
         player.onTrackStart(audioPlayer, clone)
         player.onTrackReplayGainResolved(audioPlayer, clone, null)
 
@@ -403,6 +427,7 @@ class PlayerTest {
         val labeled = track("[Some Label, v:42] Song")
         val clone = track("[Some Label, v:42] Song")
         `when`(labeled.makeClone()).thenReturn(clone)
+        `when`(audioPlayer.playingTrack).thenReturn(labeled)
 
         player.onTrackStart(audioPlayer, labeled)
         player.onTrackReplayGainResolved(audioPlayer, labeled, null)
@@ -414,6 +439,7 @@ class PlayerTest {
         player.stop()
 
         val unrelated = track("[Other Label, v:30] Different Song")
+        `when`(audioPlayer.playingTrack).thenReturn(unrelated)
         player.onTrackStart(audioPlayer, unrelated)
         player.onTrackReplayGainResolved(audioPlayer, unrelated, null)
 
@@ -428,16 +454,19 @@ class PlayerTest {
         val second = track("[Some Label, v:42] Song")
         `when`(labeled.makeClone()).thenReturn(clone)
         `when`(clone.makeClone()).thenReturn(second)
+        `when`(audioPlayer.playingTrack).thenReturn(labeled)
 
         player.onTrackStart(audioPlayer, labeled)
         player.onTrackReplayGainResolved(audioPlayer, labeled, null)
         player.volume = 600
         player.onTrackEnd(audioPlayer, labeled, AudioTrackEndReason.FINISHED)
 
+        `when`(audioPlayer.playingTrack).thenReturn(clone)
         player.onTrackStart(audioPlayer, clone)
         player.onTrackReplayGainResolved(audioPlayer, clone, null)
         player.onTrackEnd(audioPlayer, clone, AudioTrackEndReason.FINISHED)
 
+        `when`(audioPlayer.playingTrack).thenReturn(second)
         player.onTrackStart(audioPlayer, second)
         player.onTrackReplayGainResolved(audioPlayer, second, null)
 
@@ -575,5 +604,96 @@ class PlayerTest {
         `when`(audioPlayer.playingTrack).thenReturn(clone2)
         player.onTrackStart(audioPlayer, clone2)
         verify(clone2, never()).position = 90_000L
+    }
+
+    @Test
+    fun `queue-label volume in userData applies when prependQueueLabelToTitle is false and survives repeat`() {
+        player.repeatTrack = true
+        val plainTitleTrack = track("Song Without Prepended Label")
+        plainTitleTrack.userData = TrackStartOffset(offsetMs = 0L, queueLabel = "[Ambience, v:35]")
+        val clone = track("Song Without Prepended Label")
+        `when`(plainTitleTrack.makeClone()).thenReturn(clone)
+
+        `when`(audioPlayer.playingTrack).thenReturn(plainTitleTrack)
+        player.onTrackStart(audioPlayer, plainTitleTrack)
+        player.onTrackReplayGainResolved(audioPlayer, plainTitleTrack, null)
+
+        verify(audioPlayer, times(1)).volume = 35
+        assertEquals(350, player.volume)
+
+        // Repeat pass preserves userData onto clone
+        player.onTrackEnd(audioPlayer, plainTitleTrack, AudioTrackEndReason.FINISHED)
+        `when`(audioPlayer.playingTrack).thenReturn(clone)
+        player.onTrackStart(audioPlayer, clone)
+        player.onTrackReplayGainResolved(audioPlayer, clone, null)
+
+        verify(audioPlayer, times(2)).volume = 35
+    }
+
+    @Test
+    fun `URL start offset in userData is preserved across repeatTrack, queueLooping, and skip looping`() {
+        val original = track("Plain URL Track")
+        original.userData = TrackStartOffset(offsetMs = 45_000L)
+        val loopClone = track("Plain URL Track")
+        val skipClone = track("Plain URL Track")
+        `when`(original.isSeekable).thenReturn(true)
+        `when`(loopClone.isSeekable).thenReturn(true)
+        `when`(skipClone.isSeekable).thenReturn(true)
+        `when`(original.duration).thenReturn(180_000L)
+        `when`(loopClone.duration).thenReturn(180_000L)
+        `when`(skipClone.duration).thenReturn(180_000L)
+        `when`(original.makeClone()).thenReturn(loopClone, skipClone)
+
+        // 1. Natural finish with queueLooping = true copies TrackStartOffset to loopClone
+        player.queueLooping = true
+        `when`(audioPlayer.playingTrack).thenReturn(original)
+        player.onTrackStart(audioPlayer, original)
+        verify(original, times(1)).position = 45_000L
+
+        player.onTrackEnd(audioPlayer, original, AudioTrackEndReason.FINISHED)
+        assertEquals(45_000L, loopClone.getUserData(TrackStartOffset::class.java)?.offsetMs)
+
+        `when`(audioPlayer.playingTrack).thenReturn(loopClone)
+        player.onTrackStart(audioPlayer, loopClone)
+        verify(loopClone, times(1)).position = 45_000L
+
+        // 2. Skipping with queueLooping = true also copies TrackStartOffset to skipClone
+        `when`(loopClone.makeClone()).thenReturn(skipClone)
+        player.skip(0..0)
+        assertEquals(45_000L, skipClone.getUserData(TrackStartOffset::class.java)?.offsetMs)
+    }
+
+    @Test
+    fun `onTrackReplayGainResolved ignores stale callback when playingTrack has already changed`() {
+        val trackA = track("[Old, v:25] Track A")
+        val trackB = track("[New, v:75] Track B")
+
+        `when`(audioPlayer.playingTrack).thenReturn(trackA)
+        player.onTrackStart(audioPlayer, trackA)
+
+        // Track B replaces Track A before Track A resolves ReplayGain
+        `when`(audioPlayer.playingTrack).thenReturn(trackB)
+        player.onTrackStart(audioPlayer, trackB)
+
+        // Stale callback from Track A must be ignored without clobbering Track B's pending volume
+        player.onTrackReplayGainResolved(audioPlayer, trackA, null)
+        verify(audioPlayer, never()).volume = 25
+
+        // Track B's callback still applies its 75% volume cleanly
+        player.onTrackReplayGainResolved(audioPlayer, trackB, null)
+        verify(audioPlayer, times(1)).volume = 75
+        assertEquals(750, player.volume)
+    }
+
+    @Test
+    fun `shuffle publishes updated player state`() {
+        val current = track("Current")
+        `when`(audioPlayer.playingTrack).thenReturn(current)
+        player.add(track("One"), track("Two"))
+        org.mockito.Mockito.clearInvocations(publisher)
+
+        player.shuffle()
+
+        verify(publisher, times(1)).publishUpdate(anyMatcher(), anyMatcher())
     }
 }

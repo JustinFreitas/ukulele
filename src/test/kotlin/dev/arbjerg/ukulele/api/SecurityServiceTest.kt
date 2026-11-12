@@ -93,11 +93,16 @@ class SecurityServiceTest {
         repeat(SecurityService.MAX_FAILURES) {
             service.registerFailedAttempt("8.8.8.8")
         }
+        repeat(SecurityService.MAX_WRITE_REQUESTS_15M + 1) {
+            service.isRateLimited("8.8.8.8", isWrite = true)
+        }
         assertTrue(service.isBanned("8.8.8.8"))
+        assertTrue(service.isRateLimited("8.8.8.8", isWrite = true))
 
         service.resetUnauthorized()
 
         assertEquals(0L, service.getUnauthorizedCount())
         assertFalse(service.isBanned("8.8.8.8"))
+        assertFalse(service.isRateLimited("8.8.8.8", isWrite = true))
     }
 }

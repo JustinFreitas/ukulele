@@ -63,7 +63,13 @@ class Player(
         Executors.newSingleThreadScheduledExecutor { runnable ->
             Thread(runnable, "ukulele-fade-$guildId").apply { isDaemon = true }
         }
-    private val pendingSkipStop = AtomicReference<ScheduledFuture<*>?>(null)
+
+    private data class PendingSkip(
+        val track: AudioTrack,
+        val future: ScheduledFuture<*>,
+    )
+
+    private val pendingSkip = AtomicReference<PendingSkip?>(null)
 
     private data class PendingSeek(
         val track: AudioTrack,
@@ -194,14 +200,17 @@ class Player(
 
     val tracks: List<AudioTrack> get() {
         val tracks = queue.tracks.toMutableList()
-        player.playingTrack?.let { tracks.add(0, it) }
+        val playing = player.playingTrack
+        if (playing != null && pendingSkip.get()?.track !== playing) {
+            tracks.add(0, playing)
+        }
         return tracks
     }
 
     val remainingDuration: Long get() {
         val playing = player.playingTrack
         val duration =
-            if (playing != null && !playing.info.isStream) {
+            if (playing != null && pendingSkip.get()?.track !== playing && !playing.info.isStream) {
                 (playing.info.length - effectivePosition(playing)).coerceAtLeast(0L)
             } else {
                 0L
@@ -231,7 +240,8 @@ class Player(
         set(value) {
             field = value
             if (!value) {
-                if (cancelPendingSkipStop()) {
+                val pendingSkipEntry = cancelPendingSkip()
+                if (pendingSkipEntry != null && player.playingTrack === pendingSkipEntry.track) {
                     player.stopTrack()
                 }
                 val pending = cancelPendingSeek()
@@ -256,15 +266,15 @@ class Player(
     @Volatile
     var isFadeInArmed: Boolean = false
 
-    private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[[^\\]]*[vV]:(\\d{1,3})[^\\]]*\\].*$")
+    private var queueLabelVolume: Pattern = Pattern.compile("^\\s*\\[[^\\]]*[vV]:(\\d{1,3})[^\\]]*\\]")
 
     private val fadeDurationMs: Long
         get() = beans.botProps.trackFadeDurationMs.takeIf { it > 0L } ?: 1500L
 
-    private fun cancelPendingSkipStop(): Boolean {
-        val existing = pendingSkipStop.getAndSet(null) ?: return false
-        existing.cancel(false)
-        return true
+    private fun cancelPendingSkip(): PendingSkip? {
+        val existing = pendingSkip.getAndSet(null) ?: return null
+        existing.future.cancel(false)
+        return existing
     }
 
     private fun cancelPendingSeek(): PendingSeek? {
@@ -273,8 +283,16 @@ class Player(
         return existing
     }
 
+    private fun AudioTrack.cloneWithUserData(): AudioTrack =
+        makeClone().also { clone ->
+            val data = this.userData ?: this.getUserData(TrackStartOffset::class.java)
+            if (data != null) {
+                clone.userData = data
+            }
+        }
+
     fun fadeOut() {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         val pending = cancelPendingSeek()
         if (pending != null && player.playingTrack === pending.track) {
             pending.track.position = pending.position
@@ -285,7 +303,7 @@ class Player(
     }
 
     fun fadeIn() {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         val pending = cancelPendingSeek()
         if (pending != null && player.playingTrack === pending.track) {
             activeFadeFilter?.prepareFadeInOnSeek()
@@ -333,24 +351,35 @@ class Player(
                 newRange.first - 1 until newRange.last
             }
         if (newRange.last >= 0) skipped.addAll(queue.removeRange(newRange))
+        val cancelledSkip =
+            if (skipped.isNotEmpty() && skipped.first() == player.playingTrack) {
+                cancelPendingSkip()
+            } else {
+                null
+            }
         if (queueLooping) {
             // With looping enabled, add a clone of each skipped AudioTrack to the end of the queue.
             skipped.forEach {
-                queue.add(it.makeClone())
+                if (it !== cancelledSkip?.track) {
+                    queue.add(it.cloneWithUserData())
+                }
             }
         }
         if (skipped.isNotEmpty() && skipped.first() == player.playingTrack) {
-            val wasWaitingForSkipFade = cancelPendingSkipStop()
+            val wasWaitingForSkipFade = cancelledSkip != null
             val wasWaitingForSeekFade = cancelPendingSeek() != null
             val filter = activeFadeFilter
             if (!wasWaitingForSkipFade && !wasWaitingForSeekFade && trackFade && !isFadedOut && !player.isPaused && filter != null) {
                 val expectedTrack = player.playingTrack
                 filter.targetGain = 0.0f
-                val futureRef = AtomicReference<ScheduledFuture<*>?>(null)
+                val pendingRef = AtomicReference<PendingSkip?>(null)
                 val scheduled =
                     skipFadeScheduler.schedule(
                         {
-                            pendingSkipStop.compareAndSet(futureRef.get(), null)
+                            val currentPending = pendingRef.get()
+                            if (currentPending != null) {
+                                pendingSkip.compareAndSet(currentPending, null)
+                            }
                             if (player.playingTrack === expectedTrack) {
                                 isFadedOut = true
                                 player.stopTrack()
@@ -359,8 +388,9 @@ class Player(
                         fadeDurationMs,
                         TimeUnit.MILLISECONDS,
                     )
-                futureRef.set(scheduled)
-                pendingSkipStop.set(scheduled)
+                val entry = PendingSkip(expectedTrack, scheduled)
+                pendingRef.set(entry)
+                pendingSkip.set(entry)
                 publishState()
             } else {
                 // Stopping the currently playing track will handle its removal from the queue.
@@ -372,7 +402,7 @@ class Player(
     }
 
     fun pause() {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         val pending = cancelPendingSeek()
         if (pending != null && player.playingTrack === pending.track) {
             pending.track.position = pending.position
@@ -389,11 +419,13 @@ class Player(
 
     fun shuffle() {
         queue.shuffle()
+        publishState()
     }
 
     fun stop() {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         cancelPendingSeek()
+        pendingLabelVolume = null
         isFadedOut = false
         activeFadeFilter = null
         queue.clear()
@@ -431,7 +463,7 @@ class Player(
 
     fun seek(position: Long) {
         val playing = player.playingTrack ?: return
-        if (pendingSkipStop.get() != null) return
+        if (pendingSkip.get() != null) return
 
         val clampedPos = position.coerceAtLeast(0L)
         if (activeTrackStartOffsetMs > 0L) {
@@ -491,7 +523,7 @@ class Player(
         player: AudioPlayer,
         track: AudioTrack,
     ) {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         cancelPendingSeek()
         if (beans.botProps.announceTracks) {
             lastChannel?.sendMessageEmbeds(beans.nowPlayingCommand.buildEmbed(track))?.queue()
@@ -509,16 +541,20 @@ class Player(
         suppressStartOffsetFor = null
         userSeekedBeforeStartOffset = suppressStartOffset
 
+        val existingMeta = track.getUserData(TrackStartOffset::class.java)
         val resolvedStartOffsetMs =
-            track.getUserData(TrackStartOffset::class.java)?.offsetMs
+            existingMeta?.offsetMs?.takeIf { it > 0L }
+                ?: existingMeta?.queueLabel?.let { TrackTimeParser.parseLabelOffsetMs(it) }
                 ?: TrackTimeParser.parseLabelOffsetMs(track.info.title)
                 ?: 0L
         activeTrackStartOffsetMs = resolvedStartOffsetMs
-        if (resolvedStartOffsetMs > 0L) {
-            track.userData = TrackStartOffset(resolvedStartOffsetMs)
-            if (!suppressStartOffset && track.isSeekable && (track.duration <= 0L || resolvedStartOffsetMs < track.duration)) {
-                track.position = resolvedStartOffsetMs
-            }
+        if (resolvedStartOffsetMs > 0L || existingMeta != null) {
+            track.userData = TrackStartOffset(offsetMs = resolvedStartOffsetMs, queueLabel = existingMeta?.queueLabel)
+        }
+        if (resolvedStartOffsetMs > 0L && !suppressStartOffset && track.isSeekable &&
+            (track.duration <= 0L || resolvedStartOffsetMs < track.duration)
+        ) {
+            track.position = resolvedStartOffsetMs
         }
 
         val stayFadedOutOnRepeat = isNaturalRepeat && isFadedOut
@@ -566,6 +602,7 @@ class Player(
         track: AudioTrack,
         gainDb: Float?,
     ) {
+        if (player.playingTrack !== track) return
         val labelVolume = pendingLabelVolume ?: return
         pendingLabelVolume = null
 
@@ -585,10 +622,18 @@ class Player(
      * the track.  It will be in the form "[Some Queue Label, v:42] TrackIdentifierUrlOrPath".  If found, the volume
      * will be set to that when the track starts.
      *
-     * @return the label volume as a percentage (1-150), or null if the title carries none.
+     * @return the label volume as a percentage (1-150), or null if neither stored metadata nor the title carries one.
      */
     private fun parseQueueLabelVolume(track: AudioTrack): Int? {
-        val matcher: Matcher = queueLabelVolume.matcher(track.info.title)
+        val labelFromMetadata = track.getUserData(TrackStartOffset::class.java)?.queueLabel
+        if (labelFromMetadata != null) {
+            parseQueueLabelVolumeFromText(labelFromMetadata)?.let { return it }
+        }
+        return parseQueueLabelVolumeFromText(track.info.title)
+    }
+
+    private fun parseQueueLabelVolumeFromText(text: String): Int? {
+        val matcher: Matcher = queueLabelVolume.matcher(text)
         if (!matcher.find() || matcher.group(1) == null) return null
 
         return matcher
@@ -616,11 +661,11 @@ class Player(
         track: AudioTrack,
         endReason: AudioTrackEndReason,
     ) {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         cancelPendingSeek()
         if (endReason.mayStartNext) {
             if (repeatTrack) {
-                val clone = track.makeClone()
+                val clone = track.cloneWithUserData()
                 naturalRepeatTrack = clone
                 // trackVolumeOverride is set when the label volume is applied and cleared by the volume setter, so a
                 // null here means the user changed the volume by hand during this pass. Keep their value on the next
@@ -633,7 +678,7 @@ class Player(
                 }
                 queue.addFirst(clone)
             } else if (queueLooping) {
-                queue.add(track.makeClone())
+                queue.add(track.cloneWithUserData())
             }
         }
 
@@ -670,7 +715,7 @@ class Player(
     }
 
     fun destroy() {
-        cancelPendingSkipStop()
+        cancelPendingSkip()
         cancelPendingSeek()
         skipFadeScheduler.shutdownNow()
         isFadedOut = false

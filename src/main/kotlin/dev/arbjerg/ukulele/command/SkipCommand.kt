@@ -99,10 +99,18 @@ class SkipCommand : Command("skip", "s") {
             }
         }
 
-    private fun CommandContext.listQueueIfLoopingEnabled(): String {
-        val totalDuration = player.remainingDuration
+    private fun CommandContext.remainingTracksAfterSkip(skipped: List<AudioTrack>): List<AudioTrack> {
         val tracks = player.tracks
-        return when (player.tracks.isNotEmpty() && player.queueLooping) {
+        return if (skipped.isNotEmpty() && tracks.firstOrNull() === skipped.first()) {
+            tracks.drop(1)
+        } else {
+            tracks
+        }
+    }
+
+    private fun CommandContext.listQueueIfLoopingEnabled(tracks: List<AudioTrack>): String {
+        val totalDuration = player.remainingDuration
+        return when (tracks.isNotEmpty() && player.queueLooping) {
             true -> {
                 buildString {
                     append("Queue:\n")
@@ -118,21 +126,22 @@ class SkipCommand : Command("skip", "s") {
     }
 
     private fun CommandContext.printSkipped(skipped: List<AudioTrack>) {
+        val remainingTracks = remainingTracksAfterSkip(skipped)
         val playing =
-            when (player.tracks.isEmpty()) {
+            when (remainingTracks.isEmpty()) {
                 true -> {
                     "The queue is empty and the player is stopped."
                 }
 
                 false -> {
                     "Playing " +
-                        player.tracks
+                        remainingTracks
                             .first()
                             .info.title
                 }
             }
 
-        val queue = listQueueIfLoopingEnabled()
+        val queue = listQueueIfLoopingEnabled(remainingTracks)
         var skippedMessage =
             when (skipped.size) {
                 0 -> {

@@ -84,5 +84,7 @@ class SecurityService {
         unauthorizedAttempts.set(0)
         failedAttempts.invalidateAll()
         bannedIps.invalidateAll()
+        readRateLimitCache.invalidateAll()
+        writeRateLimitCache.invalidateAll()
     }
 }

@@ -1,7 +1,6 @@
 [versions]
 kotlin = "2.4.21"
 springBoot = "4.1.2"
-springFramework = "7.0.7"
 jackson = "3.3.0"
 jacksonAnnotations = "2.23"
 netty = "4.2.20.Final"
@@ -35,7 +34,6 @@ netty-bom = { group = "io.netty", name = "netty-bom", version.ref = "netty" }
 # Spring Boot
 springboot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "springBoot" }
 springboot-starter-data-r2dbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-r2dbc", version.ref = "springBoot" }
-springboot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux", version.ref = "springBoot" }
 springboot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
 springboot-starter-websocket = { group = "org.springframework.boot", name = "spring-boot-starter-websocket", version.ref = "springBoot" }
 springboot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator", version.ref = "springBoot" }

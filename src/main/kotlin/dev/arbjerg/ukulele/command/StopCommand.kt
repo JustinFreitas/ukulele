@@ -10,8 +10,8 @@ class StopCommand : Command("stop") {
     override suspend fun CommandContext.invoke() {
         val skipped = player.tracks.size
 
-        player.stop()
         guild.audioManager.closeAudioConnection()
+        player.stop()
 
         reply("Player stopped. Removed **$skipped** tracks.")
     }

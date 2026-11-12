@@ -29,7 +29,7 @@ kotlin {
 }
 
 group = "dev.arbjerg"
-version = "2.28.0"
+version = "2.28.1"
 
 repositories {
     mavenLocal()
@@ -97,8 +97,6 @@ dependencies {
     implementation(libs.springboot.configuration.processor)
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
     implementation(libs.springboot.starter.data.r2dbc)
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-webflux
-    implementation(libs.springboot.starter.webflux)
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     implementation(libs.springboot.starter.web)
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket

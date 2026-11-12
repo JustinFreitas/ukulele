@@ -198,4 +198,30 @@ class AuthFilterTest {
 
         verify(securityService).isRateLimited("9.9.9.9", true)
     }
+
+    @Test
+    fun `write-rate-limited admin can still call security reset endpoint`() {
+        `when`(securityService.isRateLimited("9.9.9.9", true)).thenReturn(true)
+        val req = request(path = "/api/security/reset", method = "POST", authHeader = testApiToken)
+        val res = response()
+
+        filter.doFilter(req, res, chain)
+
+        verify(chain, times(1)).doFilter(req, res)
+    }
+
+    @Test
+    fun `collapsed slashes and matrix params on api paths still require authentication`() {
+        val slashBypassReq = request(path = "//api//status", authHeader = null)
+        val slashRes = response()
+        filter.doFilter(slashBypassReq, slashRes, chain)
+        verify(slashRes).status = 401
+        verify(chain, never()).doFilter(slashBypassReq, slashRes)
+
+        val matrixBypassReq = request(path = "/;v=1/api/status", authHeader = null)
+        val matrixRes = response()
+        filter.doFilter(matrixBypassReq, matrixRes, chain)
+        verify(matrixRes).status = 401
+        verify(chain, never()).doFilter(matrixBypassReq, matrixRes)
+    }
 }

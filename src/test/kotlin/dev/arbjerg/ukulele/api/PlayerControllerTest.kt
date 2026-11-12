@@ -158,8 +158,15 @@ class PlayerControllerTest {
             verify(player).shuffle()
 
             controller.stop(guildId)
-            verify(player).stop()
-            verify(audioManager).closeAudioConnection()
+            val order = org.mockito.Mockito.inOrder(audioManager, player)
+            order.verify(audioManager).closeAudioConnection()
+            order.verify(player).stop()
+
+            val targetChannel = mock(VoiceChannel::class.java)
+            `when`(guild.getVoiceChannelById("202")).thenReturn(targetChannel)
+            controller.move(guildId, MoveRequest("202"))
+            verify(audioManager).openAudioConnection(targetChannel)
+            verify(player).triggerStateUpdate()
 
             controller.fade(guildId, FadeRequest(true))
             verify(player).trackFade = true
