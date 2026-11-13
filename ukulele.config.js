@@ -1,3 +1,6 @@
+const path = require("path");
+const os = require("os");
+
 module.exports = {
   apps : [{
     name: "ukulele",
@@ -13,8 +16,14 @@ module.exports = {
     // warning from lavaplayer's native loader (matches bootRun's jvmArgs).
     // ZGC provides sub-millisecond GC pauses to eliminate Lavaplayer audio buffer underruns.
     interpreter_args: "--enable-native-access=ALL-UNNAMED -XX:+UseZGC -Xms64m -Xmx2g -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=256m -Djava.io.tmpdir=C:/Users/justi/AppData/Local/Temp -jar", // -> java --enable-native-access=ALL-UNNAMED -jar build\libs\ukulele.jar
+    max_memory_restart: "2500M",
     autorestart: true,          // pm2 owns the JVM PID, so crash-restart works
+    min_uptime: "10s",
+    max_restarts: 10,
+    exp_backoff_restart_delay: 200,
     watch: false,
+    out_file: path.join(os.homedir(), ".pm2", "logs", "ukulele-out.log"),
+    error_file: path.join(os.homedir(), ".pm2", "logs", "ukulele-error.log"),
     env: {
       TEMP: "C:\\Users\\justi\\AppData\\Local\\Temp",
       TMP: "C:\\Users\\justi\\AppData\\Local\\Temp"
