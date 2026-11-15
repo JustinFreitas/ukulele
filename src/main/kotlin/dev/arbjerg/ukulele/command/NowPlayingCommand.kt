@@ -22,8 +22,10 @@ import java.awt.Color
 class NowPlayingCommand
     @Autowired
     constructor(
-        @Autowired(required = false) private val localFileCache: LocalFileMemoryCache? = null,
+        @Autowired(required = false) private val localFileCache: LocalFileMemoryCache?,
     ) : Command("nowplaying", "np") {
+        constructor() : this(null)
+
         override suspend fun CommandContext.invoke() {
             val track = player.currentTrack ?: return reply("Not playing anything.")
 

@@ -13,8 +13,10 @@ class PlayerRegistry
     @Autowired
     constructor(
         val playerBeans: Player.Beans,
-        @Autowired(required = false) val localFileCache: LocalFileMemoryCache? = null,
+        @Autowired(required = false) val localFileCache: LocalFileMemoryCache?,
     ) : DisposableBean {
+        constructor(playerBeans: Player.Beans) : this(playerBeans, null)
+
         private val players = ConcurrentHashMap<Long, Player>()
 
         init {

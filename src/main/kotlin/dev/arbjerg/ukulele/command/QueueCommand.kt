@@ -17,8 +17,10 @@ class QueueCommand
     @Autowired
     constructor(
         private val botProps: BotProps,
-        @Autowired(required = false) private val localFileCache: LocalFileMemoryCache? = null,
+        @Autowired(required = false) private val localFileCache: LocalFileMemoryCache?,
     ) : Command("queue", "q", "list") {
+        constructor(botProps: BotProps) : this(botProps, null)
+
         private val pageSize = 10
 
         override suspend fun CommandContext.invoke() {

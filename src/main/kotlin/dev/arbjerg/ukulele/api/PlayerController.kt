@@ -40,8 +40,16 @@ class PlayerController
         val shardManager: ShardManager,
         val apm: AudioPlayerManager,
         val botProps: BotProps,
-        @Autowired(required = false) val localFileCache: LocalFileMemoryCache? = null,
+        @Autowired(required = false) val localFileCache: LocalFileMemoryCache?,
     ) : DisposableBean {
+        constructor(
+            playerRegistry: PlayerRegistry,
+            guildPropertiesService: GuildPropertiesService,
+            shardManager: ShardManager,
+            apm: AudioPlayerManager,
+            botProps: BotProps,
+        ) : this(playerRegistry, guildPropertiesService, shardManager, apm, botProps, null)
+
         private val log = org.slf4j.LoggerFactory.getLogger(PlayerController::class.java)
 
         @GetMapping("/guilds")

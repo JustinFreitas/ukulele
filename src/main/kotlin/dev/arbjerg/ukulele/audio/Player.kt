@@ -47,8 +47,17 @@ class Player(
             val botProps: BotProps,
             val publisher: PlayerEventPublisher,
             @org.springframework.context.annotation.Lazy val shardManager: net.dv8tion.jda.api.sharding.ShardManager,
-            @Autowired(required = false) val localFileCache: LocalFileMemoryCache? = null,
-        )
+            @Autowired(required = false) val localFileCache: LocalFileMemoryCache?,
+        ) {
+            constructor(
+                apm: AudioPlayerManager,
+                guildProperties: GuildPropertiesService,
+                nowPlayingCommand: NowPlayingCommand,
+                botProps: BotProps,
+                publisher: PlayerEventPublisher,
+                shardManager: net.dv8tion.jda.api.sharding.ShardManager,
+            ) : this(apm, guildProperties, nowPlayingCommand, botProps, publisher, shardManager, null)
+        }
 
     private val log: Logger = LoggerFactory.getLogger(Player::class.java)
 
