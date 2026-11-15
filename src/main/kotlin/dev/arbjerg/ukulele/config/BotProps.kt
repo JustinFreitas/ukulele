@@ -33,6 +33,8 @@ class BotProps(
     var trackFadeDurationMs: Long = 1500,
     var frameBufferDurationMs: Int = 300,
     var cacheLocalFilesInMemory: Boolean = true,
+    var preloadActiveTrackIntoMemory: Boolean = true,
+    var activeTrackPreloadTimeoutMs: Long = 30000,
     var maxCachedFileMb: Int = 1024,
     var maxTotalCacheMb: Int = 512,
     var prefetchStartupWaitMs: Long = 250,

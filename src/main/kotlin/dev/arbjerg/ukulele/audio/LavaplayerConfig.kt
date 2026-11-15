@@ -19,6 +19,9 @@ class LavaplayerConfig(
     fun playerManager(): AudioPlayerManager {
         val apm = DefaultAudioPlayerManager()
         apm.configuration.isReplayGainEnabled = botProps.normalization
+        if (botProps.cacheLocalFilesInMemory && botProps.preloadActiveTrackIntoMemory) {
+            apm.setTrackStuckThreshold(maxOf(10_000L, botProps.activeTrackPreloadTimeoutMs + 5_000L))
+        }
 
         apm.registerSourceManager(InMemoryLocalAudioSourceManager(localFileCache, botProps))
 

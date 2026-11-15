@@ -269,8 +269,10 @@ class LocalFileMemoryCache(
 
     /**
      * Opens a [SeekableInputStream] for `InMemoryLocalAudioTrack.process()`.
-     * Checks RAM first without querying disk attributes (so cached tracks play even if disk/SMB disconnects),
-     * awaits an in-flight prefetch up to `prefetchStartupWaitMs`, and falls back to disk streaming otherwise.
+     * Checks RAM first without querying disk attributes (so cached tracks play even if disk/SMB disconnects).
+     * When `preloadActiveTrackIntoMemory` is enabled (default), loads an uncached track into RAM before starting
+     * playback so Track #1 also plays from memory; otherwise awaits an in-flight prefetch up to
+     * `prefetchStartupWaitMs` and falls back to disk streaming on pass #1.
      */
     fun openPlaybackStream(file: File): Pair<SeekableInputStream, PlaybackSource> {
         if (!isEnabled || shuttingDown.get()) {
@@ -279,40 +281,162 @@ class LocalFileMemoryCache(
         }
 
         val key = LocalPathInputUtils.normalizeCacheKey(file.path)
-        var pendingFuture: CompletableFuture<ByteArray?>? = null
+        if (key == null) {
+            misses.incrementAndGet()
+            return LocalSeekableInputStream(file) to PlaybackSource.DISK
+        }
 
-        if (key != null) {
-            synchronized(cacheLock) {
-                val existing = entries[key]
-                if (existing != null) {
-                    existing.lastAccessedNanos = System.nanoTime()
-                    hits.incrementAndGet()
-                    return ByteArraySeekableInputStream(existing.bytes) to PlaybackSource.MEMORY
-                }
-                pendingFuture = inFlight[key]
+        var pendingFuture: CompletableFuture<ByteArray?>? = null
+        synchronized(cacheLock) {
+            val existing = entries[key]
+            if (existing != null) {
+                existing.lastAccessedNanos = System.nanoTime()
+                hits.incrementAndGet()
+                return ByteArraySeekableInputStream(existing.bytes) to PlaybackSource.MEMORY
+            }
+            pendingFuture = inFlight[key]
+            if (botProps.preloadActiveTrackIntoMemory && pendingFuture != null) {
+                pinnedKeys.add(key)
             }
         }
 
-        val waitMs = botProps.prefetchStartupWaitMs
         val future = pendingFuture
-        if (future != null && waitMs > 0L) {
-            try {
-                val loadedBytes = future.get(waitMs, TimeUnit.MILLISECONDS)
+        if (botProps.preloadActiveTrackIntoMemory) {
+            val timeoutMs = botProps.activeTrackPreloadTimeoutMs.coerceAtLeast(0L)
+            val preloadedBytes =
+                if (future != null && timeoutMs > 0L) {
+                    awaitInFlightBytes(future, timeoutMs)
+                } else if (timeoutMs > 0L) {
+                    loadSynchronouslyForActivePlayback(key = key, file = file, timeoutMs = timeoutMs)
+                } else {
+                    null
+                }
+            if (preloadedBytes != null) {
+                hits.incrementAndGet()
+                return ByteArraySeekableInputStream(preloadedBytes) to PlaybackSource.MEMORY
+            }
+        } else {
+            val waitMs = botProps.prefetchStartupWaitMs
+            if (future != null && waitMs > 0L) {
+                val loadedBytes = awaitInFlightBytes(future, waitMs)
                 if (loadedBytes != null) {
                     hits.incrementAndGet()
                     return ByteArraySeekableInputStream(loadedBytes) to PlaybackSource.MEMORY
                 }
-            } catch (_: TimeoutException) {
-                // Cold-start grace window elapsed; fall back to immediate disk stream for pass #1
-            } catch (_: InterruptedException) {
-                Thread.currentThread().interrupt()
-            } catch (_: ExecutionException) {
-                // Prefetch failed; fall back to disk
             }
         }
 
         misses.incrementAndGet()
         return LocalSeekableInputStream(file) to PlaybackSource.DISK
+    }
+
+    private fun awaitInFlightBytes(
+        future: CompletableFuture<ByteArray?>,
+        timeoutMs: Long,
+    ): ByteArray? =
+        try {
+            future.get(timeoutMs, TimeUnit.MILLISECONDS)
+        } catch (_: TimeoutException) {
+            null
+        } catch (_: InterruptedException) {
+            Thread.currentThread().interrupt()
+            null
+        } catch (_: ExecutionException) {
+            null
+        }
+
+    private fun loadSynchronouslyForActivePlayback(
+        key: String,
+        file: File,
+        timeoutMs: Long,
+    ): ByteArray? {
+        if (shuttingDown.get()) return null
+        val path: Path = LocalPathInputUtils.toNormalizedPathOrNull(file.path) ?: return null
+        val attrs =
+            try {
+                Files.readAttributes(path, BasicFileAttributes::class.java)
+            } catch (e: Exception) {
+                log.debug("Skipping active preload for unreadable local file {}: {}", file.path, e.message)
+                return null
+            }
+
+        if (!attrs.isRegularFile) return null
+        val size = attrs.size()
+        val lastMod = attrs.lastModifiedTime().toMillis()
+
+        if (size <= 0L || size > maxCachedFileBytes) {
+            synchronized(cacheLock) {
+                oversizedFiles[key] = UncacheableRecord(lastModifiedMillis = lastMod, length = size)
+            }
+            scheduleGuildStateNotify(immediate = false)
+            return null
+        }
+
+        var existingBytes: ByteArray? = null
+        var joinedFuture: CompletableFuture<ByteArray?>? = null
+        val ownFuture = CompletableFuture<ByteArray?>()
+        val reservedOwnLoad =
+            synchronized(cacheLock) {
+                if (shuttingDown.get()) {
+                    false
+                } else {
+                    val existing = entries[key]
+                    val activeFuture = inFlight[key]
+                    when {
+                        existing != null -> {
+                            existing.lastAccessedNanos = System.nanoTime()
+                            existingBytes = existing.bytes
+                            false
+                        }
+
+                        activeFuture != null -> {
+                            pinnedKeys.add(key)
+                            joinedFuture = activeFuture
+                            false
+                        }
+
+                        pinnedBytes + reservedInFlightBytes + size > effectiveMaxTotalBytes -> {
+                            false
+                        }
+
+                        else -> {
+                            evictUnpinnedLruUntilFitsLocked(size)
+                            if (pinnedBytes + lruBytes + reservedInFlightBytes + size > effectiveMaxTotalBytes) {
+                                false
+                            } else {
+                                pinnedKeys.add(key)
+                                if (pendingPrefetchKeySet.remove(key)) {
+                                    pendingPrefetchQueue.removeIf { it.key == key }
+                                }
+                                reservedInFlightBytes += size
+                                inFlight[key] = ownFuture
+                                true
+                            }
+                        }
+                    }
+                }
+            }
+
+        existingBytes?.let { return it }
+        joinedFuture?.let { return awaitInFlightBytes(it, timeoutMs) }
+        if (!reservedOwnLoad) return null
+
+        scheduleGuildStateNotify(immediate = false)
+        val deadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs)
+        return readAndCommitReservedFile(
+            key = key,
+            rawPath = file.path,
+            path = path,
+            size = size,
+            lastMod = lastMod,
+            future = ownFuture,
+            deadlineNanos = deadlineNanos,
+            checkCancel = {
+                if (Thread.currentThread().isInterrupted) {
+                    throw InterruptedException("Track preload interrupted")
+                }
+            },
+        )
     }
 
     /**
@@ -384,14 +508,32 @@ class LocalFileMemoryCache(
             if (shuttingDown.get()) return
             while (!shuttingDown.get()) {
                 coroutineContext.ensureActive()
+                var blockingLoad: CompletableFuture<ByteArray?>? = null
                 val target =
                     synchronized(cacheLock) {
-                        val next = pendingPrefetchQueue.pollFirst()
-                        if (next != null) {
-                            pendingPrefetchKeySet.remove(next.key)
+                        if (inFlight.size >= concurrency) {
+                            blockingLoad = inFlight.values.firstOrNull()
+                            null
+                        } else {
+                            val next = pendingPrefetchQueue.pollFirst()
+                            if (next != null) {
+                                pendingPrefetchKeySet.remove(next.key)
+                            }
+                            next
                         }
-                        next
-                    } ?: break
+                    }
+
+                val waitFuture = blockingLoad
+                if (waitFuture != null) {
+                    kotlinx.coroutines.runInterruptible {
+                        try {
+                            waitFuture.get(5, TimeUnit.SECONDS)
+                        } catch (_: Exception) {
+                        }
+                    }
+                    continue
+                }
+                if (target == null) break
 
                 prefetchSingleTarget(target)
             }
@@ -447,6 +589,29 @@ class LocalFileMemoryCache(
             return
         }
 
+        val cancelCtx = coroutineContext
+        readAndCommitReservedFile(
+            key = target.key,
+            rawPath = target.rawPath,
+            path = path,
+            size = size,
+            lastMod = lastMod,
+            future = future,
+            deadlineNanos = null,
+            checkCancel = { cancelCtx.ensureActive() },
+        )
+    }
+
+    private fun readAndCommitReservedFile(
+        key: String,
+        rawPath: String,
+        path: Path,
+        size: Long,
+        lastMod: Long,
+        future: CompletableFuture<ByteArray?>,
+        deadlineNanos: Long?,
+        checkCancel: () -> Unit,
+    ): ByteArray? {
         var loadedBytes: ByteArray? = null
         var reservationReleased = false
         try {
@@ -454,10 +619,15 @@ class LocalFileMemoryCache(
             var offset = 0
             Files.newInputStream(path).use { input ->
                 while (offset < buffer.size) {
-                    coroutineContext.ensureActive()
+                    checkCancel()
                     if (shuttingDown.get()) {
                         future.complete(null)
-                        return
+                        return null
+                    }
+                    if (deadlineNanos != null && System.nanoTime() >= deadlineNanos) {
+                        log.warn("Timed out preloading active track {} into memory; falling back to disk", rawPath)
+                        future.complete(null)
+                        return null
                     }
                     val chunkLen = minOf(PREFETCH_CHUNK_BYTES, buffer.size - offset)
                     val read = input.read(buffer, offset, chunkLen)
@@ -468,13 +638,13 @@ class LocalFileMemoryCache(
 
             if (offset != buffer.size) {
                 log.warn(
-                    "Truncated read while prefetching {} (expected {} bytes, got {}); discarding",
-                    target.rawPath,
+                    "Truncated read while caching {} (expected {} bytes, got {}); discarding",
+                    rawPath,
                     buffer.size,
                     offset,
                 )
                 future.complete(null)
-                return
+                return null
             }
 
             var stored = false
@@ -482,13 +652,13 @@ class LocalFileMemoryCache(
             synchronized(cacheLock) {
                 reservedInFlightBytes = (reservedInFlightBytes - size).coerceAtLeast(0L)
                 reservationReleased = true
-                inFlight.remove(target.key, future)
+                inFlight.remove(key, future)
 
                 if (!shuttingDown.get()) {
                     evictUnpinnedLruUntilFitsLocked(size)
                     if (pinnedBytes + lruBytes + reservedInFlightBytes + size <= effectiveMaxTotalBytes) {
-                        val isStillPinned = target.key in pinnedKeys
-                        val existing = entries.remove(target.key)
+                        val isStillPinned = key in pinnedKeys
+                        val existing = entries.remove(key)
                         if (existing != null) {
                             if (existing.pinned) {
                                 pinnedBytes = (pinnedBytes - existing.length).coerceAtLeast(0L)
@@ -496,10 +666,10 @@ class LocalFileMemoryCache(
                                 lruBytes = (lruBytes - existing.length).coerceAtLeast(0L)
                             }
                         }
-                        entries[target.key] =
+                        entries[key] =
                             CacheEntry(
-                                key = target.key,
-                                rawPath = target.rawPath,
+                                key = key,
+                                rawPath = rawPath,
                                 bytes = buffer,
                                 lastModifiedMillis = lastMod,
                                 length = size,
@@ -521,18 +691,29 @@ class LocalFileMemoryCache(
             if (stored) {
                 scheduleGuildStateNotify(immediate = drained)
             }
+            return loadedBytes
         } catch (t: kotlinx.coroutines.CancellationException) {
             future.complete(null)
             throw t
-        } catch (e: Exception) {
-            log.warn("Failed to prefetch local file {} into memory: {}", target.rawPath, e.message)
+        } catch (_: InterruptedException) {
+            Thread.currentThread().interrupt()
             future.complete(null)
+            return null
+        } catch (e: Exception) {
+            log.warn("Failed to cache local file {} into memory: {}", rawPath, e.message)
+            future.complete(null)
+            return null
         } finally {
+            var wakeWorker = false
             synchronized(cacheLock) {
                 if (!reservationReleased) {
                     reservedInFlightBytes = (reservedInFlightBytes - size).coerceAtLeast(0L)
                 }
-                inFlight.remove(target.key, future)
+                inFlight.remove(key, future)
+                wakeWorker = pendingPrefetchQueue.isNotEmpty()
+            }
+            if (wakeWorker && !shuttingDown.get()) {
+                prefetchSignal.trySend(Unit)
             }
         }
     }

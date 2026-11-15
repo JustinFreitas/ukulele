@@ -162,6 +162,67 @@ class InMemoryLocalAudioSourceManagerTest {
     }
 
     @Test
+    fun `preloads cold Track 1 into RAM before playback by default and supports opt-out disk cold start`(
+        @TempDir tempDir: Path,
+    ) {
+        val defaultProps =
+            BotProps().apply {
+                cacheLocalFilesInMemory = true
+                preloadActiveTrackIntoMemory = true
+                maxTotalCacheMb = 32
+                maxCachedFileMb = 16
+            }
+        val c1 = LocalFileMemoryCache(defaultProps)
+        cache = c1
+        val manager1 = DefaultAudioPlayerManager()
+        apm = manager1
+        val sm1 = InMemoryLocalAudioSourceManager(c1, defaultProps)
+        manager1.registerSourceManager(sm1)
+
+        val coldWav = tempDir.resolve("cold-first-track.wav").toFile()
+        writeValidWavFile(coldWav, sampleCount = 4000)
+
+        // Play cold WITHOUT calling reconcileAndPrefetch() beforehand (simulating Track #1 race)
+        val track1 = sm1.loadItem(manager1, AudioReference(coldWav.absolutePath, null)) as InMemoryLocalAudioTrack
+        val player1 = manager1.createPlayer()
+        player1.playTrack(track1)
+
+        val frameBuf = ByteBuffer.allocate(4096)
+        val frame = MutableAudioFrame().apply { setBuffer(frameBuf) }
+        var gotFrame = false
+        val deadline = System.currentTimeMillis() + 5000L
+        while (System.currentTimeMillis() < deadline) {
+            frameBuf.clear()
+            if (player1.provide(frame)) {
+                gotFrame = true
+                break
+            }
+            Thread.sleep(20L)
+        }
+        assertTrue(gotFrame)
+        assertEquals(PlaybackSource.MEMORY, track1.activePlaybackSource, "Cold Track #1 should preload into RAM first by default")
+        assertEquals("MEMORY", c1.trackCacheState(track1))
+        player1.destroy()
+        sm1.shutdown()
+        c1.destroy()
+
+        // Opt-out (preloadActiveTrackIntoMemory = false): cold Track #1 streams from DISK immediately on pass #1
+        val optOutProps =
+            BotProps().apply {
+                cacheLocalFilesInMemory = true
+                preloadActiveTrackIntoMemory = false
+                maxTotalCacheMb = 32
+                maxCachedFileMb = 16
+            }
+        val c2 = LocalFileMemoryCache(optOutProps)
+        cache = c2
+        val sm2 = InMemoryLocalAudioSourceManager(c2, optOutProps)
+        val (_, source2) = c2.openPlaybackStream(coldWav).also { it.first.close() }
+        assertEquals(PlaybackSource.DISK, source2, "Opting out of preloadActiveTrackIntoMemory should fall back to DISK on cold start")
+        sm2.shutdown()
+    }
+
+    @Test
     fun `recursively scans folders in natural alphanumeric order, ignores non-audio and corrupt files, and enforces maxFolderTracks`(
         @TempDir tempDir: Path,
     ) {
