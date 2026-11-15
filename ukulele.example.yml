@@ -25,6 +25,18 @@ config:
   youtubeRemoteCipherUrl: null
   youtubeRemoteCipherPassword: null
   youtubeRemoteCipherUserAgent: "ukulele"
+  # In-memory local audio cache & recursive directory queueing:
+  cacheLocalFilesInMemory: true # Prefetch queued local/UNC files into RAM and keep an LRU cache for instant re-queueing.
+  maxCachedFileMb: 1024 # Per-file cap (MB); larger files transparently stream from disk.
+  maxTotalCacheMb: 512 # Total Pinned + LRU cache budget (MB). ukulele.config.js auto-sizes JVM -Xmx & PM2 limits from this value.
+  prefetchStartupWaitMs: 250 # Max cold-start wait (ms) for Track #1 prefetch before falling back to disk on pass #1.
+  prefetchConcurrency: 1 # Sequential background reader threads (1 avoids HDD / SMB head thrashing).
+  recursiveFolderScan: true # Recursively queue audio files inside subdirectories when given a folder path.
+  maxFolderDepth: 8 # Maximum subfolder depth when scanning a directory.
+  maxFolderTracks: 500 # Maximum number of audio tracks loaded from a single folder path.
+  restrictDiscordLocalPathsToOwner: true # When ownerId is set, only the bot owner can queue local/UNC paths from Discord.
+  allowUncPaths: true # Allow owner/API to queue UNC network share paths (\\server\share\...).
+  allowedLocalPaths: [] # Optional allowlist of root directories; empty allows any readable path for owner/API.
 
 
 server:

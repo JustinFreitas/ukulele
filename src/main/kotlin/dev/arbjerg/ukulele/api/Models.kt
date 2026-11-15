@@ -9,6 +9,19 @@ data class GuildDto(
     val isPlaying: Boolean,
 )
 
+data class CacheStatsDto(
+    val enabled: Boolean,
+    val pinnedBytes: Long,
+    val lruBytes: Long,
+    val totalBytes: Long,
+    val maxBytes: Long,
+    val pinnedCount: Int,
+    val lruCount: Int,
+    val queuedLocalCount: Int,
+    val queuedInMemoryCount: Int,
+    val prefetchingCount: Int,
+)
+
 data class PlayerStatusDto(
     val guildId: String,
     @get:com.fasterxml.jackson.annotation.JsonProperty("isPaused")
@@ -27,6 +40,7 @@ data class PlayerStatusDto(
     val trackFade: Boolean = false,
     @get:com.fasterxml.jackson.annotation.JsonProperty("isFadedOut")
     val isFadedOut: Boolean = false,
+    val cacheStats: CacheStatsDto? = null,
 )
 
 data class TrackDto(
@@ -39,18 +53,23 @@ data class TrackDto(
     val isReplayGain: Boolean,
     /** Applied ReplayGain in dB, or null if none (only known once the track is playing). */
     val replayGainDb: Float?,
+    /** "MEMORY", "PREFETCHING", "DISK" for local tracks, or null for remote sources. */
+    val cacheState: String? = null,
 )
 
-fun AudioTrack.toDto(positionOverride: Long? = null) =
-    TrackDto(
-        title = info.title,
-        author = info.author,
-        uri = info.uri,
-        duration = duration,
-        position = positionOverride ?: position,
-        isReplayGain = isReplayGainApplied(),
-        replayGainDb = replayGainDb,
-    )
+fun AudioTrack.toDto(
+    positionOverride: Long? = null,
+    cacheState: String? = null,
+) = TrackDto(
+    title = info.title,
+    author = info.author,
+    uri = info.uri,
+    duration = duration,
+    position = positionOverride ?: position,
+    isReplayGain = isReplayGainApplied(),
+    replayGainDb = replayGainDb,
+    cacheState = cacheState,
+)
 
 data class VoiceChannelDto(
     val id: String,

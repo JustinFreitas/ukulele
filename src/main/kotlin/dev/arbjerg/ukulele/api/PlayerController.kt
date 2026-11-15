@@ -7,15 +7,19 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.audio.PlayerRegistry
 import dev.arbjerg.ukulele.audio.TrackStartOffset
-import dev.arbjerg.ukulele.audio.TrackTimeParser
+import dev.arbjerg.ukulele.audio.local.LocalFileMemoryCache
+import dev.arbjerg.ukulele.audio.local.LocalPathInputUtils
+import dev.arbjerg.ukulele.command.QueueCommand
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildPropertiesService
+import dev.arbjerg.ukulele.utils.TextUtils
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.beans.factory.DisposableBean
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,425 +32,448 @@ import kotlin.coroutines.resume
 
 @RestController
 @RequestMapping("/api")
-class PlayerController(
-    val playerRegistry: PlayerRegistry,
-    val guildPropertiesService: GuildPropertiesService,
-    val shardManager: ShardManager,
-    val apm: AudioPlayerManager,
-    val botProps: BotProps,
-) : DisposableBean {
-    private val log = org.slf4j.LoggerFactory.getLogger(PlayerController::class.java)
+class PlayerController
+    @Autowired
+    constructor(
+        val playerRegistry: PlayerRegistry,
+        val guildPropertiesService: GuildPropertiesService,
+        val shardManager: ShardManager,
+        val apm: AudioPlayerManager,
+        val botProps: BotProps,
+        @Autowired(required = false) val localFileCache: LocalFileMemoryCache? = null,
+    ) : DisposableBean {
+        private val log = org.slf4j.LoggerFactory.getLogger(PlayerController::class.java)
 
-    @GetMapping("/guilds")
-    fun getGuilds(): List<GuildDto> =
-        shardManager.guilds.map { guild ->
-            val player = playerRegistry.getExisting(guild.idLong)
-            val isPlaying = player?.currentTrack != null && !player.isPaused
-            GuildDto(guild.id, guild.name, isPlaying)
+        @GetMapping("/guilds")
+        fun getGuilds(): List<GuildDto> =
+            shardManager.guilds.map { guild ->
+                val player = playerRegistry.getExisting(guild.idLong)
+                val isPlaying = player?.currentTrack != null && !player.isPaused
+                GuildDto(guild.id, guild.name, isPlaying)
+            }
+
+        @GetMapping("/player/{guildId}")
+        suspend fun getPlayer(
+            @PathVariable guildId: Long,
+        ): PlayerStatusDto {
+            val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
+            val properties = guildPropertiesService.getAwait(guildId)
+            val player = playerRegistry.get(guild, properties)
+
+            val current = player.currentTrack
+            val dto =
+                PlayerStatusDto(
+                    guildId = guildId.toString(),
+                    isPaused = player.isPaused,
+                    volume = player.volume,
+                    repeatTrack = player.repeatTrack,
+                    queueLooping = player.queueLooping,
+                    currentTrack =
+                        current?.toDto(
+                            positionOverride = player.effectivePosition(current),
+                            cacheState = localFileCache?.trackCacheState(current),
+                        ),
+                    remainingDuration = player.remainingDuration,
+                    minVolume = botProps.minVolume,
+                    maxVolume = botProps.maxVolume,
+                    isReplayGainEnabled = botProps.normalization,
+                    queueSize = player.upcomingTracks.size,
+                    channelId = guild.audioManager.connectedChannel?.id,
+                    trackFade = player.trackFade,
+                    isFadedOut = player.isFadedOut,
+                    cacheStats = localFileCache?.getStats(player.activeTracksForCacheSnapshot()),
+                )
+            return dto
         }
 
-    @GetMapping("/player/{guildId}")
-    suspend fun getPlayer(
-        @PathVariable guildId: Long,
-    ): PlayerStatusDto {
-        val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
-        val properties = guildPropertiesService.getAwait(guildId)
-        val player = playerRegistry.get(guild, properties)
+        @GetMapping("/player/{guildId}/queue")
+        suspend fun getQueue(
+            @PathVariable guildId: Long,
+        ): List<TrackDto> {
+            val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
+            val properties = guildPropertiesService.getAwait(guildId)
+            val player = playerRegistry.get(guild, properties)
+            return player.upcomingTracks.map { it.toDto(cacheState = localFileCache?.trackCacheState(it)) }
+        }
 
-        val current = player.currentTrack
-        val dto =
-            PlayerStatusDto(
-                guildId = guildId.toString(),
-                isPaused = player.isPaused,
-                volume = player.volume,
-                repeatTrack = player.repeatTrack,
-                queueLooping = player.queueLooping,
-                currentTrack = current?.toDto(player.effectivePosition(current)),
-                remainingDuration = player.remainingDuration,
-                minVolume = botProps.minVolume,
-                maxVolume = botProps.maxVolume,
-                isReplayGainEnabled = botProps.normalization,
-                queueSize = player.upcomingTracks.size,
-                channelId = guild.audioManager.connectedChannel?.id,
-                trackFade = player.trackFade,
-                isFadedOut = player.isFadedOut,
+        @GetMapping("/player/{guildId}/channels")
+        fun getChannels(
+            @PathVariable guildId: Long,
+        ): List<VoiceChannelDto> {
+            val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
+            return guild.voiceChannels.map { VoiceChannelDto(it.id, it.name) }
+        }
+
+        private fun getChannel(
+            guild: net.dv8tion.jda.api.entities.Guild,
+            channelId: String?,
+        ): net.dv8tion.jda.api.entities.channel.middleman.AudioChannel? {
+            if (channelId == "owner" && botProps.ownerId.isNotEmpty()) {
+                val member = guild.getMemberById(botProps.ownerId)
+                return member?.voiceState?.channel
+            }
+            return if (!channelId.isNullOrEmpty()) {
+                guild.getVoiceChannelById(channelId)
+            } else {
+                guild.voiceChannels.firstOrNull()
+            }
+        }
+
+        private val scope =
+            kotlinx.coroutines.CoroutineScope(
+                kotlinx.coroutines.Dispatchers.IO + SupervisorJob() +
+                    kotlinx.coroutines.CoroutineExceptionHandler { _, t ->
+                        log.error("Unhandled error in PlayerController scope", t)
+                    },
             )
-        if (dto.currentTrack != null) {
-            // Logging removed
+
+        @PostMapping("/player/{guildId}/play")
+        fun play(
+            @PathVariable guildId: Long,
+            @RequestBody body: PlayRequest,
+        ): org.springframework.http.ResponseEntity<Unit> {
+            scope.launch {
+                try {
+                    resolveAndPlay(guildId, body)
+                } catch (e: Exception) {
+                    log.error("Failed to run resolveAndPlay asynchronously", e)
+                }
+            }
+            return org.springframework.http.ResponseEntity
+                .accepted()
+                .build()
         }
-        return dto
-    }
 
-    @GetMapping("/player/{guildId}/queue")
-    suspend fun getQueue(
-        @PathVariable guildId: Long,
-    ): List<TrackDto> {
-        val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
-        val properties = guildPropertiesService.getAwait(guildId)
-        val player = playerRegistry.get(guild, properties)
-        return player.upcomingTracks.map { it.toDto() }
-    }
+        private suspend fun resolveAndPlay(
+            guildId: Long,
+            body: PlayRequest,
+        ) {
+            val guild =
+                shardManager.getGuildById(guildId) ?: run {
+                    log.error("Guild $guildId not found for play request")
+                    return
+                }
+            val properties = guildPropertiesService.getAwait(guildId)
+            val player = playerRegistry.get(guild, properties)
 
-    @GetMapping("/player/{guildId}/channels")
-    fun getChannels(
-        @PathVariable guildId: Long,
-    ): List<VoiceChannelDto> {
-        val guild = shardManager.getGuildById(guildId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Guild not found")
-        return guild.voiceChannels.map { VoiceChannelDto(it.id, it.name) }
-    }
+            // Ensure connected to voice
+            val channelId = body.channelId
+            if (!guild.audioManager.isConnected) {
+                val channel = getChannel(guild, channelId)
+                if (channel != null) {
+                    guild.audioManager.openAudioConnection(channel)
+                    guild.audioManager.sendingHandler = player
+                }
+            }
 
-    private fun getChannel(
-        guild: net.dv8tion.jda.api.entities.Guild,
-        channelId: String?,
-    ): net.dv8tion.jda.api.entities.channel.middleman.AudioChannel? {
-        if (channelId == "owner" && botProps.ownerId.isNotEmpty()) {
-            val member = guild.getMemberById(botProps.ownerId)
-            return member?.voiceState?.channel
-        }
-        return if (!channelId.isNullOrEmpty()) {
-            guild.getVoiceChannelById(channelId)
-        } else {
-            guild.voiceChannels.firstOrNull()
-        }
-    }
+            if (body.fadeIn == true) {
+                player.isFadeInArmed = true
+            }
 
-    private val scope =
-        kotlinx.coroutines.CoroutineScope(
-            kotlinx.coroutines.Dispatchers.IO + SupervisorJob() +
-                kotlinx.coroutines.CoroutineExceptionHandler { _, t ->
-                    log.error("Unhandled error in PlayerController scope", t)
-                },
-        )
+            val rawUrl = body.url?.trim() ?: ""
+            val identifiers =
+                if (rawUrl.isEmpty()) {
+                    botProps.playlist.split("|")
+                } else {
+                    rawUrl.split("|")
+                }
 
-    @PostMapping("/player/{guildId}/play")
-    fun play(
-        @PathVariable guildId: Long,
-        @RequestBody body: PlayRequest,
-    ): org.springframework.http.ResponseEntity<Unit> {
-        scope.launch {
-            try {
-                resolveAndPlay(guildId, body)
-            } catch (e: Exception) {
-                log.error("Failed to run resolveAndPlay asynchronously", e)
+            val errors = mutableListOf<String>()
+
+            // Resolve every identifier first, accumulating the tracks, then add them to the queue in a
+            // single bulk operation (one queue insert + one websocket player-status update).
+            val accepted = mutableListOf<AudioTrack>()
+
+            fun labelled(
+                track: AudioTrack,
+                queueLabel: String,
+                startOffsetMs: Long?,
+            ): AudioTrack {
+                if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
+                    track.info.title = "$queueLabel - ${track.info.title}"
+                }
+                val normalizedOffsetMs = startOffsetMs?.takeIf { it > 0L } ?: 0L
+                val normalizedLabel = queueLabel.takeIf { it.isNotEmpty() }
+                if (normalizedOffsetMs > 0L || normalizedLabel != null) {
+                    track.userData = TrackStartOffset(offsetMs = normalizedOffsetMs, queueLabel = normalizedLabel)
+                }
+                return track
+            }
+
+            identifiers.forEach { rawIdentifier ->
+                val trimmed = rawIdentifier.trim()
+                if (trimmed.isEmpty()) return@forEach
+
+                val parsed = LocalPathInputUtils.parsePlayIdentifier(trimmed)
+                val queueLabel = parsed?.queueLabel ?: ""
+                val source = parsed?.source ?: LocalPathInputUtils.stripWrappingQuotesAndAngles(trimmed)
+                val startOffsetMs = parsed?.startOffsetMs
+
+                if (source.isNotEmpty()) {
+                    val denial =
+                        LocalPathInputUtils.checkPathAccess(
+                            source = source,
+                            botProps = botProps,
+                            isDiscordInvoker = false,
+                            invokerId = null,
+                        )
+                    if (denial != null) {
+                        log.warn("Denied play source '{}': {}", source, denial)
+                        errors.add(denial)
+                        return@forEach
+                    }
+
+                    val loaded =
+                        kotlinx.coroutines.withTimeoutOrNull(45_000L) {
+                            suspendCancellableCoroutine<Unit> { cont ->
+                                apm.loadItemOrdered(
+                                    player,
+                                    source,
+                                    object : AudioLoadResultHandler {
+                                        override fun trackLoaded(track: AudioTrack) {
+                                            if (cont.isActive) {
+                                                accepted.add(labelled(track, queueLabel, startOffsetMs))
+                                                cont.resume(Unit)
+                                            }
+                                        }
+
+                                        override fun playlistLoaded(playlist: AudioPlaylist) {
+                                            if (cont.isActive) {
+                                                if (playlist.isSearchResult) {
+                                                    playlist.tracks.firstOrNull()?.let {
+                                                        accepted.add(labelled(it, queueLabel, startOffsetMs))
+                                                    }
+                                                } else {
+                                                    playlist.tracks.forEach {
+                                                        accepted.add(labelled(it, queueLabel, null))
+                                                    }
+                                                }
+                                                cont.resume(Unit)
+                                            }
+                                        }
+
+                                        override fun noMatches() {
+                                            if (cont.isActive) {
+                                                log.warn("No matches found for source: {}", source)
+                                                errors.add("Nothing found for '${TextUtils.truncate(source, 120)}'")
+                                                cont.resume(Unit)
+                                            }
+                                        }
+
+                                        override fun loadFailed(exception: FriendlyException) {
+                                            if (cont.isActive) {
+                                                log.error("Load failed for source: {}", source, exception)
+                                                errors.add(
+                                                    "Failed to load '${TextUtils.truncate(
+                                                        source,
+                                                        100,
+                                                    )}': ${TextUtils.truncate(exception.message ?: "Unknown error", 150)}",
+                                                )
+                                                cont.resume(Unit)
+                                            }
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                    if (loaded == null) {
+                        log.warn("Timed out loading source: {}", source)
+                        errors.add("Timed out loading '${TextUtils.truncate(source, 120)}'")
+                    }
+                }
+            }
+
+            if (accepted.isNotEmpty()) {
+                player.add(*accepted.toTypedArray())
+            }
+
+            if (errors.isNotEmpty()) {
+                log.warn("Some load errors occurred while processing play request for guild $guildId: {}", errors.joinToString("; "))
+                val shown = errors.take(5)
+                val suffix = if (errors.size > shown.size) "\n…and ${errors.size - shown.size} more error(s)." else ""
+                val discordMsg =
+                    TextUtils.truncate(
+                        "Failed to load some tracks:\n" + shown.joinToString("\n") + suffix,
+                        QueueCommand.MAX_DISCORD_MESSAGE_LEN,
+                    )
+                player.lastChannel?.sendMessage(discordMsg)?.queue()
             }
         }
-        return org.springframework.http.ResponseEntity
-            .accepted()
-            .build()
-    }
 
-    private suspend fun resolveAndPlay(
-        guildId: Long,
-        body: PlayRequest,
-    ) {
-        val guild =
-            shardManager.getGuildById(guildId) ?: run {
-                log.error("Guild $guildId not found for play request")
-                return
+        @PostMapping("/player/{guildId}/pause")
+        suspend fun pause(
+            @PathVariable guildId: Long,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).pause()
+        }
+
+        @PostMapping("/player/{guildId}/resume")
+        suspend fun resume(
+            @PathVariable guildId: Long,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).resume()
+        }
+
+        @PostMapping("/player/{guildId}/skip")
+        suspend fun skip(
+            @PathVariable guildId: Long,
+            @RequestBody(required = false) body: SkipRequest?,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val index = body?.index
+            val range = if (index != null && index >= 0) 0..index else 0..0
+            playerRegistry.get(guild, properties).skip(range)
+        }
+
+        @PostMapping("/player/{guildId}/volume")
+        suspend fun setVolume(
+            @PathVariable guildId: Long,
+            @RequestBody body: VolumeRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val volume = body.volume.coerceIn(0, 1500)
+            playerRegistry.get(guild, properties).volume = volume
+        }
+
+        @PostMapping("/player/{guildId}/stop")
+        suspend fun stop(
+            @PathVariable guildId: Long,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            guild.audioManager.closeAudioConnection()
+            playerRegistry.get(guild, properties).stop()
+        }
+
+        @PostMapping("/player/{guildId}/shuffle")
+        suspend fun shuffle(
+            @PathVariable guildId: Long,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).shuffle()
+        }
+
+        @PostMapping("/player/{guildId}/repeat")
+        suspend fun repeat(
+            @PathVariable guildId: Long,
+            @RequestBody body: RepeatRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val isRepeat = body.repeat
+            playerRegistry.get(guild, properties).repeatTrack = isRepeat
+        }
+
+        @PostMapping("/player/{guildId}/loop")
+        suspend fun loop(
+            @PathVariable guildId: Long,
+            @RequestBody body: LoopRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val isLoop = body.loop
+            playerRegistry.get(guild, properties).queueLooping = isLoop
+        }
+
+        @PostMapping("/player/{guildId}/fade")
+        suspend fun fade(
+            @PathVariable guildId: Long,
+            @RequestBody body: FadeRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).trackFade = body.fade
+        }
+
+        @PostMapping("/player/{guildId}/fade-out")
+        suspend fun fadeOut(
+            @PathVariable guildId: Long,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).fadeOut()
+        }
+
+        @PostMapping("/player/{guildId}/fade-in")
+        suspend fun fadeIn(
+            @PathVariable guildId: Long,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).fadeIn()
+        }
+
+        @PostMapping("/player/{guildId}/seek")
+        suspend fun seek(
+            @PathVariable guildId: Long,
+            @RequestBody body: SeekRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val position = body.position
+            playerRegistry.get(guild, properties).seek(position)
+        }
+
+        @PostMapping("/player/{guildId}/say")
+        suspend fun say(
+            @PathVariable guildId: Long,
+            @RequestBody body: SayRequest,
+        ) {
+            if (body.text.isBlank() || body.text.length > 2000) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Text must be between 1 and 2000 characters")
             }
-        val properties = guildPropertiesService.getAwait(guildId)
-        val player = playerRegistry.get(guild, properties)
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val player = playerRegistry.get(guild, properties)
+            // Only say if there is a text channel the bot last spoke in
+            player.lastChannel?.sendMessage(body.text)?.queue()
+        }
 
-        // Ensure connected to voice
-        val channelId = body.channelId
-        if (!guild.audioManager.isConnected) {
+        @PostMapping("/player/{guildId}/move")
+        suspend fun move(
+            @PathVariable guildId: Long,
+            @RequestBody body: MoveRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            val player = playerRegistry.get(guild, properties)
+            val channelId = body.channelId
             val channel = getChannel(guild, channelId)
             if (channel != null) {
                 guild.audioManager.openAudioConnection(channel)
                 guild.audioManager.sendingHandler = player
+                player.triggerStateUpdate()
             }
         }
 
-        if (body.fadeIn == true) {
-            player.isFadeInArmed = true
+        @PostMapping("/player/{guildId}/remove")
+        suspend fun remove(
+            @PathVariable guildId: Long,
+            @RequestBody body: RemoveRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).removeTrackAt(body.index)
         }
 
-        var identifiers = (body.url ?: "").split("|")
-        if (identifiers.isNotEmpty() && identifiers.first().isEmpty()) {
-            identifiers = botProps.playlist.split("|")
+        @PostMapping("/player/{guildId}/reorder")
+        suspend fun reorder(
+            @PathVariable guildId: Long,
+            @RequestBody body: ReorderRequest,
+        ) {
+            val guild = shardManager.getGuildById(guildId) ?: return
+            val properties = guildPropertiesService.getAwait(guildId)
+            playerRegistry.get(guild, properties).reorderQueue(body.fromIndex, body.toIndex)
         }
 
-        val pattern =
-            java.util.regex.Pattern
-                .compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
-        val errors = mutableListOf<String>()
-
-        // Resolve every identifier first, accumulating the tracks, then add them to the queue in a
-        // single bulk operation (one queue insert + one websocket player-status update).
-        val accepted = mutableListOf<AudioTrack>()
-
-        fun labelled(
-            track: AudioTrack,
-            queueLabel: String,
-            startOffsetMs: Long?,
-        ): AudioTrack {
-            if (botProps.prependQueueLabelToTitle && queueLabel.isNotEmpty()) {
-                track.info.title = "$queueLabel - ${track.info.title}"
-            }
-            val normalizedOffsetMs = startOffsetMs?.takeIf { it > 0L } ?: 0L
-            val normalizedLabel = queueLabel.takeIf { it.isNotEmpty() }
-            if (normalizedOffsetMs > 0L || normalizedLabel != null) {
-                track.userData = TrackStartOffset(offsetMs = normalizedOffsetMs, queueLabel = normalizedLabel)
-            }
-            return track
-        }
-
-        identifiers.forEach { identifier ->
-            val matcher = pattern.matcher(identifier)
-            var source = identifier
-            var queueLabel = ""
-            if (matcher.find() && matcher.groupCount() == 2) {
-                if (matcher.group(1) != null) queueLabel = matcher.group(1).trim()
-                if (matcher.group(2) != null) source = matcher.group(2)
-            } else {
-                log.warn("Pattern match failed for identifier: '{}', attempting to load as raw URL", identifier)
-            }
-
-            val rawSource = source.trim().removePrefix("<").removeSuffix(">")
-            val (cleanSource, urlOffsetMs) = TrackTimeParser.extractSourceAndOffset(rawSource)
-            val startOffsetMs = TrackTimeParser.parseLabelOffsetMs(queueLabel) ?: urlOffsetMs
-            source = cleanSource
-
-            if (source.isNotEmpty()) {
-                val loaded =
-                    kotlinx.coroutines.withTimeoutOrNull(45_000L) {
-                        suspendCancellableCoroutine<Unit> { cont ->
-                            apm.loadItemOrdered(
-                                player,
-                                source,
-                                object : AudioLoadResultHandler {
-                                    override fun trackLoaded(track: AudioTrack) {
-                                        if (cont.isActive) {
-                                            accepted.add(labelled(track, queueLabel, startOffsetMs))
-                                            cont.resume(Unit)
-                                        }
-                                    }
-
-                                    override fun playlistLoaded(playlist: AudioPlaylist) {
-                                        if (cont.isActive) {
-                                            if (playlist.isSearchResult) {
-                                                playlist.tracks.firstOrNull()?.let {
-                                                    accepted.add(labelled(it, queueLabel, startOffsetMs))
-                                                }
-                                            } else {
-                                                playlist.tracks.forEach {
-                                                    accepted.add(labelled(it, queueLabel, null))
-                                                }
-                                            }
-                                            cont.resume(Unit)
-                                        }
-                                    }
-
-                                    override fun noMatches() {
-                                        if (cont.isActive) {
-                                            log.warn("No matches found for source: {}", source)
-                                            errors.add("Nothing found for '$source'")
-                                            cont.resume(Unit)
-                                        }
-                                    }
-
-                                    override fun loadFailed(exception: FriendlyException) {
-                                        if (cont.isActive) {
-                                            log.error("Load failed for source: {}", source, exception)
-                                            errors.add("Failed to load '$source': ${exception.message}")
-                                            cont.resume(Unit)
-                                        }
-                                    }
-                                },
-                            )
-                        }
-                    }
-                if (loaded == null) {
-                    log.warn("Timed out loading source: {}", source)
-                    errors.add("Timed out loading '$source'")
-                }
-            }
-        }
-
-        if (accepted.isNotEmpty()) {
-            player.add(*accepted.toTypedArray())
-        }
-
-        if (errors.isNotEmpty()) {
-            log.warn("Some load errors occurred while processing play request for guild $guildId: {}", errors.joinToString("; "))
-            player.lastChannel?.sendMessage("Failed to load some tracks:\n" + errors.joinToString("\n"))?.queue()
+        override fun destroy() {
+            scope.cancel()
         }
     }
-
-    @PostMapping("/player/{guildId}/pause")
-    suspend fun pause(
-        @PathVariable guildId: Long,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).pause()
-    }
-
-    @PostMapping("/player/{guildId}/resume")
-    suspend fun resume(
-        @PathVariable guildId: Long,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).resume()
-    }
-
-    @PostMapping("/player/{guildId}/skip")
-    suspend fun skip(
-        @PathVariable guildId: Long,
-        @RequestBody(required = false) body: SkipRequest?,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val index = body?.index
-        val range = if (index != null && index >= 0) 0..index else 0..0
-        playerRegistry.get(guild, properties).skip(range)
-    }
-
-    @PostMapping("/player/{guildId}/volume")
-    suspend fun setVolume(
-        @PathVariable guildId: Long,
-        @RequestBody body: VolumeRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val volume = body.volume.coerceIn(0, 1500)
-        playerRegistry.get(guild, properties).volume = volume
-    }
-
-    @PostMapping("/player/{guildId}/stop")
-    suspend fun stop(
-        @PathVariable guildId: Long,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        guild.audioManager.closeAudioConnection()
-        playerRegistry.get(guild, properties).stop()
-    }
-
-    @PostMapping("/player/{guildId}/shuffle")
-    suspend fun shuffle(
-        @PathVariable guildId: Long,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).shuffle()
-    }
-
-    @PostMapping("/player/{guildId}/repeat")
-    suspend fun repeat(
-        @PathVariable guildId: Long,
-        @RequestBody body: RepeatRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val isRepeat = body.repeat
-        playerRegistry.get(guild, properties).repeatTrack = isRepeat
-    }
-
-    @PostMapping("/player/{guildId}/loop")
-    suspend fun loop(
-        @PathVariable guildId: Long,
-        @RequestBody body: LoopRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val isLoop = body.loop
-        playerRegistry.get(guild, properties).queueLooping = isLoop
-    }
-
-    @PostMapping("/player/{guildId}/fade")
-    suspend fun fade(
-        @PathVariable guildId: Long,
-        @RequestBody body: FadeRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).trackFade = body.fade
-    }
-
-    @PostMapping("/player/{guildId}/fade-out")
-    suspend fun fadeOut(
-        @PathVariable guildId: Long,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).fadeOut()
-    }
-
-    @PostMapping("/player/{guildId}/fade-in")
-    suspend fun fadeIn(
-        @PathVariable guildId: Long,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).fadeIn()
-    }
-
-    @PostMapping("/player/{guildId}/seek")
-    suspend fun seek(
-        @PathVariable guildId: Long,
-        @RequestBody body: SeekRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val position = body.position
-        playerRegistry.get(guild, properties).seek(position)
-    }
-
-    @PostMapping("/player/{guildId}/say")
-    suspend fun say(
-        @PathVariable guildId: Long,
-        @RequestBody body: SayRequest,
-    ) {
-        if (body.text.isBlank() || body.text.length > 2000) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Text must be between 1 and 2000 characters")
-        }
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val player = playerRegistry.get(guild, properties)
-        // Only say if there is a text channel the bot last spoke in
-        player.lastChannel?.sendMessage(body.text)?.queue()
-    }
-
-    @PostMapping("/player/{guildId}/move")
-    suspend fun move(
-        @PathVariable guildId: Long,
-        @RequestBody body: MoveRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        val player = playerRegistry.get(guild, properties)
-        val channelId = body.channelId
-        val channel = getChannel(guild, channelId)
-        if (channel != null) {
-            guild.audioManager.openAudioConnection(channel)
-            guild.audioManager.sendingHandler = player
-            player.triggerStateUpdate()
-        }
-    }
-
-    @PostMapping("/player/{guildId}/remove")
-    suspend fun remove(
-        @PathVariable guildId: Long,
-        @RequestBody body: RemoveRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).removeTrackAt(body.index)
-    }
-
-    @PostMapping("/player/{guildId}/reorder")
-    suspend fun reorder(
-        @PathVariable guildId: Long,
-        @RequestBody body: ReorderRequest,
-    ) {
-        val guild = shardManager.getGuildById(guildId) ?: return
-        val properties = guildPropertiesService.getAwait(guildId)
-        playerRegistry.get(guild, properties).reorderQueue(body.fromIndex, body.toIndex)
-    }
-
-    override fun destroy() {
-        scope.cancel()
-    }
-}

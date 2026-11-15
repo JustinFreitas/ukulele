@@ -82,4 +82,15 @@ class QueueCommandTest {
         assertTrue(message.contains("**Upcoming** `[01:00]` `🔊 RG`"))
         assertTrue(!message.contains("**Current** `[01:00]` `🔊 RG`"))
     }
+
+    @Test
+    fun `printQueue stays strictly under Discord 2000 char limit even with 500 long-titled tracks`() {
+        val botProps = BotProps().apply { normalization = true }
+        val command = QueueCommand(botProps)
+        val longTitle = "[Massive Dungeon Campaign Ambience Label, v:65] " + "A".repeat(220)
+        val tracks = (1..500).map { track("$longTitle #$it") }
+        val message = command.printQueue(player(tracks), 1)
+
+        assertTrue(message.length <= QueueCommand.MAX_DISCORD_MESSAGE_LEN)
+    }
 }

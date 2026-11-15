@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame
 import dev.arbjerg.ukulele.api.PlayerEventPublisher
 import dev.arbjerg.ukulele.api.PlayerStatusDto
 import dev.arbjerg.ukulele.api.toDto
+import dev.arbjerg.ukulele.audio.local.LocalFileMemoryCache
 import dev.arbjerg.ukulele.command.NowPlayingCommand
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.data.GuildProperties
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.audio.AudioSendHandler
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.nio.Buffer
 import java.nio.ByteBuffer
@@ -36,14 +38,17 @@ class Player(
 ) : AudioEventAdapter(),
     AudioSendHandler {
     @Component
-    class Beans(
-        val apm: AudioPlayerManager,
-        val guildProperties: GuildPropertiesService,
-        val nowPlayingCommand: NowPlayingCommand,
-        val botProps: BotProps,
-        val publisher: PlayerEventPublisher,
-        @org.springframework.context.annotation.Lazy val shardManager: net.dv8tion.jda.api.sharding.ShardManager,
-    )
+    class Beans
+        @Autowired
+        constructor(
+            val apm: AudioPlayerManager,
+            val guildProperties: GuildPropertiesService,
+            val nowPlayingCommand: NowPlayingCommand,
+            val botProps: BotProps,
+            val publisher: PlayerEventPublisher,
+            @org.springframework.context.annotation.Lazy val shardManager: net.dv8tion.jda.api.sharding.ShardManager,
+            @Autowired(required = false) val localFileCache: LocalFileMemoryCache? = null,
+        )
 
     private val log: Logger = LoggerFactory.getLogger(Player::class.java)
 
@@ -154,8 +159,19 @@ class Player(
 
     fun effectivePosition(track: AudioTrack): Long = pendingSeek.get()?.takeIf { it.track === track }?.position ?: track.position
 
+    /**
+     * Snapshot of all tracks currently held by this player (`playingTrack` including any fading-out
+     * `pendingSkip` track, plus `upcomingTracks`), used by [LocalFileMemoryCache] outside `cacheLock`.
+     */
+    fun activeTracksForCacheSnapshot(): List<AudioTrack> =
+        buildList {
+            player.playingTrack?.let { add(it) }
+            addAll(queue.tracks)
+        }
+
     private fun publishState() {
         val current = currentTrack
+        val cache = beans.localFileCache
         val dto =
             PlayerStatusDto(
                 guildId = guildId.toString(),
@@ -163,7 +179,11 @@ class Player(
                 volume = volume,
                 repeatTrack = repeatTrack,
                 queueLooping = queueLooping,
-                currentTrack = current?.toDto(effectivePosition(current)),
+                currentTrack =
+                    current?.toDto(
+                        positionOverride = effectivePosition(current),
+                        cacheState = cache?.trackCacheState(current),
+                    ),
                 remainingDuration = remainingDuration,
                 minVolume = beans.botProps.minVolume,
                 maxVolume = beans.botProps.maxVolume,
@@ -177,6 +197,7 @@ class Player(
                         ?.id,
                 trackFade = trackFade,
                 isFadedOut = isFadedOut,
+                cacheStats = cache?.getStats(activeTracksForCacheSnapshot()),
             )
         beans.publisher.publishUpdate(guildId.toString(), dto)
     }
@@ -319,6 +340,7 @@ class Player(
      */
     fun add(vararg tracks: AudioTrack): Boolean {
         queue.add(*tracks)
+        var started = false
         synchronized(playLock) {
             if (player.playingTrack == null) {
                 // take() can return null if a concurrent stop()/skip() drained the queue between the
@@ -327,13 +349,13 @@ class Player(
                 if (next != null) {
                     player.isPaused = false
                     player.playTrack(next)
-                    publishState()
-                    return true
+                    started = true
                 }
             }
         }
+        beans.localFileCache?.reconcileAndPrefetch()
         publishState()
-        return false
+        return started
     }
 
     fun skip(range: IntRange): List<AudioTrack> {
@@ -391,11 +413,16 @@ class Player(
                 val entry = PendingSkip(expectedTrack, scheduled)
                 pendingRef.set(entry)
                 pendingSkip.set(entry)
+                beans.localFileCache?.reconcileAndPrefetch()
                 publishState()
             } else {
                 // Stopping the currently playing track will handle its removal from the queue.
                 player.stopTrack()
+                beans.localFileCache?.reconcileAndPrefetch()
             }
+        } else if (skipped.isNotEmpty()) {
+            beans.localFileCache?.reconcileAndPrefetch()
+            publishState()
         }
 
         return skipped
@@ -419,6 +446,7 @@ class Player(
 
     fun shuffle() {
         queue.shuffle()
+        beans.localFileCache?.reconcileAndPrefetch()
         publishState()
     }
 
@@ -430,6 +458,7 @@ class Player(
         activeFadeFilter = null
         queue.clear()
         player.stopTrack()
+        beans.localFileCache?.reconcileAndPrefetch()
         publishState()
     }
 
@@ -441,6 +470,7 @@ class Player(
     fun removeTrackAt(index: Int): AudioTrack? {
         val removed = queue.removeAt(index)
         if (removed != null) {
+            beans.localFileCache?.reconcileAndPrefetch()
             publishState()
         }
         return removed
@@ -452,6 +482,7 @@ class Player(
     ): Boolean {
         val success = queue.reorder(fromIndex, toIndex)
         if (success) {
+            beans.localFileCache?.reconcileAndPrefetch()
             publishState()
         }
         return success
@@ -683,18 +714,24 @@ class Player(
         }
 
         if (!endReason.mayStartNext && endReason != AudioTrackEndReason.STOPPED) {
+            beans.localFileCache?.reconcileAndPrefetch()
             return
         }
 
+        var nextTrack: AudioTrack? = null
         synchronized(playLock) {
-            val new =
-                queue.take() ?: run {
-                    isFadedOut = false
-                    activeFadeFilter = null
-                    publishState()
-                    return
-                }
-            player.playTrack(new)
+            val new = queue.take()
+            if (new != null) {
+                player.playTrack(new)
+                nextTrack = new
+            } else {
+                isFadedOut = false
+                activeFadeFilter = null
+            }
+        }
+        beans.localFileCache?.reconcileAndPrefetch()
+        if (nextTrack == null) {
+            publishState()
         }
     }
 
@@ -722,6 +759,7 @@ class Player(
         activeFadeFilter = null
         queue.clear()
         player.destroy()
+        beans.localFileCache?.reconcileAndPrefetch()
         beans.shardManager
             .getGuildById(guildId)
             ?.audioManager

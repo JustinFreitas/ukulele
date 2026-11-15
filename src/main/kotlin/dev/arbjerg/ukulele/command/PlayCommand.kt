@@ -7,15 +7,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.ukulele.audio.PlayerRegistry
 import dev.arbjerg.ukulele.audio.TrackStartOffset
-import dev.arbjerg.ukulele.audio.TrackTimeParser
+import dev.arbjerg.ukulele.audio.local.LocalPathInputUtils
 import dev.arbjerg.ukulele.config.BotProps
 import dev.arbjerg.ukulele.features.HelpContext
 import dev.arbjerg.ukulele.jda.Command
 import dev.arbjerg.ukulele.jda.CommandContext
+import dev.arbjerg.ukulele.utils.TextUtils
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.dv8tion.jda.api.Permission
 import org.springframework.stereotype.Component
-import java.util.regex.Pattern
 import kotlin.coroutines.resume
 
 @Component
@@ -25,16 +25,17 @@ class PlayCommand(
     val botProps: BotProps,
     val queueCommand: QueueCommand,
 ) : Command("play", "p") {
-    val pattern: Pattern = Pattern.compile("^\\s*(\\[.*])?\\s*(\\S+.*)$")
-
     override suspend fun CommandContext.invoke() {
         if (!ensureVoiceChannel()) return
 
         players.get(guild, guildProperties).lastChannel = channel
-        var identifiers = argumentText.split(PIPE_CHAR)
-        if (identifiers.isNotEmpty() && identifiers.first().isEmpty()) {
-            identifiers = botProps.playlist.split(PIPE_CHAR)
-        }
+        val usingConfiguredDefaultPlaylist = argumentText.trim().isEmpty()
+        val identifiers =
+            if (usingConfiguredDefaultPlaylist) {
+                botProps.playlist.split(PIPE_CHAR)
+            } else {
+                argumentText.split(PIPE_CHAR)
+            }
 
         // Resolve every identifier first, accumulating the tracks, then add them all to the queue in
         // a single bulk operation (one queue insert, one state publish, one summary message).
@@ -44,24 +45,25 @@ class PlayCommand(
 
         for (rawIdentifier in identifiers) {
             val identifier = rawIdentifier.trim()
-            // identifier format is: [Some Label] Source URL or local drive file path
-            val matcher = pattern.matcher(identifier)
-            if (!(matcher.find() && matcher.groupCount() == 2)) continue
+            if (identifier.isEmpty()) continue
+            val parsed = LocalPathInputUtils.parsePlayIdentifier(identifier) ?: continue
 
-            val queueLabel = if (matcher.group(1) != null) matcher.group(1).trim() else ""
-            val rawSource =
-                if (matcher.group(2) != null) {
-                    matcher
-                        .group(2)
-                        .trim()
-                        .removePrefix("<")
-                        .removeSuffix(">")
-                } else {
-                    ""
-                }
-            val (source, urlOffsetMs) = TrackTimeParser.extractSourceAndOffset(rawSource)
-            val startOffsetMs = TrackTimeParser.parseLabelOffsetMs(queueLabel) ?: urlOffsetMs
-            if (source.isEmpty()) continue
+            val queueLabel = parsed.queueLabel
+            val source = parsed.source
+            val startOffsetMs = parsed.startOffsetMs
+
+            // Configured default playlist comes from trusted ukulele.yml; direct Discord args enforce invoker check.
+            val denial =
+                LocalPathInputUtils.checkPathAccess(
+                    source = source,
+                    botProps = botProps,
+                    isDiscordInvoker = !usingConfiguredDefaultPlaylist,
+                    invokerId = invoker.id,
+                )
+            if (denial != null) {
+                failures.add(denial)
+                continue
+            }
 
             awaitLoad(source) { item ->
                 when (item) {
@@ -78,7 +80,7 @@ class PlayCommand(
                     }
 
                     LoadOutcome.NoMatch -> {
-                        failures.add("Nothing found for “$identifier”")
+                        failures.add("Nothing found for “${TextUtils.truncate(identifier, 120)}”")
                     }
 
                     is LoadOutcome.Failed -> {
@@ -136,7 +138,11 @@ class PlayCommand(
                             override fun loadFailed(exception: FriendlyException) {
                                 if (cont.isActive) {
                                     command.log.error("Handled exception occurred", exception)
-                                    onResult(LoadOutcome.Failed("An exception occurred!\n`${exception.message}`"))
+                                    onResult(
+                                        LoadOutcome.Failed(
+                                            "An exception occurred!\n`${TextUtils.truncate(exception.message ?: "Unknown error", 200)}`",
+                                        ),
+                                    )
                                     cont.resume(Unit)
                                 }
                             }
@@ -145,7 +151,7 @@ class PlayCommand(
                 }
             }
         if (loaded == null) {
-            onResult(LoadOutcome.Failed("Timed out loading `$source`"))
+            onResult(LoadOutcome.Failed("Timed out loading `${TextUtils.truncate(source, 120)}`"))
         }
     }
 
@@ -172,50 +178,75 @@ class PlayCommand(
         accepted.add(track)
     }
 
+    private fun formatFailures(failures: List<String>): String {
+        if (failures.isEmpty()) return ""
+        val shown = failures.take(MAX_FAILURES_SHOWN)
+        val extra = failures.size - shown.size
+        return buildString {
+            append(shown.joinToString("\n"))
+            if (extra > 0) {
+                append("\n…and $extra more error(s).")
+            }
+        }
+    }
+
     private fun CommandContext.replySummary(
         accepted: List<AudioTrack>,
         filteredCount: Int,
         failures: List<String>,
     ) {
         if (accepted.isEmpty()) {
-            when {
-                failures.isNotEmpty() -> {
-                    reply(failures.joinToString("\n"))
-                }
+            val msg =
+                when {
+                    failures.isNotEmpty() -> {
+                        formatFailures(failures)
+                    }
 
-                filteredCount > 0 -> {
-                    reply("Refusing to play $filteredCount tracks because they are all over ${botProps.trackDurationLimit} minutes long")
-                }
+                    filteredCount > 0 -> {
+                        "Refusing to play $filteredCount tracks because they are all over ${botProps.trackDurationLimit} minutes long"
+                    }
 
-                else -> {
-                    reply("Nothing found.")
+                    else -> {
+                        "Nothing found."
+                    }
                 }
-            }
+            reply(TextUtils.truncate(msg, QueueCommand.MAX_DISCORD_MESSAGE_LEN))
             return
         }
 
         val started = player.add(*accepted.toTypedArray())
 
-        val message =
+        val header =
             buildString {
                 if (accepted.size == 1) {
-                    val title = accepted.first().info.title
+                    val title = TextUtils.truncate(accepted.first().info.title, 150)
                     append(if (started) "Started playing `$title`" else "Added `$title`")
                 } else {
+                    val firstTitle = TextUtils.truncate(accepted.first().info.title, 120)
                     append("Added `${accepted.size}` tracks to the queue.")
-                    if (started) append(" Now playing `${accepted.first().info.title}`.")
+                    if (started) append(" Now playing `$firstTitle`.")
                 }
                 if (filteredCount > 0) {
                     append(" `$filteredCount` tracks were ignored because they are over ${botProps.trackDurationLimit} minutes long.")
                 }
                 if (failures.isNotEmpty()) {
-                    append("\n").append(failures.joinToString("\n"))
-                }
-                // Show the current queue after adding multiple tracks, like running the queue command.
-                if (accepted.size >= 2) {
-                    append("\n\n").append(queueCommand.printQueue(player, 1))
+                    append("\n").append(formatFailures(failures))
                 }
             }
+
+        val message =
+            if (accepted.size >= 2) {
+                val remainingBudget = (QueueCommand.MAX_DISCORD_MESSAGE_LEN - header.length - 2).coerceAtLeast(0)
+                val queueBlock = queueCommand.printQueue(player, 1)
+                if (remainingBudget > 80) {
+                    "$header\n\n${TextUtils.truncate(queueBlock, remainingBudget)}"
+                } else {
+                    TextUtils.truncate(header, QueueCommand.MAX_DISCORD_MESSAGE_LEN)
+                }
+            } else {
+                TextUtils.truncate(header, QueueCommand.MAX_DISCORD_MESSAGE_LEN)
+            }
+
         reply(message)
     }
 
@@ -247,11 +278,12 @@ class PlayCommand(
     }
 
     override fun HelpContext.provideHelp() {
-        addUsage("<url>[|<url>]")
-        addDescription("Add the given track to the queue.  Multiple tracks can be provided by separating the URLs with a pipe character |.")
+        addUsage("<url_or_path>[|<url_or_path>]")
+        addDescription("Add the given track or folder to the queue. Multiple entries can be separated with a pipe character |.")
     }
 
     companion object {
         const val PIPE_CHAR = "|"
+        private const val MAX_FAILURES_SHOWN = 5
     }
 }

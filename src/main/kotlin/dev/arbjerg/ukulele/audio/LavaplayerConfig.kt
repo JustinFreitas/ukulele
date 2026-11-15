@@ -3,6 +3,8 @@ package dev.arbjerg.ukulele.audio
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
+import dev.arbjerg.ukulele.audio.local.InMemoryLocalAudioSourceManager
+import dev.arbjerg.ukulele.audio.local.LocalFileMemoryCache
 import dev.lavalink.youtube.YoutubeAudioSourceManager
 import dev.lavalink.youtube.YoutubeSourceOptions
 import org.springframework.context.annotation.Bean
@@ -11,13 +13,14 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class LavaplayerConfig(
     val botProps: dev.arbjerg.ukulele.config.BotProps,
+    val localFileCache: LocalFileMemoryCache,
 ) {
     @Bean(destroyMethod = "shutdown")
     fun playerManager(): AudioPlayerManager {
         val apm = DefaultAudioPlayerManager()
         apm.configuration.isReplayGainEnabled = botProps.normalization
 
-        AudioSourceManagers.registerLocalSource(apm)
+        apm.registerSourceManager(InMemoryLocalAudioSourceManager(localFileCache, botProps))
 
         val ytOptions =
             YoutubeSourceOptions()
