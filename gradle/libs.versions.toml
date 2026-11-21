@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.21"
-springBoot = "4.1.2"
+springBoot = "4.2.0"
 jackson = "3.3.0"
 jacksonAnnotations = "2.23"
 netty = "4.2.21.Final"
