@@ -2,6 +2,20 @@
 # (see UkuleleApplication.kt). User configuration — the Discord token, prefix, etc. — lives in the
 # external ukulele.yml in the working directory, which is merged over these defaults and wins on
 # any overlapping keys.
+spring:
+  threads:
+    virtual:
+      # JDK 25 virtual threads (JEP 491 eliminates synchronized carrier-thread pinning).
+      enabled: true
+
+server:
+  http2:
+    # Negotiate HTTP/2 (h2) over TLS via ALPN for REST/Actuator while falling back to HTTP/1.1 for wss:// WebSockets.
+    enabled: true
+  compression:
+    # Uses Spring Boot defaults (includes application/json and application/vnd.spring-boot.actuator.v3+json).
+    enabled: true
+
 management:
   server:
     # The main app port (server.port, 11111) is exposed publicly, so actuator is moved to its own
