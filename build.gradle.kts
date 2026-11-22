@@ -1,4 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 plugins {
     java
@@ -29,7 +31,7 @@ kotlin {
 }
 
 group = "dev.arbjerg"
-version = "2.29.3"
+version = "2.29.4"
 
 repositories {
     mavenLocal()
@@ -93,8 +95,6 @@ dependencies {
     // The BOM (enforced) guarantees one version across all modules, including ones added upstream.
     implementation(enforcedPlatform(libs.netty.bom))
 
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-    implementation(libs.springboot.configuration.processor)
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-r2dbc
     implementation(libs.springboot.starter.data.r2dbc)
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
@@ -146,9 +146,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation(libs.jsoup)
 
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation(libs.gson)
-
     // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
     implementation(libs.httpclient5)
     // Explicit httpcore5 to access SocketConfig
@@ -177,8 +174,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     implementation(libs.kotlin.reflect)
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib-jdk8
-    implementation(libs.kotlin.stdlib.jdk8)
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
     implementation(libs.kotlinx.coroutines.reactor)
     // https://mvnrepository.com/artifact/io.projectreactor.kotlin/reactor-kotlin-extensions
@@ -212,12 +207,15 @@ tasks.withType<BootJar> {
     archiveFileName.set("ukulele.jar")
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     classpath(tasks.jar.get().archiveFile)
+    val outputJar = archiveFile
+    val rootJar = layout.projectDirectory.file("ukulele.jar")
     doLast {
         // copies the jar into a place where the Dockerfile can find it easily (and users maybe too)
-        copy {
-            from("build/libs/ukulele.jar")
-            into(".")
-        }
+        Files.copy(
+            outputJar.get().asFile.toPath(),
+            rootJar.asFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING,
+        )
     }
 }
 

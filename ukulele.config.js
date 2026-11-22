@@ -78,9 +78,11 @@ module.exports = {
     interpreter: "C:/Program Files/Zulu/zulu-25/bin/java.exe",
     // --enable-native-access=ALL-UNNAMED silences the Java 25 restricted-method
     // warning from lavaplayer's native loader (matches bootRun's jvmArgs).
+    // -XX:+UseCompactObjectHeaders (JEP 519, JDK 25) halves object header size (128 -> 64 bits)
+    // to reduce heap footprint and improve CPU cache locality alongside Generational ZGC.
     // ZGC provides sub-millisecond GC pauses to eliminate Lavaplayer audio buffer underruns,
     // and ZUncommitDelay=60 returns evicted cache pages back to Windows after 60s.
-    interpreter_args: `--enable-native-access=ALL-UNNAMED -XX:+UseZGC -XX:ZUncommitDelay=60 -Xms64m -Xmx${heapMaxMb}m -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=256m -Djava.io.tmpdir=C:/Users/justi/AppData/Local/Temp -jar`,
+    interpreter_args: `--enable-native-access=ALL-UNNAMED -XX:+UseCompactObjectHeaders -XX:+UseZGC -XX:ZUncommitDelay=60 -Xms64m -Xmx${heapMaxMb}m -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=256m -Djava.io.tmpdir=C:/Users/justi/AppData/Local/Temp -jar`,
     max_memory_restart: `${pm2RestartMb}M`,
     autorestart: true,          // pm2 owns the JVM PID, so crash-restart works
     min_uptime: "10s",
